@@ -1,0 +1,335 @@
+<title>Timeline Jump</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@500;700&display=swap">
+<style>
+/* Layout: one full-screen canvas arcade with a single overlay card for start / game over. Single dark look (channel night palette) by choice. */
+:root {
+  --navy: #0F1A2E; --navy-2: #1C2C4A; --amber: #FFB547; --coral: #FF6B6B; --teal: #3EC7C2; --cream: #F4EAD5;
+  --ink: #0A0E18;
+  --display: "Anton", "Impact", "Arial Narrow", sans-serif;
+  --body: "DM Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--navy); color: var(--cream); font-family: var(--body); overflow: hidden; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+#stage { position: fixed; inset: 0; display: block; width: 100%; height: 100%; cursor: pointer; }
+.overlay { position: fixed; inset: 0; display: grid; place-items: center; padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); pointer-events: none; }
+.card { pointer-events: auto; width: min(420px, 100%); background: rgba(10, 14, 24, 0.82); border: 2px solid var(--amber); border-radius: 22px; padding: 26px 22px 22px; text-align: center; display: grid; gap: 14px; backdrop-filter: blur(6px); }
+.eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); font-weight: 700; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(44px, 12vw, 64px); line-height: 0.95; letter-spacing: 0.01em; color: var(--amber); text-wrap: balance; margin: 0; }
+h1 span { color: var(--teal); }
+.lead { margin: 0; font-size: 15px; line-height: 1.45; color: var(--cream); opacity: 0.9; }
+.legend { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 12px; }
+.legend div { display: grid; gap: 6px; justify-items: center; padding: 8px 4px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); }
+.dot { width: 22px; height: 16px; border-radius: 4px; }
+.dot.mem { background: var(--amber); }
+.dot.glitch { background: var(--coral); clip-path: polygon(0 20%, 30% 0, 55% 30%, 80% 5%, 100% 40%, 85% 100%, 50% 75%, 20% 100%, 0 70%); }
+.dot.slow { background: var(--teal); border-radius: 50%; width: 16px; }
+.big { font-family: var(--display); font-size: 56px; line-height: 1; color: var(--cream); font-variant-numeric: tabular-nums; }
+.row { display: flex; justify-content: center; gap: 18px; font-size: 14px; flex-wrap: wrap; }
+.row b { color: var(--amber); font-variant-numeric: tabular-nums; }
+button { font: 700 17px var(--body); border: 0; border-radius: 999px; padding: 14px 22px; background: var(--amber); color: var(--ink); cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.hint { font-size: 12px; opacity: 0.65; margin: 0; }
+#mute { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); padding: 8px 12px; font-size: 13px; background: rgba(255, 255, 255, 0.08); color: var(--cream); pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) { .card { backdrop-filter: none; } }
+</style>
+
+<canvas id="stage" aria-label="Timeline Jump game area"></canvas>
+<button id="mute" type="button" aria-pressed="false">Sound on</button>
+
+<div class="overlay" id="startScreen">
+  <div class="card">
+    <div class="eyebrow">The Other Timeline · arcade</div>
+    <h1>Timeline <span>Jump</span></h1>
+    <p class="lead">Your life keeps splitting in two. Tap to jump between timelines, grab memories, dodge glitches.</p>
+    <div class="legend">
+      <div><span class="dot mem"></span>Memory +10</div>
+      <div><span class="dot glitch"></span>Glitch: game over</div>
+      <div><span class="dot slow"></span>Slow time</div>
+    </div>
+    <button id="startBtn" type="button">Start running</button>
+    <p class="hint">Tap anywhere · Space or ↑ ↓ on a keyboard · Best: <b id="bestStart">0</b></p>
+  </div>
+</div>
+
+<div class="overlay" id="overScreen" hidden>
+  <div class="card">
+    <div class="eyebrow" id="overLine">Timeline collapsed</div>
+    <div class="big" id="finalScore">0</div>
+    <div class="row"><span>Memories <b id="finalMem">0</b></span><span>Distance <b id="finalDist">0 m</b></span><span>Best <b id="finalBest">0</b></span></div>
+    <button id="againBtn" type="button">Run again</button>
+    <p class="hint">Which timeline will you take next?</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const C = { navy: "#0F1A2E", navy2: "#1C2C4A", amber: "#FFB547", coral: "#FF6B6B", teal: "#3EC7C2", cream: "#F4EAD5", ink: "#0A0E18" };
+  const cv = document.getElementById("stage");
+  const ctx = cv.getContext("2d");
+  const startScreen = document.getElementById("startScreen");
+  const overScreen = document.getElementById("overScreen");
+  const muteBtn = document.getElementById("mute");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let W = 0, H = 0, DPR = 1;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  // ---------- storage (optional) ----------
+  function loadBest() { try { return parseInt(localStorage.getItem("tj-best") || "0", 10) || 0; } catch (e) { return 0; } }
+  function saveBest(v) { try { localStorage.setItem("tj-best", String(v)); } catch (e) {} }
+  let best = loadBest();
+  document.getElementById("bestStart").textContent = best;
+
+  // ---------- sound ----------
+  let ac = null, muted = false;
+  function audio() { if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } } return ac; }
+  function tone(freq, dur, type = "sine", vol = 0.12, slide = 0) {
+    if (muted) return; const a = audio(); if (!a) return;
+    const t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + slide), t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
+  }
+  const sfx = {
+    jump() { tone(420, 0.12, "triangle", 0.09, 260); },
+    mem(c) { tone(880 + Math.min(c, 8) * 60, 0.14, "sine", 0.1); setTimeout(() => tone(1320 + Math.min(c, 8) * 60, 0.12, "sine", 0.07), 50); },
+    slow() { tone(300, 0.5, "sine", 0.1, -150); },
+    hit() { tone(160, 0.45, "sawtooth", 0.14, -110); tone(90, 0.5, "square", 0.06, -40); }
+  };
+  muteBtn.addEventListener("click", (e) => { e.stopPropagation(); muted = !muted; muteBtn.textContent = muted ? "Sound off" : "Sound on"; muteBtn.setAttribute("aria-pressed", String(muted)); });
+
+  // ---------- game state ----------
+  const S = { mode: "menu", t: 0, dist: 0, speed: 0, lane: 0, from: 0, jumpT: 1, items: [], parts: [], mem: 0, combo: 0, slowT: 0, shake: 0, nextSpawn: 0, flash: 0 };
+  function laneY(l) { const mid = H * 0.56, gap = Math.min(H * 0.24, 190); return l === 0 ? mid - gap / 2 : mid + gap / 2; }
+  function playerX() { return Math.max(80, W * 0.24); }
+  function baseSpeed() { return Math.max(260, W * 0.42); }
+
+  function reset() {
+    Object.assign(S, { mode: "play", t: 0, dist: 0, speed: baseSpeed(), lane: 0, from: 0, jumpT: 1, items: [], parts: [], mem: 0, combo: 0, slowT: 0, shake: 0, nextSpawn: 1.0, flash: 0 });
+  }
+  function start() { audio(); reset(); startScreen.hidden = true; overScreen.hidden = true; }
+  function switchLane() {
+    if (S.mode !== "play") return;
+    S.from = S.jumpT < 1 ? S.lane : S.lane; S.lane = 1 - S.lane; S.jumpT = 0; sfx.jump();
+  }
+  function gameOver() {
+    S.mode = "over"; sfx.hit(); S.shake = reduceMotion ? 0 : 1;
+    const score = Math.floor(S.dist / 10) + S.mem * 10;
+    const isBest = score > best; if (isBest) { best = score; saveBest(best); }
+    document.getElementById("finalScore").textContent = score;
+    document.getElementById("finalMem").textContent = S.mem;
+    document.getElementById("finalDist").textContent = Math.floor(S.dist / 10) + " m";
+    document.getElementById("finalBest").textContent = best;
+    document.getElementById("bestStart").textContent = best;
+    document.getElementById("overLine").textContent = isBest ? "New best timeline" : "Timeline collapsed";
+    setTimeout(() => { overScreen.hidden = false; document.getElementById("againBtn").focus({ preventScroll: true }); }, 450);
+  }
+
+  // ---------- spawning: never block both lanes at the same x ----------
+  function spawn() {
+    const x = W + 60, r = Math.random();
+    const danger = Math.min(0.55, 0.28 + S.t * 0.006);
+    if (r < danger) {
+      const l = Math.random() < 0.5 ? 0 : 1;
+      S.items.push({ kind: "glitch", lane: l, x, w: 46, seed: Math.random() * 10 });
+      if (Math.random() < 0.6) S.items.push({ kind: "mem", lane: 1 - l, x: x + 10, w: 34 });
+    } else if (r < 0.93) {
+      const l = Math.random() < 0.5 ? 0 : 1, n = 1 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < n; i++) S.items.push({ kind: "mem", lane: l, x: x + i * 70, w: 34 });
+    } else {
+      S.items.push({ kind: "slow", lane: Math.random() < 0.5 ? 0 : 1, x, w: 30 });
+    }
+    const minGap = 0.42, maxGap = 0.95;
+    S.nextSpawn = Math.max(minGap, maxGap - S.t * 0.01) * (0.8 + Math.random() * 0.4);
+  }
+
+  function burst(x, y, col, n = 14) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, v = 80 + Math.random() * 220;
+      S.parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 60, life: 0.6 + Math.random() * 0.4, col, s: 3 + Math.random() * 4 });
+    }
+  }
+
+  // ---------- update ----------
+  function update(dt) {
+    S.t += dt;
+    S.parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; p.life -= dt; });
+    S.parts = S.parts.filter(p => p.life > 0);
+    S.shake = Math.max(0, S.shake - dt * 2.5);
+    S.flash = Math.max(0, S.flash - dt * 3);
+    if (S.mode !== "play") return;
+    const slowF = S.slowT > 0 ? 0.55 : 1;
+    S.slowT = Math.max(0, S.slowT - dt);
+    S.speed = baseSpeed() * (1 + Math.min(1.6, S.t * 0.022));
+    const v = S.speed * slowF;
+    S.dist += v * dt * 0.1;
+    S.jumpT = Math.min(1, S.jumpT + dt / 0.16);
+    S.nextSpawn -= dt * slowF;
+    if (S.nextSpawn <= 0) spawn();
+    const px = playerX(), effLane = S.jumpT > 0.55 ? S.lane : S.from;
+    for (const it of S.items) {
+      it.x -= v * dt;
+      if (it.done) continue;
+      if (Math.abs(it.x - px) < (it.w / 2 + 16) && it.lane === effLane) {
+        if (it.kind === "glitch") { burst(px, laneY(effLane), C.coral, 26); gameOver(); return; }
+        it.done = true;
+        if (it.kind === "mem") { S.mem++; S.combo++; sfx.mem(S.combo); burst(it.x, laneY(it.lane), C.amber); }
+        if (it.kind === "slow") { S.slowT = 3; sfx.slow(); S.flash = 1; burst(it.x, laneY(it.lane), C.teal, 20); }
+      }
+      if (it.kind === "mem" && !it.done && it.x < px - 40 && !it.missed) { it.missed = true; S.combo = 0; }
+    }
+    S.items = S.items.filter(it => it.x > -80 && !(it.done && it.kind !== "glitch"));
+  }
+
+  // ---------- drawing ----------
+  const stars = Array.from({ length: 70 }, () => ({ x: Math.random(), y: Math.random(), z: 0.2 + Math.random() * 0.8 }));
+  function bg() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, S.slowT > 0 ? "#173a4a" : C.navy2); g.addColorStop(1, C.navy);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    for (const s of stars) {
+      const x = ((s.x * W - S.dist * 1.2 * s.z) % W + W) % W;
+      ctx.fillStyle = `rgba(255,181,71,${0.15 + 0.35 * s.z})`;
+      ctx.fillRect(x, s.y * H * 0.9, 2 * s.z + 0.6, 2 * s.z + 0.6);
+    }
+  }
+  function timelines() {
+    const y0 = laneY(0), y1 = laneY(1), off = (S.dist * 4) % 120;
+    ctx.lineCap = "round";
+    // trunk before the split, then two branches
+    const sx = Math.max(20, playerX() - 160);
+    ctx.strokeStyle = C.amber; ctx.lineWidth = 6; ctx.globalAlpha = 0.9;
+    ctx.beginPath(); ctx.moveTo(-10, (y0 + y1) / 2); ctx.lineTo(sx, (y0 + y1) / 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx, (y0 + y1) / 2); ctx.bezierCurveTo(sx + 60, (y0 + y1) / 2, sx + 60, y0, sx + 120, y0); ctx.lineTo(W + 10, y0); ctx.stroke();
+    ctx.strokeStyle = C.teal;
+    ctx.beginPath(); ctx.moveTo(sx, (y0 + y1) / 2); ctx.bezierCurveTo(sx + 60, (y0 + y1) / 2, sx + 60, y1, sx + 120, y1); ctx.lineTo(W + 10, y1); ctx.stroke();
+    ctx.globalAlpha = 1;
+    // year ticks scrolling
+    ctx.fillStyle = "rgba(244,234,213,0.35)"; ctx.font = "600 11px 'DM Sans', sans-serif";
+    for (let x = W - off; x > sx + 140; x -= 120) {
+      ctx.fillRect(x, y0 - 6, 2, 12); ctx.fillRect(x, y1 - 6, 2, 12);
+    }
+  }
+  function drawMem(it) {
+    const y = laneY(it.lane), bob = Math.sin(S.t * 6 + it.x * 0.02) * 3;
+    ctx.save(); ctx.translate(it.x, y - 26 + bob);
+    ctx.shadowColor = C.amber; ctx.shadowBlur = 16;
+    ctx.fillStyle = "rgba(255,181,71,0.25)"; ctx.strokeStyle = C.amber; ctx.lineWidth = 3;
+    roundRect(-17, -12, 34, 24, 6); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur = 0; ctx.fillStyle = C.amber; roundRect(-12, -8, 24, 9, 3); ctx.fill();
+    ctx.restore();
+  }
+  function drawSlow(it) {
+    const y = laneY(it.lane) - 26, r = 13 + Math.sin(S.t * 8) * 2;
+    ctx.save(); ctx.shadowColor = C.teal; ctx.shadowBlur = 20; ctx.fillStyle = C.teal;
+    ctx.beginPath(); ctx.moveTo(it.x, y - r); ctx.lineTo(it.x + r * 0.8, y); ctx.lineTo(it.x, y + r); ctx.lineTo(it.x - r * 0.8, y); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  function drawGlitch(it) {
+    const y = laneY(it.lane) - 24, j = reduceMotion ? 0 : 3;
+    ctx.save(); ctx.translate(it.x, y);
+    for (let k = 0; k < 3; k++) {
+      ctx.fillStyle = k === 0 ? C.coral : (k === 1 ? "rgba(62,199,194,0.6)" : "rgba(244,234,213,0.5)");
+      const dx = k === 0 ? 0 : (Math.sin(S.t * 30 + it.seed + k) * j), dy = k === 0 ? 0 : (Math.cos(S.t * 25 + k) * j);
+      ctx.beginPath();
+      const pts = [[-22, -8], [-10, -22], [2, -10], [14, -24], [22, -4], [16, 20], [2, 12], [-12, 22], [-22, 10]];
+      pts.forEach(([px, py], i) => i ? ctx.lineTo(px + dx, py + dy) : ctx.moveTo(px + dx, py + dy));
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+  function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function drawYou() {
+    const px = playerX(), e = 1 - Math.pow(1 - S.jumpT, 3);
+    let y = laneY(S.from) + (laneY(S.lane) - laneY(S.from)) * e;
+    const arc = Math.sin(S.jumpT * Math.PI) * 28;
+    const run = S.mode === "play" ? Math.abs(Math.sin(S.t * 14)) * 4 : 0;
+    y = y - 34 - arc - run;
+    // trail
+    if (S.mode === "play") { ctx.fillStyle = S.lane === 0 ? "rgba(255,181,71,0.18)" : "rgba(62,199,194,0.18)"; for (let i = 1; i <= 4; i++) { ctx.beginPath(); ctx.arc(px - i * 14, y + 6, 18 - i * 3, 0, 7); ctx.fill(); } }
+    ctx.save(); ctx.translate(px, y);
+    // body (hoodie)
+    ctx.fillStyle = C.amber; roundRect(-17, 12, 34, 26, 12); ctx.fill();
+    ctx.strokeStyle = C.cream; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-5, 16); ctx.lineTo(-5, 26); ctx.moveTo(5, 16); ctx.lineTo(5, 26); ctx.stroke();
+    // hood + head
+    ctx.fillStyle = "#E29632"; ctx.beginPath(); ctx.arc(0, 0, 22, 0, 7); ctx.fill();
+    ctx.fillStyle = C.cream; ctx.beginPath(); ctx.arc(0, 0, 17, 0, 7); ctx.fill();
+    ctx.fillStyle = "rgba(255,170,150,0.55)"; ctx.beginPath(); ctx.arc(-10, 6, 3.5, 0, 7); ctx.arc(10, 6, 3.5, 0, 7); ctx.fill();
+    const blink = (S.t % 3.2) < 0.12 ? 0.15 : 1, dead = S.mode === "over";
+    for (const ex of [-6, 6]) {
+      ctx.fillStyle = "#fff"; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.ellipse(ex, -3, 4.6, 4.6 * blink, 0, 0, 7); ctx.fill(); ctx.stroke();
+      if (blink > 0.5) { ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(ex + (dead ? 0 : 1.5), -3, dead ? 1.4 : 2.3, 0, 7); ctx.fill(); }
+    }
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.6; ctx.beginPath();
+    if (dead) ctx.arc(0, 10, 3, 0, 7); else ctx.arc(0, 6, 3.4, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function hud() {
+    if (S.mode === "menu") return;
+    const score = Math.floor(S.dist / 10) + S.mem * 10;
+    const top = 14 + (parseFloat(getComputedStyle(document.documentElement).paddingTop) || 0);
+    ctx.textBaseline = "top";
+    ctx.fillStyle = C.cream; ctx.font = "400 40px Anton, Impact, sans-serif"; ctx.fillText(String(score), 18, top);
+    ctx.font = "700 13px 'DM Sans', sans-serif"; ctx.fillStyle = C.amber;
+    ctx.fillText(`MEMORIES ${S.mem}${S.combo > 2 ? "  ·  COMBO x" + S.combo : ""}`, 20, top + 48);
+    ctx.fillStyle = "rgba(244,234,213,0.6)"; ctx.fillText(`${Math.floor(S.dist / 10)} m  ·  BEST ${best}`, 20, top + 66);
+    if (S.slowT > 0) { ctx.fillStyle = C.teal; ctx.fillText(`SLOW TIME ${S.slowT.toFixed(1)}s`, 20, top + 84); }
+  }
+
+  function draw() {
+    ctx.save();
+    if (S.shake > 0) ctx.translate((Math.random() - 0.5) * 14 * S.shake, (Math.random() - 0.5) * 14 * S.shake);
+    bg(); timelines();
+    for (const it of S.items) { if (it.done) continue; if (it.kind === "mem") drawMem(it); else if (it.kind === "slow") drawSlow(it); else drawGlitch(it); }
+    if (S.mode !== "menu") drawYou();
+    for (const p of S.parts) { ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.col; ctx.fillRect(p.x, p.y, p.s, p.s); }
+    ctx.globalAlpha = 1;
+    if (S.flash > 0) { ctx.fillStyle = `rgba(62,199,194,${0.25 * S.flash})`; ctx.fillRect(0, 0, W, H); }
+    ctx.restore();
+    hud();
+  }
+
+  // menu demo: You idling on the amber line
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.033, (now - last) / 1000); last = now;
+    if (S.mode === "menu") { S.t += dt; S.dist += dt * 60; }
+    else update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // ---------- input ----------
+  function press(e) {
+    if (e && e.target && (e.target.closest("button"))) return;
+    if (S.mode === "play") { e && e.preventDefault && e.preventDefault(); switchLane(); }
+  }
+  cv.addEventListener("pointerdown", press);
+  document.querySelector("#startScreen").addEventListener("pointerdown", (e) => { if (!e.target.closest("button")) start(); });
+  document.getElementById("startBtn").addEventListener("click", start);
+  document.getElementById("againBtn").addEventListener("click", start);
+  window.addEventListener("keydown", (e) => {
+    if (["Space", "ArrowUp", "ArrowDown", "KeyW", "KeyS"].includes(e.code)) {
+      e.preventDefault();
+      if (S.mode === "play") switchLane();
+      else if (S.mode === "menu" || (S.mode === "over" && !overScreen.hidden)) start();
+    }
+  });
+  document.addEventListener("visibilitychange", () => { last = performance.now(); });
+})();
+</script>
