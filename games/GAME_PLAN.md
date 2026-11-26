@@ -75,3 +75,6 @@ See the conversation: platform, visual style, concept, languages, user accounts 
   So: digging is the spine, plus side sim activities that all feed improve -> sell -> upgrade.
 - Tone: absurd humour (funny finds, a neighbour, a strange ending at the core).
 - Length: 1.5-2.5 h to 100%; price 2.99 USD.
+- Round 3: the user rejected the digging theme -> choose a new theme (still: improve -> sell -> upgrade, first person, 3D low-poly, absurd humour).
+- No characters (no neighbour or radio): humour comes from items, upgrades, achievement names and the escalation.
+- Next deliverable: a full design document for approval, before any code.
