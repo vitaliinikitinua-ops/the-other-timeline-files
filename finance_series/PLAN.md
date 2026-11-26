@@ -28,5 +28,9 @@ update + add skills; report here in chat.
 shorts). `finance_series/epNN/script.py` = beats with declarative scenes. `build.py epNN` renders all.
 Publish queue: `finance_series/QUEUE.md`, worked by a scheduled task twice a day.
 
-## Status
-(see QUEUE.md and the table there)
+## Status (26.11, 13:00 Warsaw)
+- EP01-EP10 written from real data, narrated (Piper), rendered 7.9-8.1 min, each with a Short (30-45 s) and 2 thumbnails.
+- EP07 topic changed from "never bought a new car" to "house 2006 vs 2012" (car prices had no reliable dataset; housing has Case-Shiller + Freddie Mac).
+- QA done per episode via contact sheets (see skills/episode-qa). Fixes made: chart side panel cropped by camera zoom
+  (all chart beats re-rendered), y-axis labels, Anton missing glyphs (≠, →), EP04 single end date, EP05 key-date values.
+- Publishing: QUEUE.json + scheduled task (14:02 / 18:02 Warsaw). EP01 long goes out 26.11 18:00.
