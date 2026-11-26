@@ -1,0 +1,51 @@
+[
+ {
+  "ep": "ep01",
+  "kind": "long",
+  "due_warsaw": "2026-11-26T18:00",
+  "status": "pending",
+  "title": "What If You Got $1 Every Time You Said No?",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep01/EP01_1_Dollar_Every_No.mp4",
+  "thumbnail": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep01/thumb_A.jpg",
+  "description": "Every time you say no, a dollar appears. Easy money... until one no almost costs you everything.\nThen we do the real math: what $1, $5 and $10 a day would be worth today if you had invested them since 2010, using real S&P 500 prices.\n\n0:00 One word = $1\n0:38 The rules\n0:56 The coffee shop test\n1:15 Max and the $220 sneakers\n1:37 Day one\n2:03 One week later\n2:25 Max tries to cheat\n2:41 One month later\n3:03 The no that hurt\n3:34 The real power\n3:58 Why no is hard\n4:18 The real math\n4:43 The snowball\n4:58 $1 a day since 2010\n5:21 $5 and $10 a day\n5:43 Starting late\n6:06 The big no's\n6:34 Money = hours\n6:50 3 tricks\n7:12 The honest part\n7:30 Your one no\n\nMethod: money invested on the 1st of each month (Jan 2010 - Sep 2026) at the S&P 500 monthly average price (Robert Shiller data). Price only, dividends not included. US average hourly earnings: $38.00 (Oct 2026, BLS via FRED).\nThis video is for education and entertainment only. It is not financial advice. Past performance does not guarantee future results.\n\n#whatif #personalfinance #investing",
+  "tags": [
+   "what if",
+   "what if you got 1 dollar every time",
+   "saying no",
+   "personal finance",
+   "investing for beginners",
+   "compound interest",
+   "s&p 500",
+   "index fund",
+   "saving money",
+   "money habits",
+   "financial education",
+   "the other timeline",
+   "animated story"
+  ],
+  "comment": "What's ONE thing you'd say no to this week? Mine: the third streaming subscription. 👇",
+  "url": null
+ },
+ {
+  "ep": "ep01",
+  "kind": "short",
+  "due_warsaw": "2026-11-27T14:00",
+  "status": "pending",
+  "title": "What If Every NO Paid You $1? #shorts",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep01/EP01_1_Dollar_Every_No_SHORT.mp4",
+  "description": "One day of saying no saved $260. Then the real math with S&P 500 prices since 2010.\nFull video on the channel. Not financial advice. #whatif #personalfinance #money\nFull video: (link of the long ep01 video)",
+  "tags": [
+   "shorts",
+   "what if",
+   "what if you got 1 dollar every time",
+   "saying no",
+   "personal finance",
+   "investing for beginners",
+   "compound interest",
+   "s&p 500",
+   "index fund"
+  ],
+  "comment": null,
+  "url": null
+ }
+]
