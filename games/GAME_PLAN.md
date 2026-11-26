@@ -78,3 +78,7 @@ See the conversation: platform, visual style, concept, languages, user accounts 
 - Round 3: the user rejected the digging theme -> choose a new theme (still: improve -> sell -> upgrade, first person, 3D low-poly, absurd humour).
 - No characters (no neighbour or radio): humour comes from items, upgrades, achievement names and the escalation.
 - Next deliverable: a full design document for approval, before any code.
+- Theme chosen: **junk buying -> mystery selling** (storage lots / garages / containers).
+- Buying: fixed-price lots + auctions for rare lots. Restoration: manual at first, then upgrades and machines automate it.
+- Selling: own shop (faceless customer figures) + an online marketplace on the shop computer.
+- Ending: collect all achievements (100%). Design doc: games/junk-tycoon/DESIGN_DOC.md
