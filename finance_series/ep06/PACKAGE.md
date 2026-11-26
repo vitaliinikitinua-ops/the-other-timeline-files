@@ -14,21 +14,21 @@ Chapters:
 0:00 Prices in hours
 0:23 Your exchange rate
 0:59 The 9-minute coffee
-1:20 The supermarket
-1:52 Max and the 1,053-hour car
-2:15 Your real hourly pay
-2:43 Subscriptions
-3:06 The big one: rent
-3:32 The phone upgrade
-4:01 Max's card in hours
-4:33 Worth it or not
-5:00 Grandma knew
-5:22 Is your hour worth more?
-5:44 Buying hours back
-6:14 Money = stored time
-6:38 3 habits
-7:07 The honest part
-7:20 Is it worth the hours?
+1:26 The supermarket
+1:58 Max and the 1,053-hour car
+2:20 Your real hourly pay
+2:49 Subscriptions
+3:12 The big one: rent
+3:38 The phone upgrade
+4:13 Max's card in hours
+4:44 Worth it or not
+5:11 Grandma knew
+5:33 Is your hour worth more?
+5:55 Buying hours back
+6:25 Money = stored time
+6:49 3 habits
+7:18 The honest part
+7:32 Is it worth the hours?
 
 ## Tags
 what if, price in hours, time is money, hourly wage, budgeting, subscriptions, lifestyle inflation, personal finance, financial education, saving money, the other timeline, animated story

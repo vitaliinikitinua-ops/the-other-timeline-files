@@ -55,270 +55,278 @@ That's about three and a half hours a month. Almost half a working day, every mo
 You still buy it. But now you actually taste it.
 
 15
-00:01:20,880 --> 00:01:26,465
-Tuesday. The supermarket. This is where the superpower gets loud.
+00:01:20,400 --> 00:01:25,834
+Because something you pay for with your life should at least be enjoyed, not swallowed on the way to the bus.
 
 16
-00:01:26,785 --> 00:01:32,195
-Every snack shouts its hours at you. The fancy brand cereal: eighteen minutes. The store brand next to it: ten.
+00:01:26,634 --> 00:01:32,218
+Tuesday. The supermarket. This is where the superpower gets loud.
 
 17
-00:01:32,515 --> 00:01:39,771
-Pre-cut fruit, bottled water, ready meals. Each one only a few minutes. But a weekly shop is made of fifty little decisions.
+00:01:32,538 --> 00:01:37,948
+Every snack shouts its hours at you. The fancy brand cereal: eighteen minutes. The store brand next to it: ten.
 
 18
-00:01:40,091 --> 00:01:45,525
-You don't buy the cheapest thing every time. You just stop paying for convenience you don't even want.
+00:01:38,268 --> 00:01:45,525
+Pre-cut fruit, bottled water, ready meals. Each one only a few minutes. But a weekly shop is made of fifty little decisions.
 
 19
-00:01:45,845 --> 00:01:51,835
-At the checkout, the total is about an hour less than last week. Nobody else even notices. You do.
+00:01:45,845 --> 00:01:51,278
+You don't buy the cheapest thing every time. You just stop paying for convenience you don't even want.
 
 20
-00:01:52,635 --> 00:01:56,374
-At lunch, Max shows you pictures of a new car. Forty thousand dollars. He's already picked the colour.
+00:01:51,598 --> 00:01:57,589
+At the checkout, the total is about an hour less than last week. Nobody else even notices. You do.
 
 21
-00:01:56,694 --> 00:02:02,592
-Above the car, your superpower shows the real price. One thousand and fifty three hours.
+00:01:58,389 --> 00:02:02,127
+At lunch, Max shows you pictures of a new car. Forty thousand dollars. He's already picked the colour.
 
 22
-00:02:02,912 --> 00:02:09,065
-That's about twenty six full work weeks. Half a year of Mondays, just for the car. Before insurance, fuel or repairs.
+00:02:02,447 --> 00:02:08,345
+Above the car, your superpower shows the real price. One thousand and fifty three hours.
 
 23
-00:02:09,385 --> 00:02:14,215
-Max looks at the number for a long time. Then he asks if the red one is more expensive.
+00:02:08,665 --> 00:02:14,818
+That's about twenty six full work weeks. Half a year of Mondays, just for the car. Before insurance, fuel or repairs.
 
 24
-00:02:15,015 --> 00:02:16,327
-Wednesday, the superpower shows you something sneakier. Your hourly pay is probably lower than you think.
+00:02:15,138 --> 00:02:19,968
+Max looks at the number for a long time. Then he asks if the red one is more expensive.
 
 25
-00:02:16,647 --> 00:02:23,926
-Say you work forty hours a week, but you also spend an hour every day getting to and from work. Unpaid.
+00:02:20,768 --> 00:02:22,080
+Wednesday, the superpower shows you something sneakier. Your hourly pay is probably lower than you think.
 
 26
-00:02:24,246 --> 00:02:30,318
-That's forty five hours of your life for forty hours of pay. Your thirty eight dollars an hour quietly becomes about thirty four.
+00:02:22,400 --> 00:02:29,679
+Say you work forty hours a week, but you also spend an hour every day getting to and from work. Unpaid.
 
 27
-00:02:30,638 --> 00:02:36,965
-Add work clothes, lunches out and the after work takeaway because you're too tired to cook, and it drops even more.
+00:02:29,999 --> 00:02:36,071
+That's forty five hours of your life for forty hours of pay. Your thirty eight dollars an hour quietly becomes about thirty four.
 
 28
-00:02:37,285 --> 00:02:42,603
-So when you translate prices into hours, use your real hours, not the ones on the contract.
+00:02:36,391 --> 00:02:42,719
+Add work clothes, lunches out and the after work takeaway because you're too tired to cook, and it drops even more.
 
 29
-00:02:43,403 --> 00:02:46,352
-Evening. You open your phone and the superpower lights up your subscriptions.
+00:02:43,039 --> 00:02:48,356
+So when you translate prices into hours, use your real hours, not the ones on the contract.
 
 30
-00:02:46,672 --> 00:02:51,002
-Streaming, music, cloud storage, an app you forgot, a gym you visit twice a year.
+00:02:49,156 --> 00:02:52,105
+Evening. You open your phone and the superpower lights up your subscriptions.
 
 31
-00:02:51,322 --> 00:02:55,920
-Ninety dollars a month in this example. That's two hours and twenty minutes a month. Over twenty eight hours a year.
+00:02:52,425 --> 00:02:56,756
+Streaming, music, cloud storage, an app you forgot, a gym you visit twice a year.
 
 32
-00:02:56,240 --> 00:03:02,161
-Three and a half work days a year, paid automatically, for things you barely notice.
+00:02:57,076 --> 00:03:01,673
+Ninety dollars a month in this example. That's two hours and twenty minutes a month. Over twenty eight hours a year.
 
 33
-00:03:02,481 --> 00:03:05,697
-You cancel two of them before bed. That's a few hours of your year, back.
+00:03:01,993 --> 00:03:07,914
+Three and a half work days a year, paid automatically, for things you barely notice.
 
 34
-00:03:06,497 --> 00:03:10,827
-And then the big one. Rent.
+00:03:08,234 --> 00:03:11,450
+You cancel two of them before bed. That's a few hours of your year, back.
 
 35
-00:03:11,147 --> 00:03:18,125
-In this example, eighteen hundred dollars a month. Forty seven hours. More than a full work week, every month, just for the roof.
+00:03:12,250 --> 00:03:16,581
+And then the big one. Rent.
 
 36
-00:03:18,445 --> 00:03:24,180
-You can't stop paying rent. But now you understand why housing is the biggest decision in most people's money.
+00:03:16,901 --> 00:03:23,878
+In this example, eighteen hundred dollars a month. Forty seven hours. More than a full work week, every month, just for the roof.
 
 37
-00:03:24,500 --> 00:03:31,884
-A slightly cheaper place, or a roommate, can be worth more hours than a lifetime of skipped coffees.
+00:03:24,198 --> 00:03:29,934
+You can't stop paying rent. But now you understand why housing is the biggest decision in most people's money.
 
 38
-00:03:32,684 --> 00:03:37,595
-Then your phone does the most dangerous thing a phone can do. It shows you an ad for a newer phone.
+00:03:30,254 --> 00:03:37,638
+A slightly cheaper place, or a roommate, can be worth more hours than a lifetime of skipped coffees.
 
 39
-00:03:37,915 --> 00:03:44,034
-Eleven hundred and ninety nine dollars in this example. Thirty one and a half hours.
+00:03:38,438 --> 00:03:43,349
+Then your phone does the most dangerous thing a phone can do. It shows you an ad for a newer phone.
 
 40
-00:03:44,354 --> 00:03:53,468
-And here's the trick. If you upgrade every two years instead of every four, you pay those thirty one hours twice as often.
+00:03:43,669 --> 00:03:49,787
+Eleven hundred and ninety nine dollars in this example. Thirty one and a half hours.
 
 41
-00:03:53,788 --> 00:03:58,014
-Over twenty years, that's the difference between about one hundred and sixty hours and over three hundred. Four extra work weeks, for a slightly better camera.
+00:03:50,107 --> 00:03:59,221
+And here's the trick. If you upgrade every two years instead of every four, you pay those thirty one hours twice as often.
 
 42
-00:03:58,334 --> 00:04:01,085
-Your current phone suddenly looks fantastic.
+00:03:59,541 --> 00:04:03,767
+Over twenty years, that's the difference between about one hundred and sixty hours and over three hundred. Four extra work weeks, for a slightly better camera.
 
 43
-00:04:01,885 --> 00:04:10,244
-Thursday. Max asks you to look at his credit card statement with your superpower. Big mistake.
+00:04:04,087 --> 00:04:06,839
+Your current phone suddenly looks fantastic.
 
 44
-00:04:10,564 --> 00:04:15,301
-He owes five thousand dollars and pays the minimum. The superpower doesn't show the balance. It shows the interest.
+00:04:07,159 --> 00:04:12,232
+You put it in a new case, clean the screen, and it feels almost new. Zero hours spent.
 
 45
-00:04:15,621 --> 00:04:22,994
-At today's average card rates, paying the minimum on that balance could cost him over seven thousand dollars in interest. That's over two hundred hours. Just interest.
+00:04:13,032 --> 00:04:21,391
+Thursday. Max asks you to look at his credit card statement with your superpower. Big mistake.
 
 46
-00:04:23,314 --> 00:04:28,991
-Five full work weeks, for the privilege of having bought things earlier.
+00:04:21,711 --> 00:04:26,448
+He owes five thousand dollars and pays the minimum. The superpower doesn't show the balance. It shows the interest.
 
 47
-00:04:29,311 --> 00:04:32,631
-Max closes the app, opens it again, and sets up a fixed payment. Character development.
+00:04:26,768 --> 00:04:34,141
+At today's average card rates, paying the minimum on that balance could cost him over seven thousand dollars in interest. That's over two hundred hours. Just interest.
 
 48
-00:04:33,431 --> 00:04:36,775
-By Friday, the superpower is changing how you live.
+00:04:34,461 --> 00:04:40,138
+Five full work weeks, for the privilege of having bought things earlier.
 
 49
-00:04:37,095 --> 00:04:43,701
-A concert ticket: two and a half hours. Totally worth it. You go.
+00:04:40,458 --> 00:04:43,778
+Max closes the app, opens it again, and sets up a fixed payment. Character development.
 
 50
-00:04:44,021 --> 00:04:49,269
-A random gadget at two in the morning: four hours. Not worth it. Cart deleted.
+00:04:44,578 --> 00:04:47,922
+By Friday, the superpower is changing how you live.
 
 51
-00:04:49,589 --> 00:04:56,137
-You're not spending less on everything. You're spending more on the things that matter, and nothing on the things that don't.
+00:04:48,242 --> 00:04:54,848
+A concert ticket: two and a half hours. Totally worth it. You go.
 
 52
-00:04:56,457 --> 00:04:59,742
-That's the real superpower. Not being cheap. Being clear.
+00:04:55,168 --> 00:05:00,416
+A random gadget at two in the morning: four hours. Not worth it. Cart deleted.
 
 53
-00:05:00,542 --> 00:05:03,306
-On Saturday, you visit Grandma. She asks why you keep squinting at the price of her biscuits.
+00:05:00,736 --> 00:05:07,284
+You're not spending less on everything. You're spending more on the things that matter, and nothing on the things that don't.
 
 54
-00:05:03,626 --> 00:05:09,349
-You explain the superpower. She laughs, and says she's been doing this her whole life. She just never called it a superpower.
+00:05:07,604 --> 00:05:10,889
+That's the real superpower. Not being cheap. Being clear.
 
 55
-00:05:09,669 --> 00:05:14,128
-When I was young, she says, we asked one question before we bought anything. How long did I work for this?
+00:05:11,689 --> 00:05:14,453
+On Saturday, you visit Grandma. She asks why you keep squinting at the price of her biscuits.
 
 56
-00:05:14,448 --> 00:05:22,040
-Then she hands you a biscuit. Zero hours. Free. The best price in the world.
+00:05:14,773 --> 00:05:20,496
+You explain the superpower. She laughs, and says she's been doing this her whole life. She just never called it a superpower.
 
 57
-00:05:22,840 --> 00:05:26,881
-Now here's an uncomfortable twist. Is your hour worth more than it used to be?
+00:05:20,816 --> 00:05:25,275
+When I was young, she says, we asked one question before we bought anything. How long did I work for this?
 
 58
-00:05:27,201 --> 00:05:33,656
-In March two thousand six, the average US hourly pay was about twenty dollars. Today it's thirty eight. Almost double.
+00:05:25,595 --> 00:05:33,188
+Then she hands you a biscuit. Zero hours. Free. The best price in the world.
 
 59
-00:05:33,976 --> 00:05:35,601
-But prices rose too. The consumer price index went up about sixty nine percent over the same years.
+00:05:33,988 --> 00:05:38,028
+Now here's an uncomfortable twist. Is your hour worth more than it used to be?
 
 60
-00:05:35,921 --> 00:05:40,171
-So, after inflation, an hour of work buys only about twelve percent more than it did in two thousand six.
+00:05:38,348 --> 00:05:44,803
+In March two thousand six, the average US hourly pay was about twenty dollars. Today it's thirty eight. Almost double.
 
 61
-00:05:40,491 --> 00:05:43,323
-Twenty years of work history, and your hour got about twelve percent stronger. That's why every hour you spend matters.
+00:05:45,123 --> 00:05:46,748
+But prices rose too. The consumer price index went up about sixty nine percent over the same years.
 
 62
-00:05:44,123 --> 00:05:52,366
-So what if you could use the superpower in reverse? Not to spend hours, but to buy them back?
+00:05:47,068 --> 00:05:51,318
+So, after inflation, an hour of work buys only about twelve percent more than it did in two thousand six.
 
 63
-00:05:52,686 --> 00:05:57,470
-Here's the idea. Take just one hour of pay per week, thirty eight dollars, and invest it instead of spending it.
+00:05:51,638 --> 00:05:54,470
+Twenty years of work history, and your hour got about twelve percent stronger. That's why every hour you spend matters.
 
 64
-00:05:57,790 --> 00:06:04,930
-That's about one hundred and sixty five dollars a month. Let's put it in an S and P five hundred index fund, starting in January twenty ten, at real prices.
+00:05:55,270 --> 00:06:03,513
+So what if you could use the superpower in reverse? Not to spend hours, but to buy them back?
 
 65
-00:06:05,250 --> 00:06:10,799
-By September twenty twenty six, you've put in about thirty three thousand dollars.
+00:06:03,833 --> 00:06:08,617
+Here's the idea. Take just one hour of pay per week, thirty eight dollars, and invest it instead of spending it.
 
 66
-00:06:11,119 --> 00:06:14,045
-And it's worth about one hundred and seven thousand.
+00:06:08,937 --> 00:06:16,077
+That's about one hundred and sixty five dollars a month. Let's put it in an S and P five hundred index fund, starting in January twenty ten, at real prices.
 
 67
-00:06:14,845 --> 00:06:18,038
-Now turn that back into hours. One hundred and seven thousand dollars, at thirty eight dollars an hour, is over two thousand eight hundred hours.
+00:06:16,397 --> 00:06:21,947
+By September twenty twenty six, you've put in about thirty three thousand dollars.
 
 68
-00:06:18,358 --> 00:06:24,790
-That is about one year and four months of full time work. Bought back with one hour a week.
+00:06:22,267 --> 00:06:25,192
+And it's worth about one hundred and seven thousand.
 
 69
-00:06:25,110 --> 00:06:30,543
-That money could be a career break, a safety net, a house deposit, or simply the freedom to say no to a job you hate.
+00:06:25,992 --> 00:06:29,185
+Now turn that back into hours. One hundred and seven thousand dollars, at thirty eight dollars an hour, is over two thousand eight hundred hours.
 
 70
-00:06:30,863 --> 00:06:37,272
-That's what money really is. Stored time. You decide whether it's stored for someone else, or for you.
+00:06:29,505 --> 00:06:35,937
+That is about one year and four months of full time work. Bought back with one hour a week.
 
 71
-00:06:38,072 --> 00:06:40,754
-You don't need a superpower to do this. Three simple habits.
+00:06:36,257 --> 00:06:41,690
+That money could be a career break, a safety net, a house deposit, or simply the freedom to say no to a job you hate.
 
 72
-00:06:41,074 --> 00:06:46,832
-One. Before any purchase over fifty dollars, divide the price by your take home hourly pay. Say the hours out loud.
+00:06:42,010 --> 00:06:48,419
+That's what money really is. Stored time. You decide whether it's stored for someone else, or for you.
 
 73
-00:06:47,152 --> 00:06:51,332
-Two. Look at the big three first: housing, transport and food. That's where most of your hours go.
+00:06:49,219 --> 00:06:51,901
+You don't need a superpower to do this. Three simple habits.
 
 74
-00:06:51,652 --> 00:06:58,386
-Three. Pay yourself first. Move one hour of pay a week to savings or investing on payday, automatically.
+00:06:52,221 --> 00:06:57,980
+One. Before any purchase over fifty dollars, divide the price by your take home hourly pay. Say the hours out loud.
 
 75
-00:06:58,706 --> 00:07:06,775
-And one bonus habit. Once a year, add up your recurring payments and convert them into hours. It's the most honest number you'll see all year.
+00:06:58,300 --> 00:07:02,479
+Two. Look at the big three first: housing, transport and food. That's where most of your hours go.
 
 76
-00:07:07,575 --> 00:07:11,464
-The honest part. This is not financial advice.
+00:07:02,799 --> 00:07:09,533
+Three. Pay yourself first. Move one hour of pay a week to savings or investing on payday, automatically.
 
 77
-00:07:11,784 --> 00:07:18,019
-The prices in this story are examples, your hourly pay is your own, and taxes change everything.
+00:07:09,853 --> 00:07:17,922
+And one bonus habit. Once a year, add up your recurring payments and convert them into hours. It's the most honest number you'll see all year.
 
 78
-00:07:18,339 --> 00:07:20,127
-And the investing numbers use real past prices, which don't promise the future.
+00:07:18,722 --> 00:07:22,611
+The honest part. This is not financial advice.
 
 79
-00:07:20,927 --> 00:07:24,990
-Every price is a question. How many hours of my life is this worth?
+00:07:22,931 --> 00:07:29,166
+The prices in this story are examples, your hourly pay is your own, and taxes change everything.
 
 80
-00:07:25,310 --> 00:07:31,870
-So tell me in the comments: what's one thing you buy that suddenly feels too expensive when you count it in hours?
+00:07:29,486 --> 00:07:31,274
+And the investing numbers use real past prices, which don't promise the future.
 
 81
-00:07:32,190 --> 00:07:33,908
+00:07:32,074 --> 00:07:36,137
+Every price is a question. How many hours of my life is this worth?
+
+82
+00:07:36,457 --> 00:07:43,017
+So tell me in the comments: what's one thing you buy that suddenly feels too expensive when you count it in hours?
+
+83
+00:07:43,337 --> 00:07:45,055
 And I'll see you in the other timeline.
 
