@@ -64,3 +64,9 @@ What doesn't work: big serious games, long games that need several videos, and s
 
 ## 4. Open questions (asked in chat)
 See the conversation: platform, visual style, concept, languages, user accounts (Steam / portals).
+
+## 5. Decisions (user, 26.11.2026)
+- Platform: Steam (full game, 2-5 USD) + free web demo on portals.
+- Visual style: 3D low-poly (three.js).
+- Concept: **Dig to the Core**: dig a hole from your backyard to the Earth's core.
+- Languages: English + Ukrainian + more Steam languages (machine translation, then review).
