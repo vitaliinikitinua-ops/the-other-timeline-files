@@ -383,5 +383,101 @@
   ],
   "comment": null,
   "url": null
+ },
+ {
+  "ep": "ep09",
+  "kind": "long",
+  "due_warsaw": "2026-12-04T18:00",
+  "status": "pending",
+  "title": "What If Everything Went Wrong in the Same Month?",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep09/EP09_Everything_Went_Wrong.mp4",
+  "thumbnail": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep09/thumb_A.jpg",
+  "description": "Car, vet, laptop and dentist: $3,500 of bad luck in one month. One version of you puts it on a credit card and pays for years. The other has a bad day fund and is fine by Friday. What an emergency fund really does, with real credit card rates.\n\n0:00 Everything goes wrong\n0:20 An ordinary month\n0:51 The bad day fund\n1:16 The worst month\n1:42 The total\n1:53 Timeline A: the card\n2:20 31 months for 1 bad month\n2:45 When it keeps happening\n3:15 Timeline B pays cash\n3:40 Side by side\n4:00 What numbers can't show\n4:22 Losing your income\n4:53 Why not invest it?\n5:25 How big should it be?\n5:41 How to build it\n6:06 Insurance for the big ones\n6:23 The order that works\n6:48 Max's new fund\n7:08 The honest part\n7:26 Your worst month?\n\nMethod: example bills totalling $3,500. Card APR 21.19% (average US rate on accounts assessed interest, Aug 2026, Federal Reserve G.19 via FRED). Minimum payment = greater of $25 or 1% of balance plus interest (a common formula). No new purchases.\nThis video is for education and entertainment only. It is not financial advice.\n\n#whatif #emergencyfund #personalfinance",
+  "tags": [
+   "what if",
+   "emergency fund",
+   "unexpected expenses",
+   "credit card debt",
+   "budgeting",
+   "saving money",
+   "financial stress",
+   "personal finance",
+   "financial education",
+   "money tips",
+   "the other timeline",
+   "animated story"
+  ],
+  "comment": "What's the worst month your wallet ever survived? 👇",
+  "url": null
+ },
+ {
+  "ep": "ep09",
+  "kind": "short",
+  "due_warsaw": "2026-12-05T14:00",
+  "status": "pending",
+  "title": "Everything Broke in the Same Month #shorts",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep09/EP09_Everything_Went_Wrong_SHORT.mp4",
+  "description": "$3,500 of bad luck: credit card vs emergency fund, at the real average US card rate (21.19%). Full video on the channel. Not financial advice. #money #emergencyfund\nFull video: (link of the long ep09 video)",
+  "tags": [
+   "shorts",
+   "what if",
+   "emergency fund",
+   "unexpected expenses",
+   "credit card debt",
+   "budgeting",
+   "saving money",
+   "financial stress",
+   "personal finance"
+  ],
+  "comment": null,
+  "url": null
+ },
+ {
+  "ep": "ep10",
+  "kind": "long",
+  "due_warsaw": "2026-12-05T18:00",
+  "status": "pending",
+  "title": "What If You Invested at the Worst Possible Moment?",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep10/EP10_Worst_Day_to_Invest.mp4",
+  "thumbnail": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep10/thumb_A.jpg",
+  "description": "October 2007: you invest $10,000 right before the global financial crisis. Half of it disappears in 17 months. One version of you sells at the bottom. The other does nothing. Then the most surprising number of the series, plus the crashes that took far longer to recover.\n\n0:00 The unluckiest investor\n0:24 October 2007\n0:47 The crash\n1:17 Why selling felt right\n1:40 Sell or sit?\n2:14 5.5 years to get back\n2:37 The climb\n3:07 The part we left out\n3:38 The one who sold\n3:56 Max times the market\n4:34 The perfect investor\n4:55 The boring timeline\n5:20 Split it over 12 months\n5:48 It's not always this fast\n6:15 4 lessons\n6:44 Grandma's verdict\n7:10 The honest part\n7:24 Sell or hold?\n\nData: S&P 500 / S&P composite monthly average price (Robert Shiller data), price only, dividends excluded, no fees or taxes.\nThis video is for education and entertainment only. It is not financial advice. Past performance does not guarantee future results.\n\n#whatif #investing #personalfinance",
+  "tags": [
+   "what if",
+   "worst time to invest",
+   "market timing",
+   "2008 financial crisis",
+   "stock market crash",
+   "time in the market",
+   "dollar cost averaging",
+   "1929 crash",
+   "s&p 500",
+   "personal finance",
+   "the other timeline",
+   "animated story"
+  ],
+  "comment": "March 2009, your $10,000 is now $4,900. Be honest: sell or hold? 👇",
+  "url": null
+ },
+ {
+  "ep": "ep10",
+  "kind": "short",
+  "due_warsaw": "2026-12-06T14:00",
+  "status": "pending",
+  "title": "He Invested Right Before the 2008 Crash #shorts",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep10/EP10_Worst_Day_to_Invest_SHORT.mp4",
+  "description": "$10,000 in the S&P 500 in October 2007, real Shiller prices. Sell at the bottom or hold? Full video on the channel. Not financial advice. #investing #whatif\nFull video: (link of the long ep10 video)",
+  "tags": [
+   "shorts",
+   "what if",
+   "worst time to invest",
+   "market timing",
+   "2008 financial crisis",
+   "stock market crash",
+   "time in the market",
+   "dollar cost averaging",
+   "1929 crash"
+  ],
+  "comment": null,
+  "url": null
  }
 ]

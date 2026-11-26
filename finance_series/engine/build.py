@@ -230,7 +230,10 @@ def thumbnail(spec, path):
         paste_center(c, spr.rotate(bt.get("rot", 0), expand=True, resample=Image.BICUBIC), bt["x"], bt["y"])
     q = spec.get("quote")
     if q:
-        f = ImageFont.truetype(MONT, 120); f.set_variation_by_name("Black")
+        fs = 120
+        f = ImageFont.truetype(MONT, fs); f.set_variation_by_name("Black")
+        while f.getlength(q + " ") > W - 100 and fs > 60:
+            fs -= 6; f = ImageFont.truetype(MONT, fs); f.set_variation_by_name("Black")
         words = q.split(" "); hl = spec.get("hl", [])
         widths = [f.getlength(w_ + " ") for w_ in words]; x = W / 2 - sum(widths) / 2; d = ImageDraw.Draw(c)
         for w_, wd in zip(words, widths):
