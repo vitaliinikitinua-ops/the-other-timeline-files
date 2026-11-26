@@ -23,13 +23,13 @@ Chapters:
 3:37 The recovery
 4:07 Equity in 2026
 4:33 What each one paid
-5:08 Timeline C: buying today
-5:36 Three payments
-5:52 Outside the US
-6:16 Approved is not affordable
-6:36 What to learn
-7:05 The honest part
-7:22 When would you have bought?
+5:15 Timeline C: buying today
+5:44 Three payments
+6:05 Outside the US
+6:29 Approved is not affordable
+6:49 What to learn
+7:18 The honest part
+7:36 When would you have bought?
 
 ## Tags
 what if, housing market, buy a house, mortgage rates, 2008 housing crash, underwater mortgage, case shiller, rent vs buy, personal finance, financial education, the other timeline, animated story
