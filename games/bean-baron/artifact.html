@@ -1,0 +1,291 @@
+
+<title>Bean Baron</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap">
+<style>
+/* Layout: phone-first column (scene on top, shop below); on wide screens scene left, shop right. Single warm café look by choice. */
+:root {
+  --bean: #3B2418; --bean-2: #5A3826; --cream: #F7E7CE; --foam: #FFF8EC; --caramel: #D4893A; --gold: #F2B635;
+  --mint: #6CC4A1; --berry: #E0607E; --ink: #24150E; --muted: #A88B73;
+  --font: "Fredoka", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bean); color: var(--foam); font-family: var(--font); overflow: hidden; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+#app { height: 100%; display: grid; grid-template-rows: auto minmax(200px, 42%) 1fr; max-width: 1100px; margin: 0 auto;
+  padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); padding-block: 8px; gap: 8px; }
+@media (min-width: 900px) { #app { grid-template-columns: 1.15fr 1fr; grid-template-rows: auto 1fr; } #top { grid-column: 1 / 3; } #shop { grid-row: 2; } }
+#top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.brand { font-weight: 700; font-size: 18px; color: var(--gold); letter-spacing: .02em; }
+.money { text-align: center; flex: 1; min-width: 0; }
+.money .coins { font-size: clamp(28px, 7vw, 40px); font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.money .ips { font-size: 14px; color: var(--cream); opacity: .85; }
+.iconbtn { border: 0; background: rgba(255,255,255,.08); color: var(--foam); border-radius: 12px; padding: 8px 10px; font: 600 14px var(--font); cursor: pointer; }
+#sceneWrap { position: relative; border-radius: 18px; overflow: hidden; background: #2A1810; }
+#scene { width: 100%; height: 100%; display: block; cursor: pointer; }
+.tapHint { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); background: rgba(36,21,14,.75); padding: 6px 12px; border-radius: 999px; font-size: 13px; pointer-events: none; }
+.boosts { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; gap: 6px; justify-content: space-between; pointer-events: none; }
+.boosts button { pointer-events: auto; }
+.pill { border: 0; border-radius: 999px; padding: 7px 12px; font: 600 13px var(--font); cursor: pointer; color: var(--ink); background: var(--gold); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+.pill.mint { background: var(--mint); } .pill.ghost { background: rgba(36,21,14,.8); color: var(--foam); box-shadow: none; }
+.pill:disabled { opacity: .45; cursor: default; }
+#shop { display: flex; flex-direction: column; min-height: 0; background: var(--bean-2); border-radius: 18px; overflow: hidden; }
+.tabs { display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,.15); }
+.tabs button { flex: 1; border: 0; border-radius: 12px; padding: 9px 4px; font: 600 14px var(--font); color: var(--cream); background: transparent; cursor: pointer; position: relative; }
+.tabs button[aria-selected="true"] { background: var(--cream); color: var(--ink); }
+.dot { position: absolute; top: 4px; right: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--berry); }
+.buyMode { display: flex; gap: 4px; padding: 6px 8px 0; justify-content: flex-end; }
+.buyMode button { border: 0; border-radius: 8px; padding: 4px 9px; font: 600 12px var(--font); background: rgba(255,255,255,.08); color: var(--cream); cursor: pointer; }
+.buyMode button[aria-pressed="true"] { background: var(--caramel); color: var(--ink); }
+.list { overflow-y: auto; padding: 8px; display: grid; gap: 8px; align-content: start; flex: 1; }
+.row { display: grid; grid-template-columns: 48px 1fr auto; gap: 10px; align-items: center; background: rgba(255,255,255,.06); border-radius: 14px; padding: 8px; }
+.row.locked { opacity: .45; }
+.row .ic { width: 48px; height: 48px; border-radius: 12px; background: var(--cream); display: grid; place-items: center; font-size: 26px; }
+.row .nm { font-weight: 600; font-size: 15px; } .row .sub { font-size: 12px; color: var(--cream); opacity: .8; }
+.bar { height: 5px; background: rgba(255,255,255,.12); border-radius: 3px; margin-top: 4px; overflow: hidden; } .bar i { display: block; height: 100%; background: var(--mint); }
+.buy { border: 0; border-radius: 12px; padding: 9px 10px; min-width: 92px; font: 700 14px var(--font); background: var(--gold); color: var(--ink); cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+.buy:disabled { background: #6E5545; color: #CDB8A5; box-shadow: none; cursor: default; }
+.buy small { display: block; font-weight: 600; font-size: 11px; }
+.card { background: rgba(255,255,255,.06); border-radius: 14px; padding: 12px; display: grid; gap: 8px; }
+.card h3 { margin: 0; font-size: 16px; } .card p { margin: 0; font-size: 13px; color: var(--cream); line-height: 1.4; }
+.modal { position: fixed; inset: 0; background: rgba(20,10,5,.7); display: grid; place-items: center; padding: 16px; z-index: 20; }
+.modal .box { background: var(--cream); color: var(--ink); border-radius: 22px; padding: 22px 18px; width: min(360px, 100%); text-align: center; display: grid; gap: 12px; }
+.modal h2 { margin: 0; font-size: 24px; } .modal .big { font-size: 34px; font-weight: 700; color: var(--bean); }
+.modal .btns { display: grid; gap: 8px; }
+.modal .buy { width: 100%; } .modal .alt { background: transparent; color: var(--bean-2); box-shadow: none; }
+.toast { position: fixed; left: 50%; top: 14px; transform: translateX(-50%); background: var(--ink); color: var(--foam); padding: 8px 14px; border-radius: 999px; font-size: 14px; z-index: 30; }
+button:focus-visible { outline: 3px solid var(--mint); outline-offset: 2px; }
+</style>
+
+
+<div id="app">
+  <header id="top">
+    <div class="brand">☕ Bean Baron</div>
+    <div class="money"><div class="coins" id="coins">0</div><div class="ips" id="ips">0 / sec</div></div>
+    <button class="iconbtn" id="mute" aria-pressed="false" aria-label="Sound">🔊</button>
+  </header>
+  <section id="sceneWrap">
+    <canvas id="scene" aria-label="Your café. Tap to serve customers."></canvas>
+    <div class="boosts">
+      <button class="pill" id="boostBtn">▶ x2 income 3 min</button>
+      <button class="pill ghost" id="starsPill">⭐ 0</button>
+    </div>
+    <div class="tapHint" id="tapHint">Tap the café to serve coffee!</div>
+  </section>
+  <section id="shop">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="stations">Stations</button>
+      <button role="tab" aria-selected="false" data-tab="upgrades">Upgrades<span class="dot" id="upDot" hidden></span></button>
+      <button role="tab" aria-selected="false" data-tab="empire">Empire<span class="dot" id="empDot" hidden></span></button>
+    </div>
+    <div class="buyMode" id="buyMode"><button data-k="1" aria-pressed="true">x1</button><button data-k="10" aria-pressed="false">x10</button><button data-k="max" aria-pressed="false">MAX</button></div>
+    <div class="list" id="list"></div>
+  </section>
+</div>
+<div class="modal" id="modal" hidden><div class="box" id="modalBox"></div></div>
+
+<script type="module">
+import * as E from "./economy.js";
+import { Ads } from "./ads.js";
+const B = E.BALANCE;
+const ICON = { drip: "☕", espresso: "⚙️", pastry: "🥐", latte: "🎨", cold: "🧊", drive: "🚗", roast: "🔥", trucks: "🚚" };
+const SAVE_KEY = "beanbaron_save_v1";
+const $ = id => document.getElementById(id);
+
+// ---------------- state + save ----------------
+function load() {
+  try { const raw = localStorage.getItem(SAVE_KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === B.version) return s; } } catch (e) {}
+  return E.newState(Date.now() / 1000);
+}
+let st = load();
+function save() { try { st.lastSeen = Date.now() / 1000; localStorage.setItem(SAVE_KEY, JSON.stringify(st)); } catch (e) {} }
+setInterval(save, 5000); addEventListener("visibilitychange", () => { if (document.hidden) save(); else checkOffline(); });
+
+// ---------------- sound ----------------
+let ac = null, muted = false; try { muted = localStorage.getItem("bb_mute") === "1"; } catch (e) {}
+function tone(f, d = .08, type = "triangle", v = .06) {
+  if (muted) return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+  const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(ac.destination); o.start(t); o.stop(t + d + .02);
+}
+const sfx = { coin: () => { tone(988, .06); setTimeout(() => tone(1319, .08), 50); }, buy: () => { tone(523, .07, "square", .04); setTimeout(() => tone(784, .1, "square", .04), 60); }, big: () => [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, .14, "triangle", .07), i * 90)) };
+$("mute").onclick = () => { muted = !muted; $("mute").textContent = muted ? "🔇" : "🔊"; $("mute").setAttribute("aria-pressed", String(muted)); try { localStorage.setItem("bb_mute", muted ? "1" : "0"); } catch (e) {} };
+$("mute").textContent = muted ? "🔇" : "🔊";
+
+// ---------------- ads pause/resume ----------------
+let paused = false;
+Ads.on("pause", () => { paused = true; if (ac) try { ac.suspend(); } catch (e) {} });
+Ads.on("resume", () => { paused = false; if (ac) try { ac.resume(); } catch (e) {} });
+
+// ---------------- scene (canvas café) ----------------
+const cv = $("scene"), cx = cv.getContext("2d");
+let W = 0, H = 0, DPR = 1;
+function resize() { DPR = Math.min(devicePixelRatio || 1, 2); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * DPR; cv.height = H * DPR; cx.setTransform(DPR, 0, 0, DPR, 0, 0); }
+addEventListener("resize", resize);
+const customers = []; const floats = []; let spawnT = 0, baristaT = 0;
+const COLORS = ["#E0607E", "#6CC4A1", "#7FA7E8", "#F2B635", "#B98CE0", "#F08A4B"];
+function spawnCustomer() { customers.push({ x: W + 30, y: H * .72, state: "in", t: 0, col: COLORS[Math.random() * COLORS.length | 0], hair: Math.random() < .5, sz: .9 + Math.random() * .25 }); }
+function popText(txt, x, y, col = "#F2B635") { floats.push({ txt, x, y, t: 0, col }); }
+function roundRect(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
+function person(x, y, s, col, hair, apron, blink) {
+  cx.save(); cx.translate(x, y); cx.scale(s, s);
+  cx.fillStyle = col; roundRect(-16, -8, 32, 38, 12); cx.fill();
+  if (apron) { cx.fillStyle = "#3B2418"; roundRect(-11, 0, 22, 28, 6); cx.fill(); }
+  cx.fillStyle = "#F3C9A0"; cx.beginPath(); cx.arc(0, -22, 16, 0, 7); cx.fill();
+  cx.fillStyle = hair ? "#4A2B1B" : "#2B1A10"; cx.beginPath(); cx.arc(0, -27, 16, Math.PI, 2 * Math.PI); cx.fill();
+  if (apron) { cx.beginPath(); cx.arc(0, -42, 7, 0, 7); cx.fill(); }
+  cx.fillStyle = "#24150E"; const eh = blink ? 1 : 4;
+  cx.fillRect(-7, -23, 3.5, eh); cx.fillRect(4, -23, 3.5, eh);
+  cx.strokeStyle = "#24150E"; cx.lineWidth = 2; cx.beginPath(); cx.arc(0, -16, 5, .2, Math.PI - .2); cx.stroke();
+  cx.restore();
+}
+function drawScene(dt, now) {
+  if (!W) resize();
+  const g = cx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#6B4430"); g.addColorStop(1, "#4A2C1E"); cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+  // window + sign
+  cx.fillStyle = "#9FD3E8"; roundRect(W * .58, H * .12, W * .34, H * .3, 10); cx.fill(); cx.fillStyle = "rgba(255,255,255,.35)"; cx.fillRect(W * .58, H * .12, W * .34, 6);
+  cx.fillStyle = "#F7E7CE"; cx.font = `700 ${Math.max(14, H * .07)}px Fredoka, sans-serif`; cx.textAlign = "left"; cx.fillText(st.stars ? `Bean Baron #${st.stars + 1}` : "Bean Baron", W * .05, H * .2);
+  // floor
+  cx.fillStyle = "#2E1B12"; cx.fillRect(0, H * .8, W, H * .2);
+  // barista (behind the counter)
+  baristaT += dt; person(W * .3, H * .55, Math.max(.8, H / 260), "#F7E7CE", false, true, (now % 3.3) < .12);
+  // counter
+  cx.fillStyle = "#8A5A3C"; roundRect(W * .04, H * .5, W * .5, H * .3, 10); cx.fill(); cx.fillStyle = "#A66E48"; cx.fillRect(W * .04, H * .5, W * .5, 10);
+  // owned stations as icons on the counter / wall shelf
+  const own = B.stations.filter(s => st.owned[s.id] > 0); cx.font = `${Math.max(18, H * .09)}px serif`; cx.textAlign = "center";
+  own.forEach((s, i) => { const x = W * .08 + (i % 4) * W * .12, y = i < 4 ? H * .47 : H * .33; cx.fillText(ICON[s.id], x, y); });
+  // customers
+  const qx = W * .62;
+  customers.forEach((c, i) => {
+    c.t += dt;
+    if (c.state === "in") { c.x -= 90 * dt; if (c.x <= qx + i * 30) { c.x = Math.max(c.x, qx); c.state = "wait"; c.t = 0; } }
+    else if (c.state === "wait" && c.t > .6) { c.state = "out"; earnSale(c.x, c.y - 60); }
+    else if (c.state === "out") c.x += 110 * dt;
+    person(c.x, c.y + Math.sin(c.t * 10) * 2, c.sz * Math.max(.75, H / 300), c.col, c.hair, false, false);
+    if (c.state === "out") { cx.fillStyle = "#F7E7CE"; roundRect(c.x + 10, c.y - 12, 10, 13, 3); cx.fill(); }
+  });
+  for (let i = customers.length - 1; i >= 0; i--) if (customers[i].x > W + 60 && customers[i].state === "out") customers.splice(i, 1);
+  // floating texts
+  cx.textAlign = "center"; cx.font = `700 ${Math.max(16, H * .08)}px Fredoka, sans-serif`;
+  for (let i = floats.length - 1; i >= 0; i--) { const f = floats[i]; f.t += dt; f.y -= 40 * dt; cx.globalAlpha = Math.max(0, 1 - f.t / 1.2); cx.fillStyle = "#24150E"; cx.fillText(f.txt, f.x + 2, f.y + 2); cx.fillStyle = f.col; cx.fillText(f.txt, f.x, f.y); if (f.t > 1.2) floats.splice(i, 1); }
+  cx.globalAlpha = 1;
+  if (st.time < st.boostUntil) { cx.fillStyle = "rgba(108,196,161,.18)"; cx.fillRect(0, 0, W, H); }
+}
+let saleBank = 0;
+function earnSale(x, y) { if (saleBank > 0) { popText("+" + E.fmt(saleBank), x, y); saleBank = 0; } }
+cv.addEventListener("pointerdown", e => {
+  if (paused) return; const v = E.tap(st); const r = cv.getBoundingClientRect();
+  popText("+" + E.fmt(v), e.clientX - r.left, e.clientY - r.top - 10, "#FFF8EC"); sfx.coin();
+  if (customers.length < 6) spawnCustomer(); $("tapHint").hidden = true; Ads.gameplayStart();
+});
+
+// ---------------- UI ----------------
+let tab = "stations", mode = "1";
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { tab = b.dataset.tab; document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b))); $("buyMode").hidden = tab !== "stations"; render(true); });
+document.querySelectorAll("#buyMode button").forEach(b => b.onclick = () => { mode = b.dataset.k; document.querySelectorAll("#buyMode button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); render(true); });
+function maxAffordable(s) { let k = 0; while (k < 1000 && E.bulkCost(s, st.owned[s.id], k + 1) <= st.coins) k++; return Math.max(1, k); }
+function nextMilestone(n) { return B.milestones.find(m => m > n); }
+let lastSig = "";
+function render(force) {
+  $("coins").textContent = E.fmt(st.coins);
+  $("ips").textContent = E.fmt(E.incomePerSec(st)) + " / sec" + (st.time < st.boostUntil ? "  ⚡x2" : "");
+  $("starsPill").textContent = "⭐ " + st.stars + (st.stars ? `  +${Math.round(st.stars * B.starBonus * 100)}%` : "");
+  const ups = E.availableUpgrades(st); $("upDot").hidden = !ups.some(u => u.cost <= st.coins); $("empDot").hidden = !(E.pendingStars(st) > 0 || dailyReady());
+  const br = st.time >= st.boostReadyAt; $("boostBtn").disabled = !br || !Ads.available();
+  $("boostBtn").textContent = st.time < st.boostUntil ? `⚡ x2 ${Math.ceil(st.boostUntil - st.time)}s` : br ? "▶ x2 income 3 min" : `x2 in ${Math.ceil(st.boostReadyAt - st.time)}s`;
+  const sig = tab + mode + Math.floor(st.coins) + JSON.stringify(st.owned) + Object.keys(st.ups).length + st.stars;
+  if (!force && sig === lastSig) return; lastSig = sig;
+  const L = $("list"); L.innerHTML = "";
+  if (tab === "stations") {
+    B.stations.forEach((s, i) => {
+      const un = E.unlocked(st, i); const n = st.owned[s.id];
+      const k = mode === "max" ? maxAffordable(s) : +mode; const c = E.bulkCost(s, n, k);
+      const ms = nextMilestone(n); const prev = [...B.milestones].reverse().find(m => m <= n) || 0;
+      const row = document.createElement("div"); row.className = "row" + (un ? "" : " locked");
+      row.innerHTML = `<div class="ic">${un ? ICON[s.id] : "🔒"}</div><div><div class="nm">${un ? s.name : "???"} <span class="sub">x${n}</span></div>
+        <div class="sub">${un ? E.fmt(E.stationIncome(st, s)) + "/s" + (ms ? ` · x2 at ${ms}` : "") : "Unlocks at " + E.fmt(s.cost * .5) + " earned"}</div>
+        ${un && ms ? `<div class="bar"><i style="width:${(n - prev) / (ms - prev) * 100}%"></i></div>` : ""}</div>
+        <button class="buy" ${!un || st.coins < c ? "disabled" : ""}>Buy x${k}<small>${E.fmt(c)}</small></button>`;
+      row.querySelector("button").onclick = () => { if (E.buyStation(st, s.id, k)) { sfx.buy(); if (ms && st.owned[s.id] >= ms) { sfx.big(); toast(`${s.name} x2 speed!`); } save(); render(true); } };
+      L.appendChild(row);
+    });
+  } else if (tab === "upgrades") {
+    const list = E.availableUpgrades(st).sort((a, b) => a.cost - b.cost);
+    if (!list.length) L.innerHTML = `<div class="card"><p>No upgrades yet. Own 10 of a station to unlock its first upgrade.</p></div>`;
+    list.slice(0, 12).forEach(u => {
+      const row = document.createElement("div"); row.className = "row";
+      row.innerHTML = `<div class="ic">${u.station === "all" ? "🌟" : ICON[u.station]}</div><div><div class="nm">${u.name}</div><div class="sub">${u.station === "all" ? "All stations" : B.stations.find(s => s.id === u.station).name} x${u.mult} income</div></div>
+        <button class="buy" ${st.coins < u.cost ? "disabled" : ""}>Buy<small>${E.fmt(u.cost)}</small></button>`;
+      row.querySelector("button").onclick = () => { if (E.buyUpgrade(st, u.id)) { sfx.big(); save(); render(true); } };
+      L.appendChild(row);
+    });
+  } else {
+    const p = E.pendingStars(st);
+    const c1 = document.createElement("div"); c1.className = "card";
+    c1.innerHTML = `<h3>⭐ Open a new café</h3><p>Sell this café and start a new one. You keep your Stars: each Star gives +${B.starBonus * 100}% income forever.</p>
+      <p>Stars ready: <b>${p}</b>${p ? "" : ` · next Star at ${E.fmt(Math.pow(st.stars + 1, 2) * B.prestigeMin)} total earned (now ${E.fmt(st.lifetime)})`}</p>
+      <button class="buy" ${p ? "" : "disabled"}>Open café #${st.stars + p + 1}<small>+${p} ⭐</small></button>`;
+    c1.querySelector("button").onclick = () => confirmPrestige(p);
+    const c2 = document.createElement("div"); c2.className = "card";
+    const dr = dailyReady(); c2.innerHTML = `<h3>🎁 Daily delivery</h3><p>Come back every day. Day ${Math.min(st.daily.day + (dr ? 1 : 0), 7)} of 7 streak.</p><button class="buy" ${dr ? "" : "disabled"}>${dr ? "Collect " + E.fmt(dailyAmount()) : "Come back tomorrow"}</button>`;
+    c2.querySelector("button").onclick = collectDaily;
+    const c3 = document.createElement("div"); c3.className = "card";
+    c3.innerHTML = `<h3>📊 Your empire</h3><p>Total earned: ${E.fmt(st.lifetime)}<br>Stars: ${st.stars} (+${Math.round(st.stars * B.starBonus * 100)}% income)<br>Offline earnings: up to ${B.offlineCap / 3600} h at ${B.offlineEff * 100}%</p>
+      <button class="buy" style="background:#6E5545;color:#F7E7CE">Reset progress</button>`;
+    c3.querySelector("button").onclick = () => modal(`<h2>Reset everything?</h2><p>All coins, stations and Stars will be deleted.</p><div class="btns"><button class="buy" id="mYes">Yes, reset</button><button class="buy alt" id="mNo">Cancel</button></div>`, { mYes: () => { st = E.newState(Date.now() / 1000); save(); closeModal(); render(true); }, mNo: closeModal });
+    L.append(c1, c2, c3);
+  }
+}
+function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1800); }
+function modal(html, handlers) { $("modalBox").innerHTML = html; $("modal").hidden = false; Ads.gameplayStop(); for (const [id, fn] of Object.entries(handlers)) { const b = document.getElementById(id); if (b) b.onclick = fn; } }
+function closeModal() { $("modal").hidden = true; Ads.gameplayStart(); }
+
+// ---------------- boosts, prestige, daily, offline ----------------
+$("boostBtn").onclick = async () => { if (st.time < st.boostReadyAt) return; Ads.gameplayStop(); const ok = await Ads.rewarded(); Ads.gameplayStart(); if (ok && E.startBoost(st)) { sfx.big(); toast("x2 income for 3 minutes!"); } else if (!ok) toast("Ad not available right now"); render(true); };
+function confirmPrestige(p) {
+  modal(`<h2>Open café #${st.stars + p + 1}?</h2><p>You start fresh with <b>${st.stars + p} ⭐</b> = +${Math.round((st.stars + p) * B.starBonus * 100)}% income forever.</p>
+    <div class="btns"><button class="buy" id="mYes">Open new café</button><button class="buy alt" id="mNo">Not yet</button></div>`, {
+    mYes: async () => { E.prestige(st); save(); closeModal(); sfx.big(); render(true); Ads.gameplayStop(); await Ads.midgame(); Ads.gameplayStart(); },
+    mNo: closeModal });
+}
+const dayNum = () => Math.floor(Date.now() / 86400000);
+function dailyReady() { return st.daily.last !== dayNum(); }
+function dailyAmount() { const step = Math.min(st.daily.day, 6); return E.DAILY[step] + E.incomePerSec(st) * 60 * (step + 1); }
+function collectDaily() {
+  if (!dailyReady()) return; const gap = dayNum() - st.daily.last; if (st.daily.last >= 0 && gap > 1) st.daily.day = Math.max(0, st.daily.day - 1);
+  const a = dailyAmount(); st.coins += a; st.lifetime += a; st.runEarned += a; st.daily.day = Math.min(st.daily.day + 1, 7); st.daily.last = dayNum(); sfx.big(); toast("+" + E.fmt(a)); save(); render(true);
+}
+function checkOffline() {
+  const now = Date.now() / 1000; const away = now - (st.lastSeen || now); st.lastSeen = now;
+  if (away < 60 || E.incomePerSec(st) <= 0) return;
+  const gain = E.offlineEarnings(st, away); const h = Math.min(away, B.offlineCap) / 3600;
+  modal(`<h2>Welcome back!</h2><p>Your café kept brewing for ${h >= 1 ? h.toFixed(1) + " h" : Math.round(h * 60) + " min"}${away > B.offlineCap ? " (max 4 h)" : ""}.</p><div class="big">+${E.fmt(gain)}</div>
+    <div class="btns"><button class="buy" id="mAd" ${Ads.available() ? "" : "disabled"}>▶ Watch ad: x2 = ${E.fmt(gain * 2)}</button><button class="buy alt" id="mNo">Collect ${E.fmt(gain)}</button></div>`, {
+    mAd: async () => { const ok = await Ads.rewarded(); const g = ok ? gain * 2 : gain; st.coins += g; st.lifetime += g; st.runEarned += g; closeModal(); sfx.big(); save(); render(true); },
+    mNo: () => { st.coins += gain; st.lifetime += gain; st.runEarned += gain; closeModal(); save(); render(true); } });
+}
+
+// ---------------- main loop ----------------
+let last = performance.now(), acc = 0;
+function frame(t) {
+  const dt = Math.min(.25, (t - last) / 1000); last = t;
+  if (!paused) {
+    const before = st.coins; E.tick(st, dt); saleBank += st.coins - before;
+    spawnT -= dt; const ips = E.incomePerSec(st);
+    if (ips > 0 && spawnT <= 0 && customers.length < 6) { spawnCustomer(); spawnT = Math.max(.7, 3.2 - Math.log10(ips + 1) * .45); }
+    acc += dt; if (acc > .2) { acc = 0; render(false); }
+  }
+  drawScene(paused ? 0 : dt, t / 1000);
+  requestAnimationFrame(frame);
+}
+(async () => {
+  await Ads.init(); Ads.loadingStart(); resize(); render(true); Ads.loadingStop();
+  if (st.lifetime === 0) $("tapHint").hidden = false; else { $("tapHint").hidden = true; checkOffline(); }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+
