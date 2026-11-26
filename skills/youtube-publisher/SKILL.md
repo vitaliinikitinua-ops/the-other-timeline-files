@@ -20,13 +20,18 @@ On 26.11.2026 the user gave standing permission: publish the finance series myse
 - Files by URL: commit + push, then `https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/<path>`
   (repo is public; files < 100 MB).
 
+## API extras that work (tested 26.11)
+- Mutating requests: put `part` in `querystring` (not in the URL, else 400 unexpectedPart), header Content-Type application/json.
+- First comment: POST commentThreads, querystring {"part":"snippet"} -> works (pinning still manual).
+- Series playlist "What IF: Money Timelines (Real Data)" id PLct60rKstUlg: POST playlistItems to add each long video.
+
 ## Queue + scheduled task (how the finance series runs)
 - `finance_series/QUEUE.json`: items {ep, kind long|short, due_warsaw, status pending|done, title, video, thumbnail,
   description, tags, comment, url}. Add with `python3 finance_series/engine/publish_queue.py epNN <long time> <short time>`.
   Short descriptions contain "(link of the long epNN video)" - replace with the long video's URL at upload time.
-- Scheduled task "Finance series: publish queue + daily stats" (trigger trig_01FmjYgwucogcmCG1FL8f6N2, cron
-  `CRON_TZ=Europe/Warsaw 2 14,18 * * *`) fires into the session: publishes at most one due item, posts the first comment,
-  logs stats to finance_series/STATS.md on the 14:00 run, commits, reports to the user in Ukrainian.
+- Scheduled task trig_01FmjYgwucogcmCG1FL8f6N2, hourly 09:07-23:07 Warsaw: publishes the next item as soon as
+  fewer than 5 uploads happened in the last 24 h and the last upload is 30+ min old; a Short only 30+ min after its
+  long video; then first comment + playlist; daily stats after 14:00. User wants the maximum the limits allow.
 
 ## Limits (learned 25-26.11.2026)
 - Zapier free plan: max 5 YouTube uploads per rolling 24 h ("This action has been throttled without retry.").
