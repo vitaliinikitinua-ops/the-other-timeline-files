@@ -34,7 +34,9 @@ On 26.11.2026 the user gave standing permission: publish the finance series myse
   long video; then first comment + playlist; daily stats after 14:00. User wants the maximum the limits allow.
 
 ## Limits (learned 25-26.11.2026)
-- Zapier free plan: max 5 YouTube uploads per rolling 24 h ("This action has been throttled without retry.").
+- Zapier free plan: max 5 YouTube upload *runs* per rolling 24 h ("This action has been throttled without retry.").
+  Failed runs (e.g. YouTube 429) count too, so count your own upload attempts, not only the videos on the channel.
+  Never retry a 429 within the same day: it burns a Zapier slot.
 - YouTube API project quota: "429 Too Many Requests" until the daily reset at midnight Pacific = 09:00 Warsaw;
   uploads worked right after 09:00. Don't hammer retries: one retry per run, then wait for the next slot.
 - `publish_at` scheduling is unreliable here; use the queue + scheduled task instead.
