@@ -70,3 +70,8 @@ See the conversation: platform, visual style, concept, languages, user accounts 
 - Visual style: 3D low-poly (three.js).
 - Concept: **Dig to the Core**: dig a hole from your backyard to the Earth's core.
 - Languages: English + Ukrainian + more Steam languages (machine translation, then review).
+- Camera: first person (shovel or drill in hand, the pit deepening under your feet).
+- Gameplay (user's words): "not only digging but everything else; the point is to improve, sell and so on".
+  So: digging is the spine, plus side sim activities that all feed improve -> sell -> upgrade.
+- Tone: absurd humour (funny finds, a neighbour, a strange ending at the core).
+- Length: 1.5-2.5 h to 100%; price 2.99 USD.
