@@ -335,5 +335,53 @@
   ],
   "comment": null,
   "url": null
+ },
+ {
+  "ep": "ep08",
+  "kind": "long",
+  "due_warsaw": "2026-12-03T18:00",
+  "status": "pending",
+  "title": "What If Your Salary Doubled and You Stayed Broke?",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep08/EP08_Salary_Doubled_Still_Broke.mp4",
+  "thumbnail": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep08/thumb_A.jpg",
+  "description": "Two versions of you get the same raises, from $40,000 to $80,000. One upgrades everything and is still living paycheck to paycheck. The other saves half of every raise and ends up with about $392,000. Lifestyle inflation, explained with real market data.\n\n0:00 Salary doubled, still broke\n0:25 2012: noodles\n0:48 Timeline A upgrades\n1:15 Lifestyle creep\n1:45 Why raises shrink\n2:12 Timeline B's rule\n2:39 B is not a monk\n3:05 2020: the stress test\n3:26 Half the raises, invested\n3:56 Same salary, different life\n4:36 The $2,000 repair\n5:02 Money = options\n5:34 Why it happens\n6:00 The whole country\n6:14 Max on hard mode\n6:51 How to be timeline B\n7:22 The honest part\n7:34 Where did your raise go?\n\nMethod: example salary $40,000 in 2012, +$4,000 a year to $80,000 (before tax). Timeline B invests half of every raise monthly at the S&P 500 monthly average price (Robert Shiller data), price only, Jan 2012 to Sep 2026. US personal saving rate: BEA via FRED PSAVERT. Average hourly earnings: BLS via FRED.\nThis video is for education and entertainment only. It is not financial advice.\n\n#whatif #lifestyleinflation #personalfinance",
+  "tags": [
+   "what if",
+   "lifestyle inflation",
+   "lifestyle creep",
+   "save your raise",
+   "paycheck to paycheck",
+   "personal saving rate",
+   "investing",
+   "personal finance",
+   "financial education",
+   "money habits",
+   "the other timeline",
+   "animated story"
+  ],
+  "comment": "Be honest: where did your last raise go? 👇",
+  "url": null
+ },
+ {
+  "ep": "ep08",
+  "kind": "short",
+  "due_warsaw": "2026-12-04T14:00",
+  "status": "pending",
+  "title": "Salary Doubled, Still Broke? #shorts",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep08/EP08_Salary_Doubled_Still_Broke_SHORT.mp4",
+  "description": "Same raises, two timelines. Saving half of every raise, invested at real S&P 500 prices since 2012 (example salary). Full video on the channel. Not financial advice. #money #whatif\nFull video: (link of the long ep08 video)",
+  "tags": [
+   "shorts",
+   "what if",
+   "lifestyle inflation",
+   "lifestyle creep",
+   "save your raise",
+   "paycheck to paycheck",
+   "personal saving rate",
+   "investing",
+   "personal finance"
+  ],
+  "comment": null,
+  "url": null
  }
 ]
