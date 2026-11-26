@@ -136,6 +136,8 @@ def shot(c, t, b, sc):
     else:
         z = 1.06
         cx, cy = W / 2 + (1 if k % 2 else -1) * 60 * (clamp01((t - ts) / 6) - 0.5), H / 2
+    if sc.get("type") == "chart":  # keep the side panel and axis labels fully in frame
+        z = min(z, 1.035); cx, cy = W / 2, H / 2
     sh = 0
     for s_k in sc.get("shake", []):
         if 0 <= t - b.S(s_k) < 0.45:
@@ -218,7 +220,7 @@ def sc_chart(t, b, sc):
     v = 0
     while v <= vmax:
         y = Y(v); d.line((X0, y, X1, y), fill=(255, 255, 255, 25), width=2)
-        lab = sc.get("yfmt", "${:,.0f}").format(v) if step < 1000 else f"${v / 1000:,.0f}K"
+        lab = sc.get("yfmt", "${:,.0f}").format(v) if step < 1000 else (f"${v / 1000:,.0f}K" if step % 1000 == 0 else f"${v / 1000:,.1f}K")
         if sc.get("yfmt") == "{:.0f}%":
             lab = f"{v:.0f}%"
         d.text((X0 - 12 - fs.getlength(lab), y - 16), lab, font=fs, fill=CREAM + (140,))
@@ -247,9 +249,15 @@ def sc_chart(t, b, sc):
     for j, cn in enumerate(sc.get("side", [])):
         vals = cn["values"]; vv = vals[min(int(kf), len(vals) - 1)]
         y = 300 + j * 160
-        paste_center(c, T(cn["label"], 34, tuple(cn.get("col", CREAM)), "D"), 1650, y)
+        lab = T(cn["label"], 34, tuple(cn.get("col", CREAM)), "D")
+        if lab.width > 420:
+            lab = lab.resize((420, int(lab.height * 420 / lab.width)), Image.LANCZOS)
+        paste_center(c, lab, 1650, y)
         txt = money(vv) if cn.get("fmt", "money") == "money" else cn["fmt"].format(vv)
-        paste_center(c, T(txt, 70, tuple(cn.get("col", CREAM)), "A"), 1650, y + 62)
+        val = T(txt, 70, tuple(cn.get("col", CREAM)), "A")
+        if val.width > 420:
+            val = val.resize((420, int(val.height * 420 / val.width)), Image.LANCZOS)
+        paste_center(c, val, 1650, y + 62)
     if sc.get("xnow"):
         paste_center(c, T(sc["xnow"](kf), 36, CREAM, "D"), 1650, 300 + len(sc.get("side", [])) * 160 + 20)
     if sc.get("footnote"):

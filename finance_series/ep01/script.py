@@ -172,7 +172,7 @@ BEATS = [
    ("By September twenty twenty six, you've put in six thousand one hundred and fourteen dollars.", None),
    ("And it's worth about nineteen thousand eight hundred.", None),
    ("From one dollar a day.", None),
- ], dict(type="chart", reveal=(0, 3), series=[dict(values=[v / 5 for v in VAL], col=TEAL, fill=True), dict(values=[v / 5 for v in INV], col=AMBER, width=6)],
+ ], dict(type="chart", reveal=(1, 3.5), series=[dict(values=[v / 5 for v in VAL], col=TEAL, fill=True), dict(values=[v / 5 for v in INV], col=AMBER, width=6)],
          xlabels=YEARS, side=[dict(label="PUT IN", values=[v / 5 for v in INV], col=AMBER), dict(label="WORTH", values=[v / 5 for v in VAL], col=TEAL)],
          footnote="S&P 500 monthly avg. price (R. Shiller). $30.42 on the 1st of each month, Jan 2010 - Sep 2026. Price only, no dividends. Not financial advice.",
          texts=[dict(text="$1 = $3.24", size=110, col=GREEN, x=760, y=150, at=5, glow=14)], actors=[dict(who="you", x=1650, y=1070, size=150, emo={0: "neutral", 4: "shock"})])),
