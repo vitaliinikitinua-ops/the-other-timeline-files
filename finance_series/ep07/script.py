@@ -135,6 +135,7 @@ BEATS = [
    ("Timeline B: about one hundred and eighty seven thousand.", None),
    ("To be fair, timeline B also paid rent for those five and a half years. But even with that, the gap is enormous.", None),
    ("Same house. The only difference was when they bought, and the rate they got.", None),
+   ("And neither of them could have known in advance. In two thousand six, almost nobody on television was predicting the crash.", None),
  ], dict(type="bars", groups=[dict(label="TIMELINE A", vals=[(438246, AMBER)], at=1), dict(label="TIMELINE B", sub="+ 5.5 years of rent", vals=[(186873, TEAL)], at=2)],
          texts=[dict(text="PAID SO FAR", size=100, col=CREAM, y=150, glow=10)], flash={2: TEAL})),
  ("c_buys", [
@@ -150,6 +151,7 @@ BEATS = [
    ("Here are all three payments side by side.", None),
    ("Eight hundred and nineteen. One thousand five hundred and sixty three. Two thousand nine hundred and sixty six.", None),
    ("Same house. Three completely different lives.", None),
+   ("One family can save every month. One gets by. And one spends a third of the budget before buying a single grocery.", None),
  ], dict(type="bars", groups=[dict(label="B: 2012", sub="3.87%", vals=[(819, TEAL)], at=1), dict(label="A: 2006", sub="6.79%", vals=[(1563, AMBER)], at=1.3), dict(label="C: 2026", sub="7.21%", vals=[(2966, CORAL)], at=1.6)],
          texts=[dict(text="MONTHLY PAYMENT", size=100, col=CREAM, y=150, glow=10)], flash={2: CREAM})),
  ("europe", [

@@ -87,6 +87,7 @@ BEATS = [
    ("Six months later, the washing machine floods. It goes on the same card. Then a friend's wedding. Then a parking fine.", None),
    ("The balance never quite reaches zero. And slowly, the debt stops being an emergency and becomes a permanent roommate.", None),
    ("Timeline A isn't irresponsible. It's just unprotected.", None),
+   ("And every month of interest is money that can't go into a cushion, which makes the next surprise even more likely to land on the card.", None),
  ], dict(type="stage", loc="kitchen", actors=[you(560, {0: "neutral", 1: "shock", 2: "sad", 3: "neutral"})],
          props=[dict(kind="tag", text="WASHING MACHINE", col=CORAL, x=1250, y=300, at=1, scale=0.8), dict(kind="tag", text="WEDDING", col=CORAL, x=1250, y=440, at=1.3, scale=0.8), dict(kind="tag", text="PARKING FINE", col=CORAL, x=1250, y=580, at=1.6, scale=0.8),
                 dict(kind="card", label="SAME CARD", col=CORAL, x=1250, y=790, at=2, scale=0.6)],
@@ -164,7 +165,9 @@ BEATS = [
  ("max", [
    ("Max, of course, hears all of this, nods seriously, and opens a savings account.", None),
    ("He names it jet ski fund.", None),
+   ("You point out that a jet ski is not an emergency. Max says it will be, if he doesn't get one soon.", None),
    ("It's a start.", None),
+   ("And honestly, a fund with a silly name that actually exists beats a perfect plan that never starts.", None),
  ], dict(type="stage", loc="street", actors=[dict(who="max", x=700, y=1010, size=330, emo={0: "neutral", 1: "money", 2: "happy"}), you(1350, {0: "neutral", 2: "smug"}, flip=True)],
          props=[dict(kind="phone", text="JET SKI FUND", sub="NEW ACCOUNT", col=TEAL, x=1030, y=520, at=1, scale=0.9)])),
  ("honest", [

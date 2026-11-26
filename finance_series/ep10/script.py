@@ -52,6 +52,7 @@ BEATS = [
    ("By March two thousand nine, the index's average price is fifty one percent below where you bought.", None),
    ("Your ten thousand dollars is worth about four thousand nine hundred.", None),
    ("Grandma's gift, cut in half, in seventeen months.", None),
+   ("You start checking the account every morning. Then every hour. Then you delete the app, reinstall it, and check again.", None),
  ], dict(type="chart", reveal=(0, 2), series=[dict(values=LUMP[:iLow + 1], col=CORAL, width=9, fill=True), dict(values=FLAT[:iLow + 1], col=CREAM, width=4)], vmax=12000,
          xlabels=[(0, "OCT 2007"), (iLow, "MAR 2009")], side=[dict(label="YOUR $10,000", values=LUMP[:iLow + 1], col=CORAL)],
          footnote="S&P 500 monthly avg. price (R. Shiller). Price only, dividends excluded. Not financial advice.",
@@ -69,6 +70,7 @@ BEATS = [
    ("In timeline A, you can't take it anymore. You sell everything and keep the cash. Four thousand nine hundred dollars, safe forever.", None),
    ("In timeline B, you're scared, but you do nothing. You leave it there and try not to look.", None),
    ("Most people believe they'd be timeline B. In two thousand nine, a lot of real people chose timeline A.", None),
+   ("Not because they were stupid. Because watching half your savings disappear feels like the house is on fire, and every instinct says run.", None),
  ], dict(type="split", left=dict(title="TIMELINE A", sub="sells at the bottom", col=CORAL, who="you", emo="shock", value=dict(**{"from": 10000, "to": 4918}, at=1, dur=1.4, label="locked in")),
          right=dict(title="TIMELINE B", sub="does nothing", col=TEAL, who="you", emo="worried", at=2),
          texts=[dict(text="SELL OR SIT?", size=110, col=AMBER, y=800, at=3, glow=12)])),
@@ -159,6 +161,7 @@ BEATS = [
    ("In twenty twenty six, you visit Grandma and tell her the whole story.", None),
    ("The crash, the panic, the five years of waiting, and the almost fifty thousand dollars.", None),
    ("She nods and says: I told you to do something smart with it. I never said fast.", None),
+   ("Then she asks if you'd like to hear how she lived through the nineteen seventies. You say yes. It takes three hours. Totally worth it.", None),
  ], dict(type="stage", loc="kitchen", actors=[you(620, {0: "neutral", 1: "happy"}), dict(who="grandma", x=1350, y=1010, size=320, emo={0: "neutral", 2: "smug"}, flip=True, talk=[2])],
          bubbles=[dict(text="I never said FAST.", x=1350, y=500, at=2)])),
  ("honest", [
