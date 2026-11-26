@@ -276,7 +276,7 @@ def sc_bars(t, b, sc):
             hgt = hmax * v / vmax * p
             if hgt > 2:
                 paste_center(c, Image.new("RGBA", (int(bw), int(hgt)), tuple(col) + (255,)), x, base - hgt / 2)
-            lab = money(round(v * p, -1 if v < 100000 else -2)) if sc.get("fmt", "money") == "money" else sc["fmt"].format(v * p)
+            lab = money(round(v * p, 0 if v < 10000 else (-1 if v < 100000 else -2))) if sc.get("fmt", "money") == "money" else sc["fmt"].format(v * p)
             pop(c, T(lab, 38 if nv > 1 else 52, tuple(col), "A"), x, base - hgt - 34, t, t0 + 0.2)
         pop(c, T(g["label"], 40, CREAM, "A"), cx, base + 48, t, t0)
         if g.get("sub"):
