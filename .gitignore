@@ -2,4 +2,5 @@ ep2/build/
 finance01/build/
 finance02/build/
 finance02/voice/
+finance_series/*/build/
 __pycache__/
