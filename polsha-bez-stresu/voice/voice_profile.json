@@ -1,0 +1,12 @@
+{
+  "name": "8d (Тетяна, чітка)",
+  "engine": "piper-tts",
+  "model": "uk_UA-ukrainian_tts-medium (dataset CC0)",
+  "speaker": 2,
+  "length_scale": 0.92,
+  "noise_scale": 0.6,
+  "noise_w_scale": 0.8,
+  "pitch": 1.08,
+  "ffmpeg_eq": "highpass=f=90,equalizer=f=3500:t=q:w=1:g=3",
+  "qa": "faster-whisper small (uk): best of 8 takes per sentence, sentences < 3 words merged with previous"
+}
