@@ -11,7 +11,20 @@
   [hidden] { display:none !important; }
   #hud-money { position:fixed; left:16px; top:14px; font-size:28px; font-weight:800; text-shadow:0 2px 0 #0007; }
   #hud-ach { position:fixed; right:16px; top:14px; font-size:16px; font-weight:700; background:#0006; padding:6px 10px; border-radius:8px; }
-  #hud-goal { position:fixed; left:16px; top:52px; font-size:14px; background:#0006; padding:5px 9px; border-radius:8px; max-width:340px; }
+  #hud-lvl { position:fixed; left:16px; top:50px; font-size:13px; background:#0006; padding:4px 9px; border-radius:8px; display:flex; align-items:center; gap:6px; }
+  #hud-lvl .bar { display:inline-block; width:90px; height:8px; background:#fff3; border-radius:4px; overflow:hidden; }
+  #hud-lvl .bar i { display:block; height:100%; background:var(--accent); }
+  #hud-streak { position:fixed; left:16px; top:80px; font-size:15px; font-weight:800; color:#ffcf5a; text-shadow:0 2px 0 #0008; }
+  #hud-goal { position:fixed; left:16px; top:108px; font-size:15px; background:#000a; padding:9px 12px; border-radius:10px; max-width:360px; border-left:4px solid var(--accent); line-height:1.35; }
+  #hud-goal b { color:var(--accent); }
+  .tut-h { font-size:12px; text-transform:uppercase; letter-spacing:.08em; opacity:.7; margin-bottom:3px; }
+  .tut-skip { font-size:11px; opacity:.55; margin-top:5px; }
+  #hud-quests { position:fixed; left:16px; bottom:16px; width:330px; font-size:13px; }
+  #hud-quests .qh { font-weight:800; margin-bottom:4px; text-shadow:0 1px 0 #000; }
+  #hud-quests .q { display:flex; gap:8px; align-items:center; background:#0009; padding:6px 9px; border-radius:8px; margin-top:4px; }
+  #hud-quests .q span { flex:1; } #hud-quests .q em { font-style:normal; color:var(--good); font-weight:700; }
+  #hud-quests .q.done { background:#1f5a35cc; }
+  .tabs { display:flex; gap:8px; margin-bottom:12px; } .cat { font-size:12px; text-transform:uppercase; letter-spacing:.08em; opacity:.6; margin:12px 0 6px; }
   #cross { position:fixed; left:50%; top:50%; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; background:#fff; box-shadow:0 0 0 2px #0008; pointer-events:none; }
   #hint { position:fixed; left:50%; bottom:64px; transform:translateX(-50%); font-size:16px; background:#000a; padding:8px 14px; border-radius:10px; white-space:nowrap; pointer-events:none; }
   #hint b { color:var(--accent); }
@@ -41,7 +54,10 @@
 </head>
 <body>
 <div id="hud-money">$0</div>
+<div id="hud-lvl"></div>
+<div id="hud-streak" hidden></div>
 <div id="hud-goal"></div>
+<div id="hud-quests"></div>
 <div id="hud-ach">Achievements 0/0</div>
 <div id="cross"></div>
 <div id="hint" hidden></div>
@@ -51,13 +67,14 @@
 <div id="start" class="overlay">
   <div class="panel">
     <h1>Junk Lot Tycoon</h1>
-    <p class="sub">Prototype v0.1 · Little Loop Games</p>
-    <p>Buy mystery lots. Clean the junk. Sell it. Get absurdly rich. Collect every achievement.</p>
+    <p class="sub">Prototype v0.2 · Little Loop Games</p>
+    <p>Buy mystery lots. Clean the junk. Sell it. Fill requests, level up, unlock bigger lots. Collect every achievement.</p><p class="sub">A short tutorial will show you the ropes (press T to skip).</p>
     <div class="keys">
       <kbd>WASD</kbd><span>walk</span>
       <kbd>Mouse</kbd><span>look around</span>
       <kbd>E / click</kbd><span>pick up · place · use</span>
       <kbd>Hold click</kbd><span>scrub an item on the workbench (move the mouse!)</span>
+      <kbd>Shift</kbd><span>run</span>
       <kbd>Tab</kbd><span>achievements</span>
       <kbd>Esc</kbd><span>pause</span>
     </div>
