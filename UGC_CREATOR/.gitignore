@@ -13,3 +13,4 @@ models/piper/*.onnx
 *.mov
 tools/sadtalker/
 __pycache__/
+tools/wav2lip/
