@@ -10,15 +10,15 @@ SPK=int(os.environ.get("SPK","1"))
 A="́"
 # (scene, caption text, tts text)
 SEG=[
- ("A","4 березня 2027 — статус UKR закінчується. А в тебе діти і жодного плану?",
+ ("A","4 березня 2027|статус UKR закінчується.|А в тебе діти|і жодного плану?",
       f"четве{A}рте бе{A}резня два{A}дцять сьо{A}мого — ста{A}тус у ка ер закі{A}нчується. а в те{A}бе ді{A}ти, і жо{A}дного пла{A}ну?"),
- ("B","Спокійно. Є карта побиту CUKR — на три роки. Заява тільки онлайн, через портал MOS, і подати її треба до 4 березня.",
+ ("B","Спокійно.|Є карта побиту CUKR|на три роки.|Заява тільки онлайн,|через портал MOS,|і подати її треба|до 4 березня.",
       f"споко{A}йно. є ка{A}рта по{A}биту цукр — на три ро{A}ки. зая{A}ва ті{A}льки онла{A}йн, через портал мос, і пода{A}ти її{A} тре{A}ба до четве{A}ртого бе{A}резня."),
- ("C","І про 800+: з лютого виплата є, тільки якщо хтось із батьків працює, а дитина ходить до польської школи.",
+ ("C","І про 800+:|з лютого виплата є,|тільки якщо хтось|із батьків працює,|а дитина ходить|до польської школи.",
       f"і про ві{A}сімсот плюс: з лю{A}того ви{A}плата є, ті{A}льки якщо{A} хтось із батькі{A}в працю{A}є, а дити{A}на хо{A}дить до по{A}льської шко{A}ли."),
- ("D","Що зробити вже зараз. Перше — перевір статус UKR для всієї сім'ї. Друге: заведи акаунт у MOS і зроби фото. Третє: підготуй оплату — 440 злотих за заяву.",
+ ("D","Що зробити вже зараз.|Перше: перевір|статус UKR для всієї сім'ї.|Друге: заведи|акаунт у MOS|і зроби фото.|Третє: підготуй оплату:|440 злотих за заяву.",
       f"що зроби{A}ти вже за{A}раз. пе{A}рше — переві{A}р ста{A}тус у ка ер для всіє{A}ї сім'ї{A}. друге: заведи{A} ака{A}унт у мос і зроби{A} фо{A}то. тре{A}тє: підготу{A}й опла{A}ту — чоти{A}риста со{A}рок зло{A}тих за зая{A}ву."),
- ("E","Підпишись — покажу, як заповнити заяву крок за кроком!",
+ ("E","Підпишись!|Покажу, як заповнити заяву|крок за кроком!",
       f"підпиши{A}сь — покажу{A}, як запо{A}внити зая{A}ву, крок за кро{A}ком!"),
 ]
 
@@ -59,7 +59,7 @@ def best_one(tag,cap,text):
         if sc>=0.99: break
     return best
 def best_tts(i,cap,text):
-    cs=SPLIT.split(cap.strip()); ts=SPLIT.split(text.strip())
+    cs=SPLIT.split(cap.replace('|',' ').strip()); ts=SPLIT.split(text.strip())
     if len(cs)!=len(ts): cs,ts=[cap],[text]
     # merge very short sentences with the previous one (ASR is unreliable on 1-2 words)
     C,T=[],[]
@@ -74,7 +74,9 @@ def best_tts(i,cap,text):
 PAD_BEFORE,PAD_AFTER=0.15,0.2
 segs=[]; t=0
 for i,(sc,cap,tx) in enumerate(SEG):
-    a,sr=best_tts(i,cap,tx)
+    cf=f'voicecache_{i}.npy'
+    if os.path.exists(cf) and os.environ.get('REUSE')=='1': a=np.load(cf); sr=22050
+    else: a,sr=best_tts(i,cap,tx); np.save(cf,a)
     d=len(a)/sr
     segs.append(dict(scene=sc,cap=cap,audio=a,sr=sr,start=t,vstart=t+PAD_BEFORE,vdur=d,dur=PAD_BEFORE+d+PAD_AFTER))
     t+=PAD_BEFORE+d+PAD_AFTER
@@ -110,16 +112,42 @@ mix+=(np.sin(2*np.pi*110*x)+np.sin(2*np.pi*164.8*x)+np.sin(2*np.pi*220*x))*0.012
 mix=mix[:int(SR*TOTAL)]; mix=mix/max(1,np.abs(mix).max()*1.05)
 with wave.open("mix.wav","wb") as w: w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((mix*32767).astype(np.int16).tobytes())
 
-# ---- captions (chunked karaoke)
+# ---- captions (chunked karaoke, safe-zone aware)
+CAP_CX,CAP_W,CAP_Y=515,780,1240
+NOEND={"до","у","в","і","й","а","з","із","для","на","через","про","по","не","що","як","—","за","та"}
+NB="\u00a0"
+KEEP=["крок за кроком","статус UKR","карта побиту","портал MOS","акаунт у MOS","до 4 березня","4 березня 2027","440 злотих","800+:","польської школи","всієї сім'ї"]
+def prep(cap):
+    cap=cap.replace(" — "," ").replace("—","")
+    for k in KEEP: cap=cap.replace(k,k.replace(" ",NB))
+    return cap
 def chunks_for(s):
-    words=s["cap"].split(); out=[]; cur=[]
-    for w in words:
-        cur.append(w)
-        if len(cur)>=4 or w[-1] in ".:?!…—":
-            out.append(cur); cur=[]
+    if "|" in s["cap"]:
+        res2=[c.split() for c in s["cap"].split("|")]; words=s["cap"].replace("|"," ").split()
+        total=sum(len(w)+1 for w in words); t=s["vstart"]; res=[]
+        for c in res2:
+            L=sum(len(w)+1 for w in c); d=s["vdur"]*L/total; res.append((t,t+d,c)); t+=d
+        return res
+    words=prep(s["cap"]).split(); out=[]; cur=[]
+    for i,w in enumerate(words):
+        cur.append(w); nxt=words[i+1] if i+1<len(words) else None
+        L=len(" ".join(cur))
+        end_punct=w[-1] in ".:?!…,"
+        brk=(end_punct and len(cur)>=2) or w[-1] in ".?!…" or len(cur)>=5 or L>=24
+        if brk and nxt is not None:
+            # don't end on a function word / dash / bare number before its noun
+            while len(cur)>1 and (cur[-1].lower() in NOEND or cur[-1].isdigit()):
+                nxt_word=cur.pop(); out.append(cur); cur=[nxt_word]; break
+            else:
+                out.append(cur); cur=[]
     if cur: out.append(cur)
-    total=sum(len(w)+1 for w in words); t=s["vstart"]; res=[]
+    # merge a lone trailing dash/short word into previous chunk
+    res2=[]
     for c in out:
+        if res2 and (c==["—"] or (len(c)==1 and len(c[0])<=2)): res2[-1]+=c
+        else: res2.append(c)
+    total=sum(len(w)+1 for w in words); t=s["vstart"]; res=[]
+    for c in res2:
         L=sum(len(w)+1 for w in c); d=s["vdur"]*L/total
         res.append((t,t+d,c)); t+=d
     return res
@@ -127,22 +155,23 @@ CH=[c for s in segs for c in chunks_for(s)]
 def caption(d,t):
     for a,b,c in CH:
         if a<=t<b+0.15:
-            f=font(70); txt=" ".join(c); lines=wrap(d,txt,f,940); lh=86
-            y0=1250
-            # word index
+            c=" ".join(w.replace(NB," ") for w in c).split(); txt=" ".join(c)
             tot=sum(len(w)+1 for w in c); acc=0; k=0
             for i,w in enumerate(c):
                 if a+(b-a)*acc/tot<=t: k=i
                 acc+=len(w)+1
-            pop=back(prog(t,a,a+0.15)); sz=int(70*(0.85+0.15*pop)); f=font(max(40,sz))
+            pop=back(prog(t,a,a+0.15)); f=font(max(40,int(66*(0.88+0.12*pop)))); lh=82
+            lines=wrap(d,txt,f,CAP_W)
+            wmax=max(d.textlength(l,font=f) for l in lines)
+            d.rounded_rectangle((CAP_CX-wmax/2-34,CAP_Y-18,CAP_CX+wmax/2+34,CAP_Y+len(lines)*lh+6),28,fill=(0,0,0,135))
             idx=0
-            for li,l in enumerate(wrap(d,txt,f,940)):
-                tw=d.textlength(l,font=f); xx=W/2-tw/2
+            for li,l in enumerate(lines):
+                tw=d.textlength(l,font=f); xx=CAP_CX-tw/2
                 for w in l.split():
                     col=(255,214,10) if idx==k else "white"
-                    d.text((xx,y0+li*lh),w,font=f,fill=col,stroke_width=9,stroke_fill="black"); xx+=d.textlength(w+" ",font=f); idx+=1
+                    # NOTE: word index counts space-separated words of the chunk
+                    d.text((xx,CAP_Y+li*lh),w,font=f,fill=col,stroke_width=5,stroke_fill="black"); xx+=d.textlength(w+" ",font=f); idx+=1
             return
-
 # ---- scenes
 def mom(d,cx,cy,r,mood,tau):
     d.ellipse((cx-r*1.15,cy-r*1.05,cx+r*1.15,cy+r*1.35),fill=(120,70,40))
@@ -154,7 +183,7 @@ def scene_A(d,img,tau,s):
     r=int(175*(1+0.1*ease(prog(tau,hit,hit+0.25))))
     d.rounded_rectangle((540-170+sh,780+r-40,540+170+sh,1180),60,fill=(200,80,110))
     mom(d,540+sh,760,r,"shock" if shock else "calm",tau)
-    for kx,ph in ((220,0.3),(860,0.7)):
+    for kx,ph in ((235,0.3),(800,0.7)):
         kr=95; ky=960
         d.rounded_rectangle((kx-90,ky+kr-20,kx+90,1180),40,fill=(90,170,220) if kx<540 else (250,200,70))
         face(d,kx,ky,kr,"shock" if tau>=hit+0.15 else "calm",tau+ph,skin=(255,220,185))
@@ -173,10 +202,10 @@ def scene_B(d,img,tau,s):
     if tau>0.9: ctext(d,500,"3 роки",font(56),(25,25,25),cx=340)
     # laptop
     t1=D*0.4
-    partial_line(d,[(600,360),(960,360),(960,560),(600,560),(600,360)],prog(tau,t1,t1+0.5))
-    partial_line(d,[(560,600),(1000,600)],prog(tau,t1+0.3,t1+0.6))
-    if tau>t1+0.5: ctext(d,420,"MOS",font(80),(30,150,70),cx=780)
-    if tau>t1+0.7: ctext(d,620,"тільки онлайн",font(44),(25,25,25),cx=780)
+    partial_line(d,[(590,360),(910,360),(910,560),(590,560),(590,360)],prog(tau,t1,t1+0.5))
+    partial_line(d,[(560,600),(940,600)],prog(tau,t1+0.3,t1+0.6))
+    if tau>t1+0.5: ctext(d,420,"MOS",font(80),(30,150,70),cx=750)
+    if tau>t1+0.7: ctext(d,620,"тільки онлайн",font(44),(25,25,25),cx=750)
     # calendar
     t2=D*0.68
     partial_line(d,[(330,760),(750,760),(750,1130),(330,1130),(330,760)],prog(tau,t2,t2+0.4))
@@ -193,11 +222,11 @@ def scene_C(d,img,tau,s):
     for i,(txt,f0) in enumerate(rows):
         st=PAD_BEFORE+s["vdur"]*f0-0.2; p=ease(prog(tau,st,st+0.35))
         if p<=0: continue
-        y=520+i*190; x=W-(W-110)*p
-        d.rounded_rectangle((x,y,x+860,y+150),30,fill=(36,44,78))
+        y=520+i*190; x=W-(W-60)*p
+        d.rounded_rectangle((x,y,x+840,y+150),30,fill=(36,44,78))
         d.ellipse((x+30,y+30,x+120,y+120),fill=(60,200,130))
         d.line((x+52,y+77,x+72,y+98,x+102,y+52),fill="white",width=12)
-        d.text((x+150,y+45),txt,font=font(52),fill="white")
+        d.text((x+140,y+52),txt,font=font(44),fill="white")
     st=PAD_BEFORE+s["vdur"]*0.82; p=back(prog(tau,st,st+0.4))
     if p>0.05:
         d.rounded_rectangle((540-300*p,920,540+300*p,1100),40,fill=(255,214,10))
@@ -215,10 +244,10 @@ def scene_D(d,img,tau,s):
     for i,c in enumerate(cards):
         st=PAD_BEFORE+s["vdur"]*(0.2+i*0.27)-0.1; p=ease(prog(tau,st,st+0.35))
         if p<=0: continue
-        x=W-(W-80)*p; y=500+i*175
-        d.rounded_rectangle((x,y,x+920,y+145),30,fill="white")
+        x=W-(W-60)*p; y=500+i*175
+        d.rounded_rectangle((x,y,x+840,y+145),30,fill="white")
         d.ellipse((x+25,y+27,x+115,y+117),fill=(230,80,60)); ctext(d,y+42,str(i+1),font(56),"white",cx=int(x+70))
-        d.text((x+140,y+44),c,font=font(52),fill=(30,30,40))
+        d.text((x+138,y+46),c,font=font(50),fill=(30,30,40))
 def scene_E(d,img,tau,s):
     d.rectangle((0,0,W,H),fill=(46,58,89))
     p=back(prog(tau,0.0,0.45))
