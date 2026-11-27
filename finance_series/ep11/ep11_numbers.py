@@ -1,4 +1,4 @@
-"""EP11 numbers - every value in script.md comes from here. Run: python3 numbers.py"""
+"""EP11 numbers - every value in script.md comes from here. Run: python3 ep11_numbers.py"""
 import csv, os, re
 D = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
 

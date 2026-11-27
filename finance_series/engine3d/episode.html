@@ -1,0 +1,241 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<script type="module">
+// Data-driven 16:9 episode renderer: ?ep=epNN reads ../epNN/build3d/timeline.json; window.renderAt(t) -> JPEG dataURL
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, makeStage, makeSet, shot, blinkAt, bill, coin, cup, jar } from "./rig.js";
+const EP = new URLSearchParams(location.search).get("ep");
+const TL = await (await fetch(`../${EP}/build3d/timeline.json`)).json();
+const W = TL.w, H = TL.h;
+for (const [n, f] of [["Anton", "Anton-Regular.ttf"], ["Mont", "Montserrat.ttf"]]) { const ff = new FontFace(n, `url(../../ep2/fonts/${f})`); await ff.load(); document.fonts.add(ff); }
+const st = makeStage(W, H, 0x222244);
+const MAT = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, flatShading: true, ...o });
+function texCanvas(w, h, draw) { const cv = document.createElement("canvas"); cv.width = w; cv.height = h; draw(cv.getContext("2d"), w, h); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; }
+function neon(text, col, w = 4, h = 1.2) {
+  const t = texCanvas(1024, 200, (g, cw, ch) => { g.fillStyle = "rgba(0,0,0,0)"; g.fillRect(0, 0, cw, ch); let fs = 150; g.font = fs + "px Anton"; while (g.measureText(text).width > cw - 80) { fs -= 6; g.font = fs + "px Anton"; } g.textAlign = "center"; g.textBaseline = "middle"; g.shadowColor = col; g.shadowBlur = 30; g.fillStyle = col; g.fillText(text, cw / 2, ch / 2 + 6); g.shadowBlur = 0; g.fillStyle = "#ffffff"; g.globalAlpha = 0.55; g.fillText(text, cw / 2, ch / 2 + 6); });
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, transparent: true }));
+}
+// ------------------------------------------------------------ sets
+const SETS = { void: makeSet(st.scene, "void"), street: makeSet(st.scene, "street"), cafe: makeSet(st.scene, "cafe"), rich: makeSet(st.scene, "rich") };
+{ // store: purple wall, shelves of colourful boxes, neon sale signs
+  const g = new THREE.Group(); st.scene.add(g); SETS.store = g;
+  const fl = new THREE.Mesh(new THREE.CircleGeometry(30, 24), MAT(0x3b3150)); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; g.add(fl);
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 0.3), MAT(0x4a2f6e)); wall.position.set(0, 5, -4.5); wall.receiveShadow = true; g.add(wall);
+  const cols = [0xff6b5b, 0xffc23a, 0x38c6b4, 0x7f8cff, 0xff8ac6, 0x4fd17a];
+  for (const sx of [-6.5, -3.2, 3.2, 6.5]) { for (let r = 0; r < 3; r++) { const sh = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.1, 0.8), MAT(0xd8cbe8)); sh.position.set(sx, 0.9 + r * 1.1, -3.9); g.add(sh);
+    for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5 + ((k + r) % 2) * 0.2, 0.5), MAT(cols[(k + r * 2 + Math.abs(sx | 0)) % 6])); b.position.set(sx - 1 + k * 0.66, 1.2 + r * 1.1, -3.9); b.castShadow = true; g.add(b); } } }
+  const s1 = neon("-40%", "#ff3d6e", 3.2, 1.1); s1.position.set(-4.8, 4.3, -4.3); g.add(s1);
+  const s2 = neon("BLACK FRIDAY", "#ffc23a", 4.4, 1.1); s2.position.set(0, 4.75, -4.3); g.add(s2);
+  const s3 = neon("SALE", "#38c6b4", 2.6, 1.0); s3.position.set(4.8, 4.3, -4.3); g.add(s3);
+  SETS.store.signs = [s1, s2, s3];
+}
+{ // home: wall, window with night sky, sofa, lamp
+  const g = new THREE.Group(); st.scene.add(g); SETS.home = g;
+  const fl = new THREE.Mesh(new THREE.CircleGeometry(30, 24), MAT(0x7a5a48)); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; g.add(fl);
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 0.3), MAT(0xc9a8b8)); wall.position.set(0, 5, -4); wall.receiveShadow = true; g.add(wall);
+  const win = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.9), new THREE.MeshBasicMaterial({ map: texCanvas(256, 190, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#1a2350"); gr.addColorStop(1, "#4a3a7a"); c.fillStyle = gr; c.fillRect(0, 0, w, h); c.fillStyle = "#fff"; for (let i = 0; i < 25; i++) c.fillRect((i * 53) % w, (i * 37) % (h * 0.7), 2, 2); c.fillStyle = "#f5eccd"; c.beginPath(); c.arc(w * 0.75, h * 0.28, 16, 0, 7); c.fill(); }) }));
+  win.position.set(-3.2, 3.6, -3.84); g.add(win);
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(2.8, 2.1, 0.1), MAT(0xf3efe6)); frame.position.set(-3.2, 3.6, -3.9); g.add(frame);
+  const sofa = new THREE.Group(); const base = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.7, 1.2), MAT(0x5b6fb0)); base.position.y = 0.45; const back = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.0, 0.35), MAT(0x4d5f9a)); back.position.set(0, 1.0, -0.45);
+  sofa.add(base, back); for (const x of [-1.8, 1.8]) { const a = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.9, 1.2), MAT(0x4d5f9a)); a.position.set(x, 0.6, 0); sofa.add(a); }
+  sofa.position.set(2.6, 0, -2.9); sofa.traverse(o => o.castShadow = true); g.add(sofa);
+  const lamp = new THREE.Mesh(new THREE.ConeGeometry(0.45, 0.6, 8, 1, true), MAT(0xffe2a8, { side: THREE.DoubleSide, emissive: 0x664400 })); lamp.position.set(5.2, 2.6, -3.2); g.add(lamp);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.3), MAT(0x333333)); pole.position.set(5.2, 1.15, -3.2); g.add(pole);
+}
+const showSet = (n) => { for (const k in SETS) SETS[k].visible = k === n; };
+// ------------------------------------------------------------ characters (one rig per id)
+const CH = {};
+function getChar(id, who) { if (!CH[id] || CH[id].who !== who) { if (CH[id]) st.scene.remove(CH[id].root); CH[id] = makeChar(who); st.scene.add(CH[id].root); } return CH[id]; }
+// ------------------------------------------------------------ props
+const P = { rain: [], boxes: [], tags: {}, extra: {} };
+for (let i = 0; i < 40; i++) { const b = bill(i % 4 ? "50" : "100"); st.scene.add(b); P.rain.push({ m: b, x: (Math.random() - .5) * 9, z: (Math.random() - .5) * 3, sp: 1 + Math.random(), ph: Math.random() * 7 }); }
+const BOXCOL = [0xff6b5b, 0xffc23a, 0x38c6b4, 0x7f8cff, 0xff8ac6, 0x4fd17a, 0xf5a25a, 0x9a6edc];
+for (let i = 0; i < 16; i++) { const g = new THREE.Group(); const b = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.55, 0.6), MAT(0xc89a6a)); const tape = new THREE.Mesh(new THREE.BoxGeometry(0.77, 0.08, 0.62), MAT(BOXCOL[i % 8])); tape.position.y = 0.1; g.add(b, tape); g.traverse(o => o.castShadow = true); st.scene.add(g); P.boxes.push(g); }
+function tagMesh(text) {
+  if (P.tags[text]) return P.tags[text];
+  const t = texCanvas(512, 256, (g, w, h) => { g.fillStyle = "#fff6e0"; g.beginPath(); g.roundRect(8, 8, w - 16, h - 16, 40); g.fill(); g.lineWidth = 10; g.strokeStyle = "#1b1530"; g.stroke(); g.fillStyle = "#1b1530"; g.beginPath(); g.arc(60, h / 2, 18, 0, 7); g.fill();
+    g.font = `${text.length > 5 ? 120 : 150}px Anton`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = text.includes("x") ? "#2a9d5a" : "#e0344a"; g.fillText(text, w / 2 + 25, h / 2 + 8); });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 0.85), new THREE.MeshBasicMaterial({ map: t, transparent: true })); st.scene.add(m); P.tags[text] = m; return m;
+}
+P.extra.phone = (() => { const g = new THREE.Group(); const b = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.62, 0.05), MAT(0x1b1b24)); const sc = new THREE.Mesh(new THREE.PlaneGeometry(0.29, 0.54), new THREE.MeshBasicMaterial({ color: 0x8fe8ff })); sc.position.z = 0.03; g.add(b, sc); st.scene.add(g); return g; })();
+P.extra.card = (() => { const m = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.32, 0.02), MAT(0xd94848, { metalness: 0.3 })); st.scene.add(m); return m; })();
+P.extra.cup = (() => { const c = cup(); st.scene.add(c); return c; })();
+P.extra.jar = (() => { const j = jar(); j.scale.setScalar(1.7); st.scene.add(j); return j; })();
+P.extra.counter = (() => { const g = new THREE.Group(); const c = new THREE.Mesh(new THREE.BoxGeometry(3, 1.2, 1.0), MAT(0x2c2440)); c.position.y = 0.6; const top = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.1, 1.15), MAT(0xe8e2d8)); top.position.y = 1.25;
+  const reg = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.45, 0.5), MAT(0x3a3a46)); reg.position.set(0.6, 1.55, 0); const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.3), new THREE.MeshBasicMaterial({ color: 0x4fd17a })); scr.position.set(0.6, 1.62, 0.26);
+  g.add(c, top, reg, scr); g.traverse(o => { o.castShadow = true; o.receiveShadow = true; }); st.scene.add(g); return g; })();
+P.extra.button = (() => { const g = new THREE.Group(); const base = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.8, 0.25, 24), MAT(0x2a2a33)); base.rotation.x = Math.PI / 2;
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.22, 24), MAT(0x2fd56a, { emissive: 0x0a4a20 })); cap.rotation.x = Math.PI / 2; cap.position.z = 0.15;
+  const lbl = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.55), new THREE.MeshBasicMaterial({ transparent: true, map: texCanvas(256, 128, (c, w, h) => { c.font = "64px Anton"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#fff"; c.fillText("PAY IN 4", w / 2, h / 2 + 4); }) }));
+  lbl.position.z = 0.27; g.add(base, cap, lbl); st.scene.add(g); return g; })();
+P.extra.receipt = (() => { const t = texCanvas(256, 2048, (c, w, h) => { c.fillStyle = "#fbfbf6"; c.fillRect(0, 0, w, h); c.fillStyle = "#555"; c.font = "26px Mont"; for (let y = 60; y < h - 40; y += 46) { c.fillRect(20, y, 120 + (y * 7 % 60), 6); c.fillText("$" + (30 + (y * 13 % 9)), 170, y + 8); } });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 8), new THREE.MeshStandardMaterial({ map: t, side: THREE.DoubleSide, roughness: 0.9 })); st.scene.add(m); return m; })();
+function hideProps() { P.rain.forEach(r => r.m.visible = false); P.boxes.forEach(b => b.visible = false); for (const k in P.tags) P.tags[k].visible = false; for (const k in P.extra) P.extra[k].visible = false; }
+const V3 = THREE.Vector3; const grip = (c, side = "R") => c.arms[side].grip.getWorldPosition(new V3());
+// ------------------------------------------------------------ helpers
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const easeOut = k => 1 - Math.pow(1 - clamp(k), 3);
+const popK = k => { k = clamp(k); return k < 1 ? 1 + Math.sin(k * Math.PI) * 0.18 * (1 - k) * 2 : 1; };
+function sentAt(t) { const S = TL.sents; let lo = 0, hi = S.length - 1; if (t < S[0].t0) return 0; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (S[mid].t0 <= t) lo = mid; else hi = mid - 1; } return lo; }
+const hasRight = s => s.ov.some(o => (o.x || 0) > 0.55 || ["calendar", "chart", "paywith", "stat", "hours", "cards", "facts", "list"].includes(o.k) && (o.x || 0.68) > 0.55);
+// ------------------------------------------------------------ 3D frame
+function draw3D(s, t, si) {
+  showSet(s.set); st.scene.background.set(s.bg); st.scene.fog.color.set(s.bg); hideProps();
+  for (const id in CH) CH[id].root.visible = false;
+  const lt = t - s.t0, dur = s.t1 - s.t0;
+  let xs = [];
+  for (const [id, c] of Object.entries(s.chars)) {
+    const ch = getChar(id, c.who); ch.root.visible = true; ch.root.position.set(c.x || 0, 0, c.z || 0); ch.root.rotation.y = c.ry || 0; xs.push(c.x || 0);
+    const seed = id.length * 1.7;
+    applyPose(ch, c.from && c.from !== c.pose ? { from: c.from, to: c.pose || "idle", t0: s.t0 + 0.05, dur: 0.28 } : (c.pose || "idle"), t, { walk: !!c.walk, hop: !!c.hop, shake: !!c.shake, baseX: c.x || 0, seed, squash: c.from !== c.pose ? s.t0 + 0.1 : 0 });
+    const talk = (s.voice === "cashier" && c.who === "cashier") || (s.voice === "karl" && id === "karl");
+    setFace(ch, c.emo || "neutral", blinkAt(t, seed), [0, 0]);
+    if (talk) ch.head.position.y += 0;   // (faces are drawn; mouth flaps not needed for the meme style)
+  }
+  // props
+  for (const p of s.props) {
+    if (p.k === "rain") P.rain.forEach(r => { r.m.visible = true; const y = 7.5 - ((t * 2.0 * r.sp + r.ph) % 8); r.m.position.set(r.x + (xs[0] || 0) * 0.3, y, r.z); r.m.rotation.set(t * 3 * r.sp + r.ph, t * 2 + r.ph, t * r.sp); });
+    if (p.k === "boxes") { const n = p.n, prev = p.prev ?? n; for (let i = 0; i < n; i++) { const b = P.boxes.find(q => !q.visible); if (!b) break; b.visible = true;
+        const row = i < 3 ? 0 : i < 5 ? 1 : 2, col = i < 3 ? i : i < 5 ? i - 3 : 0, off = row === 0 ? -0.8 : row === 1 ? -0.4 : 0;
+        const k = i >= prev ? easeOut((lt - (i - prev) * 0.18) / 0.35) : 1; b.position.set((p.x || 0) + off + col * 0.8, 0.28 + row * 0.56 + (1 - k) * 3, p.z || 0); b.rotation.y = (i * 0.37) % 0.5 - 0.25; b.scale.setScalar(Math.max(0.01, k)); } }
+    if (p.k === "tag") { const swap = p.to && lt > (p.at || 0) * dur; const m = tagMesh(swap ? p.to : p.text); m.visible = true; m.position.set(p.x || 0, (p.y || 2.8) + Math.sin(t * 2.2) * 0.06, p.z || 0); m.quaternion.copy(st.camera.quaternion);
+      const k = swap ? (lt - (p.at || 0) * dur) / 0.3 : (si > 0 && TL.sents[si - 1].props.some(q => q.k === "tag")) ? 1 : lt / 0.3; m.scale.setScalar(popK(k) * easeOut(k * 2)); }
+    if (["phone", "card", "cup"].includes(p.k) && s.chars[p.on]) { const ch = CH[p.on], m = P.extra[p.k]; m.visible = true; const side = p.k === "card" ? "L" : "R"; m.position.copy(grip(ch, side)).add(new V3(0, 0.2, 0.15)); m.rotation.set(-0.3, ch.root.rotation.y, 0); }
+    if (p.k === "jar") { const m = P.extra.jar; m.visible = true; m.position.set(p.x || 0, (p.y || 1) + Math.sin(t * 2) * 0.05, p.z || 0); m.rotation.y = t * 0.6; }
+    if (p.k === "counter") { const m = P.extra.counter, c = s.chars.cash; m.visible = true; m.position.set(c ? c.x - 0.2 : 1.1, 0, c ? c.z + 1.0 : 0.4); }
+    if (p.k === "button") { const m = P.extra.button; m.visible = true; m.position.set(p.x || 0, (p.y || 2.4) + Math.sin(t * 3) * 0.06, 0.8); m.quaternion.copy(st.camera.quaternion); m.scale.setScalar(easeOut(lt / 0.4) * (1 + Math.max(0, Math.sin(t * 6)) * 0.04)); }
+    if (p.k === "receipt") { const m = P.extra.receipt; m.visible = true; const on = TL.sents.slice(0, si).reverse().findIndex(q => !q.props.some(r => r.k === "receipt")); const L = 0.5 + Math.min(7.5, (t - s.t0) * 2.2 + (si > 0 && TL.sents[si - 1].props.some(q => q.k === "receipt") ? 7 : 0));
+      m.scale.y = L / 8; m.position.set(p.x || 0, L / 2, p.z || 0); m.rotation.y = Math.sin(t) * 0.15; }
+  }
+  if (s.set === "store") SETS.store.signs.forEach((g, i) => g.material.opacity = 0.75 + 0.25 * Math.sin(t * 5 + i * 2));
+  // camera: preset + per-sentence variation + punch-in on hits
+  const cx = xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+  const right = hasRight(s) ? (s.ov.some(o => o.k === "chart") ? 1.75 : 1) : 0; const side = ((s.bi * 7 + s.si * 3) % 5 - 2) * 0.35;
+  const hit = s.sfx.some(x => /^(boom|pop|cash|stamp|thunk6|click)/.test(x));
+  const punch = hit && lt < 0.35 ? 0.12 * Math.sin(lt / 0.35 * Math.PI) : 0, shake = s.sfx.some(x => /^(boom|stamp)/.test(x)) && lt < 0.5 ? 0.05 : 0.006;
+  const k = lt / Math.max(1, dur);
+  const cam = s.cam[0];
+  if (cam === "close" && s.chars[s.cam[1]]) {
+    const c = s.chars[s.cam[1]], x = c.x || 0, z = c.z || 0, sh = right * 1.7;
+    shot(st.camera, [x + sh + side * 0.6 + 0.4, 2.9, z + 6.8], [x + sh + side * 0.6, 2.8, z + 5.9], [x + sh, 2.45, z], k, punch, shake, t);
+  } else if (cam === "two") {
+    const sh = right * 2.3; shot(st.camera, [cx + sh + side + 0.5, 2.8, 9.0], [cx + sh + side, 2.7, 8.1], [cx + sh, 1.95, 0], k, punch, shake, t);
+  } else {
+    const sh = right * 2.8; shot(st.camera, [cx + sh + side, 3.3, 12.5], [cx + sh + side * 0.5, 3.1, 11.2], [cx + sh, 2.0, 0], k, punch, shake, t);
+  }
+  st.renderer.render(st.scene, st.camera);
+}
+// ------------------------------------------------------------ 2D overlays
+const OUT = document.createElement("canvas"); OUT.width = W; OUT.height = H; const g = OUT.getContext("2d");
+const COL = { A: "#ff8a3d", B: "#38c6b4" };
+function txt(s, x, y, size, col = "#fff", font = "Anton", align = "center", stroke = 0.14, maxw = 1700) {
+  g.font = `${size}px ${font}`; while (g.measureText(s).width > maxw && size > 20) { size -= 4; g.font = `${size}px ${font}`; }
+  g.textAlign = align; g.textBaseline = "middle"; g.lineJoin = "round";
+  if (stroke) { g.lineWidth = size * stroke; g.strokeStyle = "#0d0a1a"; g.strokeText(s, x, y); }
+  g.fillStyle = col; g.fillText(s, x, y); return g.measureText(s).width;
+}
+function panel(x, y, w, h, col = "rgba(16,12,34,0.82)", r = 34, border = null) { g.fillStyle = col; g.beginPath(); g.roundRect(x, y, w, h, r); g.fill(); if (border) { g.lineWidth = 6; g.strokeStyle = border; g.stroke(); } }
+function pill(x, y, text, bg, fg = "#fff", size = 34, align = "left") { g.font = `${size}px Anton`; const w = g.measureText(text).width + size * 1.1; const x0 = align === "left" ? x : align === "right" ? x - w : x - w / 2; panel(x0, y, w, size * 1.6, bg, size * 0.8); txt(text, x0 + w / 2, y + size * 0.82, size, fg, "Anton", "center", 0); return w; }
+function withScale(cx, cy, k, fn) { g.save(); g.translate(cx, cy); g.scale(k, k); g.translate(-cx, -cy); fn(); g.restore(); }
+function caption(s, t) {
+  if (t < s.sp0 - 0.05 || t > s.sp1 + 0.25) return;
+  const words = s.sub.split(" "); g.font = "52px Mont"; const lines = [[]]; let w = 0;
+  for (const wd of words) { const ww = g.measureText(wd + " ").width; if (w + ww > 1500 && lines[lines.length - 1].length) { lines.push([]); w = 0; } lines[lines.length - 1].push(wd); w += ww; }
+  const y0 = H - 70 - (lines.length - 1) * 66;
+  lines.forEach((ln, li) => { const full = ln.join(" "); g.font = "800 52px Mont"; let x = W / 2 - g.measureText(full).width / 2;
+    for (const wd of ln) { const num = /[\d$%]/.test(wd); g.font = "800 52px Mont"; g.textAlign = "left"; g.textBaseline = "middle"; g.lineWidth = 11; g.lineJoin = "round"; g.strokeStyle = "#0d0a1a"; g.strokeText(wd, x, y0 + li * 66);
+      g.fillStyle = num ? "#ffc23a" : "#ffffff"; g.fillText(wd, x, y0 + li * 66); x += g.measureText(wd + " ").width; } });
+}
+function phone(cx, cy, w, h, fn) { panel(cx - w / 2 - 14, cy - h / 2 - 14, w + 28, h + 28, "#15121f", 56); panel(cx - w / 2, cy - h / 2, w, h, "#f4f1fa", 44); g.save(); g.beginPath(); g.roundRect(cx - w / 2, cy - h / 2, w, h, 44); g.clip(); fn(cx - w / 2, cy - h / 2); g.restore(); }
+function overlay(o, s, t) {
+  const age = t - o.on, k = easeOut(age / 0.3), pk = popK(age / 0.35); if (age < 0) return;
+  const X = (o.x ?? 0.5) * W;
+  switch (o.k) {
+    case "label": pill(36, 30, o.side === "A" ? "TIMELINE A · FOUR EASY PAYMENTS" : "TIMELINE B · FULL PRICE OUT LOUD", COL[o.side], "#10101a", 34); break;
+    case "tag": pill(W - 36, 30, o.text, "rgba(255,255,255,0.92)", "#1b1530", 34, "right"); break;
+    case "counter": withScale(W - 220, 150, pk, () => pill(W - 36, 112, o.text, "#ffc23a", "#1b1530", 44, "right")); break;
+    case "split": { const a = easeOut(age / 0.4); g.globalAlpha = a; pill(W * 0.25 - 330, 110, o.a, COL.A, "#10101a", 48); pill(W * 0.75 + 330, 110, o.b, COL.B, "#10101a", 48, "right"); g.globalAlpha = 1; break; }
+    case "title": { g.fillStyle = `rgba(8,6,20,${0.55 * k})`; g.fillRect(0, 0, W, H); withScale(W / 2, H * 0.42, pk * (0.6 + 0.4 * k), () => { txt(o.text, W / 2, H * 0.4, 150, o.col || "#ffffff"); if (o.sub) txt(o.sub, W / 2, H * 0.4 + 140, 80, "#ffc23a"); }); break; }
+    case "big": { const y = (o.y ?? 0.42) * H; withScale(X, y, pk * (0.5 + 0.5 * k), () => { txt(o.text, X, y, o.size || 230, o.col || "#fff", "Anton", "center", 0.12, o.x > 0.55 ? 820 : 1600); if (o.sub) txt(o.sub, X, y + (o.size || 230) * 0.68, 54, "#ffffff", "Anton", "center", 0.14, o.x > 0.55 ? 820 : 1600); }); break; }
+    case "stat": { const x = (o.x ?? 0.68) * W, y = H * 0.44; withScale(x, y, pk * (0.6 + 0.4 * k), () => { panel(x - 400, y - 230, 800, 440, "rgba(16,12,34,0.86)", 40, "#ffc23a"); txt(o.text, x, y - 60, 170, "#ffc23a", "Anton", "center", 0.1, 740); txt(o.sub, x, y + 85, 42, "#ffffff", "Anton", "center", 0, 740); txt("SOURCE: " + o.src, x, y + 160, 28, "#a9a3c9", "Mont", "center", 0, 740); }); break; }
+    case "vs": { const y = H * 0.4; g.fillStyle = `rgba(8,6,20,${0.45 * k})`; g.fillRect(0, 0, W, H);
+      withScale(W / 2, y, pk * (0.6 + 0.4 * k), () => { txt(o.l, W * 0.27, y, 190, o.col || "#ff4d5e"); txt(o.op, W / 2, y, 60, "#ffffff"); txt(o.r, W * 0.73, y, 190, "#ffffff"); if (o.sub) txt(o.sub, W / 2, y + 170, 54, "#ffc23a"); }); break; }
+    case "facts": o.items.forEach((it, i) => { const a = easeOut((age - i * 0.35) / 0.3); if (a <= 0) return; g.globalAlpha = a; pill(X - 360 + (1 - a) * 80, 260 + i * 120, it, i === 1 ? "#ffc23a" : "rgba(255,255,255,0.92)", "#1b1530", 50); g.globalAlpha = 1; }); break;
+    case "list": { const x = X - 330, y = 200; withScale(X, 450, pk * (0.6 + 0.4 * k), () => { panel(x, y, 660, 520, "#fff8e6", 30, "#1b1530"); txt(o.title, X, y + 70, 64, "#1b1530", "Anton", "center", 0);
+      o.items.forEach((it, i) => { panel(x + 48, y + 158 + i * 100, 44, 44, "#2a9d5a", 10); txt(it, x + 120, y + 180 + i * 100, 58, "#1b1530", "Anton", "left", 0); }); txt("TOTAL " + o.total, X, y + 440, 70, "#e0344a", "Anton", "center", 0); }); break; }
+    case "myth": { const x = W * 0.66, y = H * 0.42; withScale(x, y, pk * (0.6 + 0.4 * k), () => { panel(x - 430, y - 170, 860, 340, "rgba(16,12,34,0.88)", 40, "#ffffff"); txt("MYTH #" + o.n, x, y - 85, 60, "#ffc23a"); txt(o.text, x, y + 40, 84, "#ffffff", "Anton", "center", 0.1, 800); });
+      if (o.busted) { const b = easeOut((age < 1 ? (t - s.t0) : age) / 0.25); g.save(); g.translate(x, y); g.rotate(-0.18); g.scale(2 - b, 2 - b); g.globalAlpha = b; g.lineWidth = 12; g.strokeStyle = "#ff4d5e"; g.strokeRect(-260, -80, 520, 160); txt("BUSTED", 0, 4, 130, "#ff4d5e", "Anton", "center", 0); g.restore(); } break; }
+    case "stamp": { const b = easeOut(age / 0.2); g.save(); g.translate(W * 0.7, H * 0.3); g.rotate(-0.2); g.scale(2.4 - 1.4 * b, 2.4 - 1.4 * b); g.globalAlpha = b; g.lineWidth = 18; g.strokeStyle = o.col; g.strokeRect(-400, -130, 800, 260); txt(o.text, 0, 6, 200, o.col, "Anton", "center", 0); g.restore(); break; }
+    case "note": pill(W * 0.62, H - 250, o.text, "#38c6b4", "#10101a", 44, "center"); break;
+    case "timers": { const items = ["ENDS IN 00:0" + (9 - Math.floor(t) % 10) + ":" + String(59 - Math.floor(t * 7) % 60).padStart(2, "0"), "ONLY 2 LEFT!", "0% INTEREST", "PAY IN 4"];
+      items.forEach((it, i) => { const a = easeOut((age - i * 0.25) / 0.25); if (a <= 0) return; const x = [W * 0.6, W * 0.86, W * 0.62, W * 0.84][i], y = [250, 330, 470, 560][i] + Math.sin(t * 3 + i) * 10;
+        withScale(x, y, popK((age - i * 0.25) / 0.3), () => pill(x, y - 35, it, ["#ff4d5e", "#ffc23a", "#4fd17a", "#ff8ac6"][i], "#10101a", 50, "right")); }); break; }
+    case "hours": { const x0 = X - 380, y0 = 230, cw = 88, chh = 54; txt("HOURS OF WORK", X, y0 - 50, 60, "#ffffff");
+      const n = Math.min(o.hours, Math.floor(age / 1.6 * o.hours)); for (let d = 0; d < 5; d++) { txt(["MON", "TUE", "WED", "THU", "FRI"][d], x0 + d * 160 + 70, y0 + 30, 36, "#a9a3c9", "Anton", "center", 0);
+        for (let h = 0; h < 8; h++) { const idx = d * 8 + h; panel(x0 + d * 160 + 26, y0 + 70 + h * (chh + 8), cw, chh, idx < n ? o.col : "rgba(255,255,255,0.12)", 10); } }
+      txt("~" + Math.min(o.hours, n) + " HOURS", X, y0 + 600, 90, o.col); break; }
+    case "cards": { const R = ["SAY THE FULL PRICE OUT LOUD", "ONE PLAN AT A TIME", "NEVER PAY BNPL WITH A CREDIT CARD"]; txt("3 RULES", X, 150, 80, "#ffc23a");
+      for (let i = 0; i < 3; i++) { const on = i < (s.ov.find(q => q.k === "cards").n); const y = 260 + i * 190; panel(X - 440, y, 880, 160, on ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.12)", 30, on && i === s.ov.find(q => q.k === "cards").n - 1 ? "#38c6b4" : null);
+        if (on) { txt(String(i + 1), X - 370, y + 80, 100, "#38c6b4", "Anton", "center", 0); txt(R[i], X + 40, y + 80, 54, "#1b1530", "Anton", "center", 0, 700); } } break; }
+    case "calendar": calendar(o, s, t, age); break;
+    case "paywith": phone(X, H * 0.46, 430, 820, (x, y) => { g.fillStyle = "#1b1530"; g.fillRect(x, y, 430, 130); txt(o.mode === "min" ? "CREDIT CARD" : "PAYMENT DUE", x + 215, y + 70, 48, "#fff", "Anton", "center", 0);
+      if (o.mode === "min") { txt("BALANCE", x + 215, y + 220, 40, "#777", "Anton", "center", 0); txt("$1,200", x + 215, y + 300, 100, "#e0344a", "Anton", "center", 0); txt("MINIMUM DUE", x + 215, y + 430, 40, "#777", "Anton", "center", 0);
+        txt("$" + Math.round(TL.chart.first_min), x + 215, y + 510, 110, "#1b1530", "Anton", "center", 0); panel(x + 40, y + 640, 350, 100, "#2fd56a", 50); txt("PAY MINIMUM", x + 215, y + 690, 46, "#fff", "Anton", "center", 0); }
+      else { txt("$50", x + 215, y + 260, 150, "#1b1530", "Anton", "center", 0); txt("PAY WITH:", x + 215, y + 400, 44, "#777", "Anton", "center", 0); panel(x + 40, y + 450, 350, 110, "#ffe3e3", 24, "#e0344a"); txt("CREDIT CARD", x + 215, y + 505, 48, "#e0344a", "Anton", "center", 0);
+        panel(x + 40, y + 580, 350, 100, "#eeeeee", 24); txt("DEBIT CARD", x + 215, y + 630, 44, "#999", "Anton", "center", 0); } }); break;
+    case "chart": chart(o, s, t, age); break;
+  }
+}
+function calendar(o, s, t, age) {
+  const X = (o.x ?? 0.7) * W, mode = o.mode;
+  phone(X, H * 0.46, 470, 860, (x, y) => {
+    g.fillStyle = mode === "rent" ? "#178f80" : "#2a1f4a"; g.fillRect(x, y, 470, 120); txt(mode === "dec" ? "PAYMENTS" : "JANUARY", x + 235, y + 64, 60, "#fff", "Anton", "center", 0);
+    if (mode === "dec") { const rows = [["DEC 11", "$300"], ["DEC 25 · CHRISTMAS", "$300"], ["JAN 8 · + RENT", "$300"]]; txt("6 PLANS · EVERY 2 WEEKS", x + 235, y + 175, 34, "#555", "Anton", "center", 0);
+      rows.forEach((r, i) => { if (i >= (s.caln || 0)) return; const yy = y + 240 + i * 170; panel(x + 30, yy, 410, 140, i === 2 ? "#ffe1e1" : "#ffffff", 24, i === 2 ? "#e0344a" : "#d8d2e8"); txt(r[0], x + 60, yy + 45, 38, "#1b1530", "Anton", "left", 0); txt(r[1], x + 60, yy + 100, 56, "#e0344a", "Anton", "left", 0); });
+      return; }
+    const cx0 = x + 30, cy0 = y + 160, cs = 58; ["M", "T", "W", "T", "F", "S", "S"].forEach((d, i) => txt(d, cx0 + i * cs + cs / 2, cy0, 28, "#999", "Anton", "center", 0));
+    for (let d = 1; d <= 31; d++) { const idx = d + 3, r = Math.floor((idx - 1) / 7), c = (idx - 1) % 7, xx = cx0 + c * cs + cs / 2, yy = cy0 + 50 + r * 62;
+      if (d === 8) { panel(xx - 27, yy - 27, 54, 54, mode === "rent" ? "#38c6b4" : "#e0344a", 27); } txt(String(d), xx, yy, 30, d === 8 ? "#fff" : "#333", "Anton", "center", 0); }
+    const by = y + 560;
+    if (mode === "rent") { panel(x + 30, by, 410, 110, "#e0f7f3", 24, "#38c6b4"); txt("JAN 8 · RENT · PAID", x + 235, by + 55, 44, "#178f80", "Anton", "center", 0); txt("NOTHING ELSE DUE", x + 235, by + 175, 40, "#178f80", "Anton", "center", 0); return; }
+    const n = mode === "full" ? 6 : Math.min(6, Math.floor((age - 0.2) / 0.35) + 1);
+    for (let i = 0; i < 6; i++) { if (i >= n) continue; const a = mode === "full" ? 1 : easeOut((age - 0.2 - i * 0.35) / 0.25); const bx = x + 40 + (i % 3) * 135, byy = by + Math.floor(i / 3) * 80 - (1 - a) * 300;
+      panel(bx, byy, 120, 64, "#e0344a", 32); txt("$50", bx + 60, byy + 33, 40, "#fff", "Anton", "center", 0); }
+    if (mode === "full" || age > 2.6) { panel(x + 30, by + 175, 410, 80, "#1b1530", 20); txt("+ RENT", x + 235, by + 215, 46, "#ff4d5e", "Anton", "center", 0); }
+  });
+}
+function chart(o, s, t, age) {
+  const pts = TL.chart.pts, n = pts.length - 1, x0 = W * 0.3, x1 = W * 0.94, y0 = 220, y1 = 800, maxV = 2400;
+  panel(x0 - 70, y0 - 110, x1 - x0 + 120, y1 - y0 + 200, "rgba(16,12,34,0.86)", 36);
+  txt("$1,200 ON A 21% CARD · MINIMUM PAYMENTS", (x0 + x1) / 2, y0 - 55, 44, "#ffffff", "Anton", "center", 0);
+  g.strokeStyle = "rgba(255,255,255,0.15)"; g.lineWidth = 2;
+  for (const v of [0, 600, 1200, 1800, 2400]) { const y = y1 - (v / maxV) * (y1 - y0); g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); txt("$" + v.toLocaleString("en-US"), x0 - 14, y, 28, "#a9a3c9", "Mont", "right", 0); }
+  for (let yr = 0; yr <= 7; yr++) { const x = x0 + (yr * 12 / n) * (x1 - x0); txt(String(2027 + yr), x, y1 + 40, 30, "#a9a3c9", "Anton", "center", 0); }
+  const k = clamp(age / 7); const m = Math.floor(k * n);
+  const line = (idx, col, w) => { g.strokeStyle = col; g.lineWidth = w; g.lineJoin = "round"; g.beginPath(); for (let i = 0; i <= m; i++) { const x = x0 + (i / n) * (x1 - x0), y = y1 - (pts[i][idx] / maxV) * (y1 - y0); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); };
+  line(1, "#ff4d5e", 9); line(2, "#ffc23a", 7);
+  const lx = x0 + (m / n) * (x1 - x0);
+  txt("BALANCE", x0 + 30, y1 - (pts[Math.min(m, 6)][1] / maxV) * (y1 - y0) - 40, 38, "#ff4d5e", "Anton", "left", 0.1);
+  txt("TOTAL PAID $" + Math.round(pts[m][2] / 10) * 10, Math.min(lx, x1 - 260), y1 - (pts[m][2] / maxV) * (y1 - y0) - 40, 40, "#ffc23a", "Anton", "center", 0.1);
+  txt("MONTH " + m + " · " + (m / 12).toFixed(1) + " YEARS", (x0 + x1) / 2, y1 + 95, 40, "#ffffff", "Anton", "center", 0);
+  if (o.show === "interest" || s.ov.some(q => q.k === "chart" && q.show)) { panel(x0 + 40, y0 + 10, 520, 110, "#ff4d5e", 24); txt("INTEREST ~$1,070", x0 + 300, y0 + 65, 60, "#ffffff", "Anton", "center", 0); }
+}
+function endScreen(t) {
+  const a = easeOut((t - TL.end_t0) / 0.6); g.fillStyle = `rgba(8,6,20,${0.6 * a})`; g.fillRect(0, 0, W, H);
+  g.globalAlpha = a; txt(TL.end.text, W / 2, 140, 110, "#ffc23a");
+  for (const x of [W * 0.27, W * 0.73]) { panel(x - 380, 260, 760, 428, "rgba(255,255,255,0.08)", 30, "rgba(255,255,255,0.5)"); }
+  txt(TL.end.sub, W / 2, 860, 64, "#ffffff"); g.globalAlpha = 1;
+}
+// ------------------------------------------------------------ main
+window.renderAt = (t) => {
+  const si = sentAt(Math.min(t, TL.end_t0 - 0.01)); const s = TL.sents[si];
+  if (t >= TL.end_t0) { // end screen: Karl waves in the void
+    const e = { ...TL.sents[TL.sents.length - 1], set: "void", bg: "#1d1a33", chars: { karl: { who: "you", x: 0, z: 0, pose: "cheer", emo: "happy", hop: true, from: "cheer" } }, props: [], cam: ["wide"], ov: [], sfx: [], t0: TL.end_t0, t1: TL.total };
+    draw3D(e, t, si);
+  } else draw3D(s, t, si);
+  g.drawImage(st.renderer.domElement, 0, 0);
+  if (window.CLEAN) {} else if (t < TL.end_t0) { for (const o of s.ov) overlay(o, s, t); caption(s, t); } else endScreen(t);
+  return OUT.toDataURL("image/jpeg", 0.9);
+};
+window.ready = true;
+</script></body></html>

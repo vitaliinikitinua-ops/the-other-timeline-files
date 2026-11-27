@@ -108,6 +108,21 @@ shake), eye blinks. Do this before the next new episode and show the user a test
 - Render ~5-8 min per Short on 4 CPUs; run 3 in parallel with `xargs -P 3`, then wait with a background until-loop.
 - Thumbnail C variants (huge number + one big face): `engine/thumbs_test.py` -> `epNN/tests/thumb_C.jpg`.
 
+## 3D long-video pipeline (built for Video #1 / ep11, 28.11.2026) - USE THIS for new videos
+- Content: `epNN/ep.py` = META (title, file, speed 1.0, music_seed), BEATS = [(name, base_state, [S(sub, spoken, **changes)])],
+  END, SHORTS. State carries sentence to sentence: set (store home void street cafe rich), bg, chars {id: {who,x,z,ry,pose,emo,walk,hop,shake}}
+  (dict without `who` = partial update, None = hide), props (tag/to/at, boxes n, rain, phone/card/cup on=id, jar, counter, button, receipt),
+  cam ["wide"|"two"|"close", id], ov (2D overlays: label tag counter split title big stat vs facts list myth stamp note timers hours cards
+  calendar paywith chart). `title`/`stamp` last one sentence; others carry until replaced. Overlays on the right (x>0.55) shift the camera
+  so characters stand left. sfx tokens: boom thud whoosh rewind pop click ding cash tick sad buzz stamp thunk6 musicstop, `name@0.4` = offset.
+  voice="cashier"/"karl" = pitch-shifted Piper for dialogue.
+- Build: `cd finance_series/engine3d && python3 epbuild.py epNN timeline` (Piper TTS + timing + captions_en.srt; prints minutes and words),
+  `stills [t1,t2..]` -> build3d/contact.jpg (CHECK IT before rendering), `audio`, `render` (4 workers, ~0.2 s/frame each, ~15-20 min for 8 min),
+  `mux` -> epNN/<file>.mp4 (loudnorm -14 LUFS). Shorts: `python3 shorts3d.py epNN`. Clean frames for thumbnails:
+  `node render_ep.js epNN stills t1,t2 clean` -> build3d/clean/, then `epNN/thumbs.py`.
+- Length: Piper speed 1.0 gives ~2.8 words/s incl. gaps -> 1,380 words = 8.2 min with a 15 s end screen. Speed 1.15 was too fast (6.7 min).
+- Never name an episode helper `numbers.py` (shadows the stdlib module and breaks PIL) -> `epNN_numbers.py`.
+
 ## Standing user decisions (28.11.2026)
 - MAIN HERO of every video = **Karl** (cast.js key `you`, name "Karl"). Narration and on-screen text call him Karl; the story is still told so the viewer sees themselves in him.
 - ROUND all money on screen and in the voice-over so it looks clean ($1,200, ~$390, ~$2,850, ~32 hours). Exact values stay in BRIEF.md / the description's method section.

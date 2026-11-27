@@ -2,7 +2,7 @@
 Hero: Karl (cast `you`) · Side: Cashier · Timelines: A "Four Easy Payments" / B "Full Price Out Loud"
 Target 8:30-9:30 · VO English (Piper) · all money ROUNDED on screen and in VO (exact values in BRIEF.md)
 
-Numbers (computed, `ep11/numbers.py`): cart full price $2,000 -> -40% = $1,200 = 6 plans x $200 = 24 payments of $50 ·
+Numbers (computed, `ep11/ep11_numbers.py`): cart full price $2,000 -> -40% = $1,200 = 6 plans x $200 = 24 payments of $50 ·
 avg hourly pay $38.00 (Oct 2026) -> ~32 h · card APR 21.19% (Aug 2026) · $1,200 at minimum payments -> 87 months (~7 years),
 $1,072 interest (~$1,070), $2,272 total (~$2,270) · $800 in S&P 500 Sep 2016 -> Sep 2026 x3.55 -> ~$2,850 (price only) ·
 CFPB: 63% stack loans · LendingTree: 41% paid late (2026: 47%) · late fee up to $7-8 · Adobe: $20B BNPL holiday 2025.
@@ -10,7 +10,7 @@ CFPB: 63% stack loans · LendingTree: 41% paid late (2026: 47%) · late fee up t
 ---
 
 ## 0:00-0:15 · END FIRST
-[Phone screen, January calendar. Friday the 8th: six bubbles "$50" drop onto it one by one — thunk, thunk, thunk — then a fat red "RENT". Bank app: "-$12". Karl stares, eye twitches. Freeze. Tape-rewind sound, card: "6 WEEKS EARLIER · BLACK FRIDAY".]
+[Phone screen, January calendar. Friday the 8th: six bubbles "$50" drop onto it one by one — thunk, thunk, thunk — then a fat red "RENT". Bank app: "PAYCHECK GONE". Karl stares, eye twitches. Freeze. Tape-rewind sound, card: "6 WEEKS EARLIER · BLACK FRIDAY".]
 
 VO: This is Karl. It's January, and his whole paycheck is already gone. Not to rent. Not to food. To six tiny payments of fifty dollars. How did it happen? One button.
 
@@ -109,4 +109,4 @@ VO: So, did you guess right? Was your number closer to twelve hundred, or to twe
 [End screen 15 s: next video + subscribe.]
 
 ---
-Word count (VO only): see numbers.py output. Shorts candidates: (1) "-40% cost him MORE than full price" 0:35 reveal cut; (2) "$50 x 24 = ?" guess Short; (3) "Never pay BNPL with a credit card" rule Short.
+Word count (VO only): see ep11_numbers.py output. Shorts candidates: (1) "-40% cost him MORE than full price" 0:35 reveal cut; (2) "$50 x 24 = ?" guess Short; (3) "Never pay BNPL with a credit card" rule Short.

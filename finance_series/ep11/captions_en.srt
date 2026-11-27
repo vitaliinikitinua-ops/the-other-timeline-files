@@ -1,0 +1,551 @@
+1
+00:00:00,430 --> 00:00:01,219
+This is Karl.
+
+2
+00:00:01,639 --> 00:00:04,460
+It's January, and his whole paycheck is already gone.
+
+3
+00:00:04,880 --> 00:00:06,242
+Not to rent. Not to food.
+
+4
+00:00:06,662 --> 00:00:08,926
+To six tiny payments of $50.
+
+5
+00:00:09,346 --> 00:00:10,836
+How did it happen? One button.
+
+6
+00:00:12,156 --> 00:00:14,725
+Black Friday. 40% off everything.
+
+7
+00:00:15,145 --> 00:00:17,409
+And at every checkout, the same friendly button:
+
+8
+00:00:17,829 --> 00:00:19,690
+"Pay in 4. Zero interest."
+
+9
+00:00:20,110 --> 00:00:20,992
+Here's your question.
+
+10
+00:00:21,412 --> 00:00:24,710
+By the end of this story, how much did Karl really spend?
+
+11
+00:00:25,130 --> 00:00:27,354
+Guess a number now. Write it down. Keep it.
+
+12
+00:00:28,674 --> 00:00:32,010
+Karl is 26. Normal job, normal paycheck,
+
+13
+00:00:32,430 --> 00:00:34,729
+one credit card he's proud of not using much.
+
+14
+00:00:35,149 --> 00:00:36,963
+He's not reckless. He has a list:
+
+15
+00:00:37,383 --> 00:00:40,858
+a winter jacket and a gift for his mom. About $400.
+
+16
+00:00:41,278 --> 00:00:41,975
+That's the plan.
+
+17
+00:00:42,395 --> 00:00:45,948
+We're going to watch two versions of Karl walk into the same Black Friday.
+
+18
+00:00:46,368 --> 00:00:47,749
+Timeline A uses the button.
+
+19
+00:00:48,169 --> 00:00:50,456
+Timeline B uses one strange little habit.
+
+20
+00:00:50,876 --> 00:00:53,512
+Same guy, same money, same sales.
+
+21
+00:00:54,832 --> 00:00:57,366
+Timeline A. The jacket is $200.
+
+22
+00:00:57,786 --> 00:00:58,912
+Too much for one day.
+
+23
+00:00:59,332 --> 00:01:00,621
+But the Cashier leans in.
+
+24
+00:01:01,041 --> 00:01:02,129
+"Or just $50 today!"
+
+25
+00:01:02,549 --> 00:01:04,889
+Fifty. Fifty is nothing. Fifty is a dinner.
+
+26
+00:01:05,309 --> 00:01:05,565
+Click.
+
+27
+00:01:05,985 --> 00:01:08,539
+Here's the trick, and it's not Karl being stupid.
+
+28
+00:01:08,959 --> 00:01:12,411
+Your brain doesn't feel $200. It feels $50.
+
+29
+00:01:12,831 --> 00:01:16,813
+Splitting a price into four makes paying hurt about four times less.
+
+30
+00:01:17,233 --> 00:01:18,920
+That's not a bug. That's the product.
+
+31
+00:01:19,340 --> 00:01:24,216
+Stores pay these apps a fee on every sale, because people who split the price buy more.
+
+32
+00:01:24,636 --> 00:01:28,761
+One study from the U.S. National Bureau of Economic Research found
+
+33
+00:01:29,181 --> 00:01:35,187
+that after people start using buy now, pay later, their spending goes up and stays up, around $60 a week.
+
+34
+00:01:36,507 --> 00:01:38,531
+Then the headphones. Fifty today.
+
+35
+00:01:38,951 --> 00:01:40,487
+The sneakers. Fifty today.
+
+36
+00:01:40,907 --> 00:01:43,662
+A speaker he didn't know he needed. Fifty today.
+
+37
+00:01:44,082 --> 00:01:47,220
+None of these feel big, because none of them are big. Alone.
+
+38
+00:01:47,640 --> 00:01:51,657
+And here's the sneaky part: each app only sees its own fifty dollars.
+
+39
+00:01:52,077 --> 00:01:56,725
+Nobody adds them up. Not the store, not the app, and definitely not Karl at midnight.
+
+40
+00:01:57,145 --> 00:02:00,593
+By Cyber Monday, Karl has six plans in four different apps.
+
+41
+00:02:01,013 --> 00:02:02,197
+And he's not unusual.
+
+42
+00:02:02,617 --> 00:02:06,777
+The U.S. Consumer Financial Protection Bureau looked at real borrowers:
+
+43
+00:02:07,197 --> 00:02:10,935
+63% had several of these loans open at the same time.
+
+44
+00:02:11,355 --> 00:02:13,074
+A third used more than one app.
+
+45
+00:02:13,494 --> 00:02:15,955
+And it peaks exactly now, during the holidays.
+
+46
+00:02:16,375 --> 00:02:21,974
+Last holiday season Americans put about $20 billion on buy now, pay later online.
+
+47
+00:02:22,394 --> 00:02:24,813
+Remember your guess? Here's the first real number.
+
+48
+00:02:25,233 --> 00:02:26,765
+Six plans of $200.
+
+49
+00:02:27,185 --> 00:02:29,484
+Karl just spent $1,200.
+
+50
+00:02:29,904 --> 00:02:31,239
+Three times his list.
+
+51
+00:02:32,559 --> 00:02:34,359
+And look at everything around that button.
+
+52
+00:02:34,779 --> 00:02:38,524
+A timer. "Only two left." A big green "zero interest".
+
+53
+00:02:38,944 --> 00:02:42,288
+All of it is built to make you decide in seconds, not days.
+
+54
+00:02:42,708 --> 00:02:44,519
+Now the two myths Karl believes.
+
+55
+00:02:44,939 --> 00:02:47,207
+Myth one: "It's interest-free, so it's free."
+
+56
+00:02:47,627 --> 00:02:51,818
+It's free only if every single payment is on time, and only if you would have bought it anyway.
+
+57
+00:02:52,238 --> 00:02:57,013
+40% off something you didn't plan to buy isn't a saving. It's 60% spent.
+
+58
+00:02:57,433 --> 00:02:59,375
+Myth two: "It's not real debt."
+
+59
+00:02:59,795 --> 00:03:00,434
+It is a loan.
+
+60
+00:03:00,854 --> 00:03:04,523
+And for years most of these loans didn't even show up on credit reports.
+
+61
+00:03:04,943 --> 00:03:07,056
+Which means nobody saw the full stack.
+
+62
+00:03:07,476 --> 00:03:09,825
+Not the banks, not the apps. Not even Karl.
+
+63
+00:03:11,145 --> 00:03:14,538
+Timeline B. Same jacket, same Cashier, same button.
+
+64
+00:03:14,958 --> 00:03:16,046
+"Or just $50 today!"
+
+65
+00:03:16,466 --> 00:03:17,940
+But this Karl has one rule.
+
+66
+00:03:18,360 --> 00:03:20,914
+Before he pays, he says the full price out loud.
+
+67
+00:03:21,334 --> 00:03:22,318
+"Two hundred dollars."
+
+68
+00:03:22,738 --> 00:03:26,527
+It sounds silly. It works, because now his brain hears the real number.
+
+69
+00:03:26,947 --> 00:03:29,934
+Then a second question: would I pay $200 in cash, today?
+
+70
+00:03:30,354 --> 00:03:32,517
+For the jacket, yes. He planned it.
+
+71
+00:03:32,937 --> 00:03:34,694
+He pays with his debit card. Done.
+
+72
+00:03:35,114 --> 00:03:38,566
+For the headphones he says it out loud: "$199."
+
+73
+00:03:38,986 --> 00:03:40,460
+He hears how it sounds.
+
+74
+00:03:40,880 --> 00:03:43,562
+So he leaves them in the cart for 48 hours.
+
+75
+00:03:43,982 --> 00:03:48,409
+Black Friday prices aren't the last sale of the year. Most of them come back before Christmas.
+
+76
+00:03:48,829 --> 00:03:51,279
+Two days later, he doesn't even remember them.
+
+77
+00:03:51,699 --> 00:03:54,980
+Timeline B spends $400. The list. Nothing else.
+
+78
+00:03:56,300 --> 00:03:58,869
+Let's translate this into something money hides: time.
+
+79
+00:03:59,289 --> 00:04:03,341
+The average American earns about $38 an hour before tax.
+
+80
+00:04:03,761 --> 00:04:07,441
+So Timeline A's $1,200 is about 32 hours of work.
+
+81
+00:04:07,861 --> 00:04:11,484
+Four full days of Karl's life, for things he mostly didn't plan to buy.
+
+82
+00:04:11,904 --> 00:04:16,025
+Timeline B's extra, the stuff he didn't buy, is $800.
+
+83
+00:04:16,445 --> 00:04:18,140
+21 hours he gets to keep.
+
+84
+00:04:19,460 --> 00:04:20,598
+Back to Timeline A.
+
+85
+00:04:21,018 --> 00:04:25,306
+Every two weeks, six payments land on the same days. $300.
+
+86
+00:04:25,726 --> 00:04:26,828
+On December 11th.
+
+87
+00:04:27,248 --> 00:04:28,212
+On Christmas day.
+
+88
+00:04:28,632 --> 00:04:30,981
+On January 8th, the same week as rent.
+
+89
+00:04:31,401 --> 00:04:33,491
+And Karl is not the only one struggling.
+
+90
+00:04:33,911 --> 00:04:39,901
+In a LendingTree survey, 41% of people who use these loans paid late at least once in a year.
+
+91
+00:04:40,321 --> 00:04:42,330
+The latest version says 47.
+
+92
+00:04:42,750 --> 00:04:46,991
+Late fees are up to $7 or $8 a time, and a missed payment can freeze the app.
+
+93
+00:04:47,411 --> 00:04:52,810
+And some providers have started reporting these loans to credit bureaus, so a late payment can follow you.
+
+94
+00:04:53,230 --> 00:04:57,804
+Karl has three hundred dollars due, rent next to it, and a paycheck that doesn't stretch.
+
+95
+00:04:58,224 --> 00:05:00,314
+So Karl does what feels smart.
+
+96
+00:05:01,634 --> 00:05:04,895
+Meanwhile, Timeline B. January 8th. Rent. That's it.
+
+97
+00:05:05,315 --> 00:05:07,103
+No bubbles, no buzzing apps.
+
+98
+00:05:07,523 --> 00:05:09,485
+Honestly, it's a boring January.
+
+99
+00:05:09,905 --> 00:05:15,571
+Karl B didn't get the speaker or the gaming chair, and for about two days he felt like he lost Black Friday.
+
+100
+00:05:15,991 --> 00:05:17,407
+But his paycheck is his again.
+
+101
+00:05:17,827 --> 00:05:22,007
+And the $800 he didn't spend is still sitting there, waiting for a decision.
+
+102
+00:05:23,327 --> 00:05:26,334
+He pays each $50 payment with his credit card.
+
+103
+00:05:26,754 --> 00:05:30,078
+No late fees, no freezes. Problem solved, right?
+
+104
+00:05:30,498 --> 00:05:31,392
+Here's the twist.
+
+105
+00:05:31,812 --> 00:05:36,735
+The zero-interest loan just moved onto a card that charges about 21% a year.
+
+106
+00:05:37,155 --> 00:05:41,721
+That's the U.S. average on cards that pay interest, August 2026.
+
+107
+00:05:42,141 --> 00:05:45,438
+By January, the whole $1,200 is sitting on that card.
+
+108
+00:05:45,858 --> 00:05:49,573
+And Karl pays the minimum, because the minimum is what the app suggests.
+
+109
+00:05:49,993 --> 00:05:54,049
+His first minimum payment is only about $33. Sounds harmless.
+
+110
+00:05:54,469 --> 00:05:58,907
+But about two thirds of that $33 is just interest. The debt barely moves.
+
+111
+00:06:00,227 --> 00:06:03,145
+So, your guess. How much did Karl really spend?
+
+112
+00:06:03,565 --> 00:06:07,187
+At the minimum payment, it takes him about 7 years to clear the card.
+
+113
+00:06:07,607 --> 00:06:09,700
+Seven years. For a Black Friday.
+
+114
+00:06:10,120 --> 00:06:13,232
+He pays about $1,070 in interest.
+
+115
+00:06:13,652 --> 00:06:16,477
+Total: about $2,270.
+
+116
+00:06:16,897 --> 00:06:20,197
+And remember the full price, before the 40% off? $2,000.
+
+117
+00:06:20,617 --> 00:06:22,707
+Karl paid more than full price for a sale.
+
+118
+00:06:23,127 --> 00:06:23,940
+And Timeline B?
+
+119
+00:06:24,360 --> 00:06:32,371
+If he had put those $800 into the S&P 500 ten years ago, they'd be worth about $2,850 today.
+
+120
+00:06:32,791 --> 00:06:34,498
+That's history, not a promise.
+
+121
+00:06:34,918 --> 00:06:39,069
+But the gap is real: one Karl has a seven-year receipt, the other has money.
+
+122
+00:06:40,389 --> 00:06:43,261
+To be fair: buy now, pay later is not evil.
+
+123
+00:06:43,681 --> 00:06:50,368
+If you pay every installment on time, from money you already have, for something you'd buy anyway, it really is zero interest.
+
+124
+00:06:50,788 --> 00:06:54,565
+Some people use it well. The trap is the stack, and the card behind it.
+
+125
+00:06:54,985 --> 00:06:59,907
+And the trap is designed for exactly the moment you're tired, it's late, and the timer says nine minutes.
+
+126
+00:07:00,327 --> 00:07:03,477
+So three rules. Simple enough to remember at the checkout.
+
+127
+00:07:03,897 --> 00:07:08,827
+Rule one: say the full price out loud. If you wouldn't pay it in cash today, don't split it.
+
+128
+00:07:09,247 --> 00:07:12,923
+Rule two: one plan at a time. Never for groceries or bills.
+
+129
+00:07:13,343 --> 00:07:15,862
+If you need a second plan, you can't afford the first.
+
+130
+00:07:16,282 --> 00:07:20,500
+Rule three: never pay a buy-now-pay-later loan with a credit card.
+
+131
+00:07:20,920 --> 00:07:24,232
+And if you already have a stack, don't panic. Three steps, tonight.
+
+132
+00:07:24,652 --> 00:07:29,997
+One: open every app and write every date and amount in one calendar. See the real total.
+
+133
+00:07:30,417 --> 00:07:35,177
+Two: pay the smallest plan off first, so the number of payments shrinks fast.
+
+134
+00:07:35,597 --> 00:07:39,768
+Three: no new plans until the list is empty. Delete the apps if you have to.
+
+135
+00:07:40,188 --> 00:07:42,661
+This is education, not financial advice.
+
+136
+00:07:43,981 --> 00:07:45,270
+So, did you guess right?
+
+137
+00:07:45,690 --> 00:07:50,175
+Was your number closer to $1,200, or to $2,270? Tell me in the comments.
+
+138
+00:07:50,595 --> 00:07:53,570
+And how many of these plans do you have open right now? Be honest.
