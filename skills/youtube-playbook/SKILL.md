@@ -21,6 +21,10 @@ Mark every rule as **[data]** (seen in our numbers), **[competitor]** (seen in o
 | Style of long videos | Decided after the Shorts style test (winner style becomes the long-video style) |
 | Old long EP04-EP10 | Not published. New episodes are made from scratch. |
 | Old hourly queue task | Disabled 27.11 (trig_01FmjYgwucogcmCG1FL8f6N2) |
+| Hook (first 3 s) | **END FIRST** (flash-forward): open on the final outcome - rich/broke/shocked character + the final number - then "how did this happen?" and rewind to the start |
+| Tone | Irony + drama: funny recurring cast (You, Max, Grandma, Banker), serious real numbers |
+| Characters | Keep our cast but IMPROVE them: hands with gestures, more emotions, body motion (walk, jump, slump) - engine TODO |
+| Retention device (long videos) | **Viewer guesses**: an open question on screen in the first 30 s ("Who ends up richer? Guess now"), reminders mid-video, answer revealed near the end |
 Package for every long video (user uploads in Studio): mp4, 3 thumbnails A/B/C for Test & Compare, title (<= 55 chars),
 description with chapters + method + sources + not financial advice, tags, first comment (question), suggested end screen.
 
@@ -36,7 +40,10 @@ description with chapters + method + sources + not financial advice, tags, first
   headline, or a character reacting. **[practice]**
 - Say the payoff-promise in the first sentence: "$5,000 on a card, minimum payments only - it takes 19 years." **[competitor]**
 - Headline on screen = the question the video answers, max 2 lines x 22 characters, white line + yellow line. **[practice]**
-- Hook types that we can make (pick one per video, rotate to test):
+- DEFAULT HOOK (user choice): **end first**. Frame 1 = the ending (character's reaction + final number, e.g. "$198,344"
+  or "19 YEARS"), line 1 = the outcome ("This is me, 20 years later, with $198,344. Because I said NO."), line 2 = the
+  rewind ("Let's go back to day one."), visual rewind effect (fast reverse + "20 YEARS EARLIER" card).
+- Other hook types (use only for tests):
   1. **Big number** cold-open (number counts up in 1 s, sub-line explains). 2. **Question + A/B quiz** (answer at the end).
   3. **Contrast** ("same $200/month, 18 vs 30"). 4. **Impossible premise** ("every NO pays you $1").
   5. **Mistake** ("he invested at the worst moment").
@@ -68,13 +75,15 @@ y 1906-1920 progress bar (amber), grows with time
 ## 4. Long videos (8-10 min) - beat map
 | Time | What | Why |
 |---|---|---|
-| 0:00-0:20 | Hook: both endings teased + the big number + "stay to the end for the twist" | intro drop-off |
+| 0:00-0:15 | END FIRST: final scene + final number + reaction, then rewind card | intro drop-off |
+| 0:15-0:30 | The GUESS: question on screen "Who ends up richer? A or B - guess now" | open loop |
 | 0:20-1:00 | Setup: who (You/Max/Grandma), the rule, the stakes in one sentence | context |
-| ~1:00 | First "open loop": a question answered only at the end | retention |
+| every ~2 min | Remind the guess ("Still think A?") with a small on-screen tag | retention |
 | every 45-60 s | A new scene / twist / number reveal; never the same frame > 6 s | re-hook |
 | middle | Chart race or timeline split - the visual payoff | value |
 | 60-75% | Twist (stopper, late start, crash) | mid-video dip |
-| last 90 s | Honest part, 3 practical rules, question for comments | trust + engagement |
+| ~85% | REVEAL the answer to the guess with a big moment | payoff |
+| last 90 s | Honest part, 3 practical rules, question for comments ("Did you guess right?") | trust + engagement |
 | last 15 s | End screen (next video + subscribe) | session time |
 - Our data says longs get 0-6 views without an audience **[data]**, but the user chose daily longs: so every long gets 2-4 Shorts cut from it (new styles), published in the Shorts slots, so viewers have a path to the long.
 

@@ -53,11 +53,18 @@ Ideas next: start at 25 vs 35 in Europe, rent vs buy with rent index, car new vs
 ## Script recipe (target 8-10 min)
 - Piper at SPEED 1.18 speaks ~2.95 words/s incl. pauses: **8 min needs ~1,350-1,450 words**, 13-20 beats.
   First drafts always came out 5.5-6.5 min; plan 18 beats of 5-6 sentences from the start.
-- Structure: hook (both endings teased, big number) -> setup with recurring cast (Max = bad influence, Grandma = wise,
+- Structure (v3, user decisions 27.11): END-FIRST hook (final scene + number, then rewind) -> GUESS question on screen
+  (A or B?) -> ... -> reveal of the guess at ~85% -> honest part. Tone: irony + drama. Older structure:
+  hook (both endings teased, big number) -> setup with recurring cast (Max = bad influence, Grandma = wise,
   Banker) -> rules/timelines -> timeline A story with drama -> timeline B -> chart race -> result bars -> twist
   (stopper, different start date, Max's timing) -> why it works -> how-to cards -> honest part -> outro question.
 - Spoken text spells numbers ("twenty ten", "S and P five hundred", "four thousand nine hundred"); subtitle text uses digits.
 - Hook in the first sentence; scene changes every sentence; numbers in subtitles are amber automatically.
+
+## Character upgrade TODO (user decision 27.11)
+Keep the cast, make them more alive in `engine/kit.py`: arms + hands with gesture poses (point, shrug, facepalm, hold
+money, thumbs up), more emotions (panic, smug-rich, crying-laughing), simple body motion (walk cycle, jump, slump,
+shake), eye blinks. Do this before the next new episode and show the user a test sheet first.
 
 ## Visual gotchas (learned)
 - Anton/DM Sans have no "≠", "→", emoji: they render as "=" or boxes. Use words ("IS NOT", "BECOMES", "TO").
