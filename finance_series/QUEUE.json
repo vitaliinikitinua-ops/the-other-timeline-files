@@ -3,7 +3,7 @@
   "ep": "ep01",
   "kind": "long",
   "due_warsaw": "2026-11-26T18:00",
-  "status": "pending",
+  "status": "done",
   "title": "What If You Got $1 Every Time You Said No?",
   "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep01/EP01_1_Dollar_Every_No.mp4",
   "thumbnail": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep01/thumb_A.jpg",
@@ -24,7 +24,8 @@
    "animated story"
   ],
   "comment": "What's ONE thing you'd say no to this week? Mine: the third streaming subscription. 👇",
-  "url": null
+  "url": "https://www.youtube.com/watch?v=vD8P-wgv3sQ",
+  "published_at": "2026-11-27T08:09:17Z"
  },
  {
   "ep": "ep01",
