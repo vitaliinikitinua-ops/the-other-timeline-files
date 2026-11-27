@@ -191,6 +191,30 @@ def product_card(src, out_png, bg=(247, 214, 222)):
     canvas.save(out_png)
 
 
+def product_cutout(src, out_png, width=360, angle=0):
+    """Вирізає продукт з білого фону (оригінальне фото) + біла рамка і тінь — як наліпка."""
+    import numpy as np
+    arr = np.array(Image.open(src).convert("RGBA"))
+    arr[..., 3] = np.where((arr[..., :3] > 238).all(axis=-1), 0, 255)
+    px = Image.fromarray(arr, "RGBA")
+    px = px.crop(px.getbbox())
+    px = px.resize((width, int(px.height * width / px.width)), Image.LANCZOS)
+    a = px.split()[3]
+    pad = 30
+    canvas = Image.new("RGBA", (px.width + 2 * pad, px.height + 2 * pad), (0, 0, 0, 0))
+    border = Image.new("RGBA", canvas.size, (255, 255, 255, 0))
+    bm = Image.new("L", canvas.size, 0); bm.paste(a, (pad, pad))
+    bm = bm.filter(ImageFilter.MaxFilter(15))
+    shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0)); shadow.putalpha(bm.filter(ImageFilter.GaussianBlur(10)).point(lambda v: v * 0.45))
+    border.putalpha(bm)
+    canvas = Image.alpha_composite(canvas, shadow)
+    canvas = Image.alpha_composite(canvas, border)
+    canvas.alpha_composite(px, (pad, pad))
+    if angle:
+        canvas = canvas.rotate(angle, resample=Image.BICUBIC, expand=True)
+    canvas.save(out_png)
+
+
 def photo_card(src, out_png, focus_y=0.35):
     cover(Image.open(src), focus_y=focus_y).save(out_png)
 
@@ -205,11 +229,14 @@ def render_still(png, out_mp4, dur, move="in"):
          str(frames), "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-an", str(out_mp4)])
 
 
-def render_clip(src, out_mp4, start, dur, focus="center", speed=1.0):
-    loop = ["-stream_loop", "-1"] if duration(src) - start < dur * speed - 0.05 else []
+def render_clip(src, out_mp4, start, dur, focus="center", speed=1.0, short="freeze"):
+    """short: що робити, якщо кліп коротший за сцену — "freeze" (стоп-кадр) або "loop"."""
+    is_short = duration(src) - start < dur * speed - 0.05
+    loop = ["-stream_loop", "-1"] if is_short and short == "loop" else []
+    pad = f",tpad=stop_mode=clone:stop_duration={dur + 1:.2f}" if is_short and short == "freeze" else ""
     y = {"top": "0", "center": "(ih-oh)/2", "bottom": "ih-oh"}.get(focus, "(ih-oh)/2")
     vf = (f"setpts=PTS/{speed},scale={W}:{H}:force_original_aspect_ratio=increase,"
-          f"crop={W}:{H}:(iw-ow)/2:{y},fps={FPS},format=yuv420p,setsar=1")
+          f"crop={W}:{H}:(iw-ow)/2:{y},fps={FPS}{pad},format=yuv420p,setsar=1")
     run(["ffmpeg", "-y", "-v", "error", *loop, "-ss", f"{start:.3f}", "-i", str(src), "-t",
          f"{dur:.3f}", "-vf", vf, "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-an",
          str(out_mp4)])
@@ -438,7 +465,7 @@ def build(cfg_path):
                              "start": t, "end": t + dur})
         if kind == "video":
             render_clip(rp(vis["src"]), out, vis.get("in", 0.0), dur, vis.get("focus", "center"),
-                        vis.get("speed", 1.0))
+                        vis.get("speed", 1.0), vis.get("short", "freeze"))
         elif kind in ("photo", "product"):
             png = d_img / f"{sid}.png"
             if kind == "product":
@@ -448,6 +475,18 @@ def build(cfg_path):
             render_still(png, out, dur, vis.get("move", "in"))
         else:
             raise ValueError(f"Невідомий тип візуалу: {kind}")
+        if sc.get("sticker"):  # картинка-наліпка поверх кадру (напр. банка з оригінального фото)
+            stk = sc["sticker"]
+            png = d_img / f"{sid}_sticker.png"
+            product_cutout(rp(stk["src"]), png, stk.get("w", 360), stk.get("angle", 0))
+            tmp = out.with_name(out.stem + "_stk.mp4")
+            at = stk.get("at", 0.3)
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(out), "-loop", "1", "-i", str(png), "-filter_complex",
+                 f"[1:v]format=rgba,fade=in:st=0:d=0.25:alpha=1,setpts=PTS+{at}/TB[s];"
+                 f"[0:v][s]overlay={stk.get('x', 660)}:{stk.get('y', 980)}:enable='gte(t,{at})':shortest=1,"
+                 f"format=yuv420p", "-t", f"{dur:.3f}", "-c:v", "libx264", "-preset", "medium", "-crf", "16",
+                 str(tmp)])
+            tmp.replace(out)
         for o in sc.get("overlays", []):
             overlays.append({**o, "start": t + o.get("at", 0.0),
                              "end": t + min(dur, o.get("until", dur))})

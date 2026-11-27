@@ -11,3 +11,4 @@ models/piper/*.onnx
 *.mp4
 *.wav
 *.mov
+tools/sadtalker/

@@ -1,0 +1,208 @@
+{
+  "name": "lr_crusty_raspberry_AI_hookA_v1",
+  "note": "AI-версія: обличчя оживлене з її фото (SadTalker, CPU), голос ElevenLabs Nadiia. Позначити як AI-контент при публікації.",
+  "product_image": "../../references/products/lr_figu_active_crusty_raspberry.jpg",
+  "target_duration": [
+    30,
+    40
+  ],
+  "music": null,
+  "subtitle_style": {
+    "size": 74,
+    "margin_v": 560
+  },
+  "thumbnail": {
+    "scene": "s07",
+    "offset": 1.2,
+    "text": "Сніданок за 1 хвилину"
+  },
+  "scenes": [
+    {
+      "id": "s01",
+      "visual": {
+        "type": "video",
+        "src": "scenes/talk/s01_comp.mp4",
+        "in": 0.0,
+        "short": "freeze"
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s01.wav",
+      "lead": 0.0,
+      "tail": 0.2,
+      "line": "Немає часу на сніданок? Дивись.",
+      "overlays": [
+        {
+          "text": "Сніданок за 1 хвилину?",
+          "style": "top",
+          "at": 0.0
+        }
+      ]
+    },
+    {
+      "id": "s02",
+      "visual": {
+        "type": "video",
+        "src": "scenes/talk/s02_comp.mp4",
+        "in": 0.0,
+        "short": "freeze"
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s02.wav",
+      "lead": 0.0,
+      "tail": 0.2,
+      "line": "Знайомо? Зранку лише кава, а о десятій уже хочеться булочку."
+    },
+    {
+      "id": "s03",
+      "visual": {
+        "type": "video",
+        "src": "scenes/talk/s03_comp.mp4",
+        "in": 0.0,
+        "short": "freeze"
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s03.wav",
+      "lead": 0.0,
+      "tail": 0.2,
+      "line": "Тримай лайфхак: пластівці від LR.",
+      "sticker": {
+        "src": "../../references/products/lr_figu_active_crusty_raspberry.jpg",
+        "w": 300,
+        "angle": -6,
+        "x": 620,
+        "y": 420,
+        "at": 0.25
+      }
+    },
+    {
+      "id": "s04",
+      "visual": {
+        "type": "product",
+        "src": "../../references/products/lr_figu_active_crusty_raspberry.jpg",
+        "move": "in"
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s04.wav",
+      "line": "Шість ложок,",
+      "min_dur": 1.6,
+      "overlays": [
+        {
+          "text": "6 ложок",
+          "style": "top",
+          "at": 0.1
+        }
+      ]
+    },
+    {
+      "id": "s05",
+      "visual": {
+        "type": "photo",
+        "src": "../../references/model/model_ref_01.jpg",
+        "move": "in",
+        "focus_y": 0.3
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s05.wav",
+      "line": "склянка соєвого напою — і сніданок готовий.",
+      "sticker": {
+        "src": "../../references/products/lr_figu_active_crusty_raspberry.jpg",
+        "w": 260,
+        "angle": 5,
+        "x": 700,
+        "y": 380,
+        "at": 0.1
+      },
+      "overlays": [
+        {
+          "text": "+ 300 мл соєвого напою",
+          "style": "top",
+          "at": 0.1
+        }
+      ]
+    },
+    {
+      "id": "s06",
+      "visual": {
+        "type": "product",
+        "src": "../../references/products/lr_figu_active_crusty_raspberry.jpg",
+        "move": "out"
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s06.wav",
+      "line": "Хрусткі, з малиною і шматочками шоколаду.",
+      "overlays": [
+        {
+          "text": "малина • шоколад • хрустить",
+          "style": "top",
+          "at": 0.2
+        }
+      ]
+    },
+    {
+      "id": "s07",
+      "visual": {
+        "type": "video",
+        "src": "scenes/talk/s07_comp.mp4",
+        "in": 0.0,
+        "short": "freeze"
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s07.wav",
+      "lead": 0.0,
+      "tail": 0.2,
+      "line": "У порції — двадцять грамів білка і клітковина. І вони веганські, без лактози.",
+      "overlays": [
+        {
+          "text": "20 г білка в порції",
+          "style": "badge",
+          "at": 0.2,
+          "until": 3.0
+        },
+        {
+          "text": "веган • без лактози",
+          "style": "badge",
+          "at": 3.1
+        }
+      ]
+    },
+    {
+      "id": "s08",
+      "visual": {
+        "type": "product",
+        "src": "../../references/products/lr_figu_active_crusty_raspberry.jpg",
+        "move": "in"
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s08.wav",
+      "line": "Готується за хвилину — встигнеш, навіть коли запізнюєшся.",
+      "overlays": [
+        {
+          "text": "готується за 1 хвилину",
+          "style": "top",
+          "at": 0.2
+        }
+      ]
+    },
+    {
+      "id": "s09",
+      "visual": {
+        "type": "video",
+        "src": "scenes/talk/s09_comp.mp4",
+        "in": 0.0,
+        "short": "freeze"
+      },
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s09.wav",
+      "lead": 0.0,
+      "tail": 0.9,
+      "line": "Хочеш спробувати? Пиши мені в директ слово «сніданок».",
+      "overlays": [
+        {
+          "text": "Пиши «СНІДАНОК» у директ",
+          "style": "cta",
+          "at": 0.3
+        }
+      ]
+    }
+  ]
+}

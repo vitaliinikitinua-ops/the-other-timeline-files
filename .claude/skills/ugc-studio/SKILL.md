@@ -56,3 +56,16 @@ description: Створення вертикальних UGC-реклам (TikTo
 ## Постійна модель
 Фото-референси: `UGC_CREATOR/references/model/` (у .gitignore — не комітити, не змінювати).
 Постійний образ (за замовчуванням): високий хвіст, природний денний макіяж, чорний жакет + біла футболка.
+
+## AI-версія (оживлення її фото, $0, CPU)
+Коли користувач хоче, щоб «вона розповідала» без зйомки:
+1. Кадри 9:16 з її фото, обличчя у верхній третині → `images/talk/*.png` (1080x1920).
+2. `tools/sadtalker/.venv/bin/python scripts/talking_head.py <png> <scene.wav> <talk.mp4>`
+   (SadTalker full+still+GFPGAN; ~3.5 хв CPU на 1 с аудіо). Середовище: `uv venv -p python3.11`,
+   torch 2.2.2 CPU; патчі: basicsr functional_tensor, np.float→np.float64, align_img float(), setuptools<70.
+3. `python3 scripts/composite_face.py <png> <talk.mp4> <comp.mp4>` — лише обличчя (рамка RetinaFace)
+   накладається на чисте фото → фон без артефактів.
+4. `project_ai.json`: говорячі сцени `lead: 0` (синхрон губ), `short: freeze`; продукт — картки/наліпки
+   (`sticker`) з ОРИГІНАЛЬНОГО фото банки, AI не малює продукт.
+5. При публікації — обов'язкова мітка AI-контенту (TikTok/Instagram).
+HF ZeroGPU (MoDA) — анонімна квота 0; токен користувач надавати не захотів — не пропонувати повторно.
