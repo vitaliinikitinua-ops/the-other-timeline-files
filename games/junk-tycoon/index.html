@@ -24,6 +24,9 @@
   #hud-quests .q { display:flex; gap:8px; align-items:center; background:#0009; padding:6px 9px; border-radius:8px; margin-top:4px; }
   #hud-quests .q span { flex:1; } #hud-quests .q em { font-style:normal; color:var(--good); font-weight:700; }
   #hud-quests .q.done { background:#1f5a35cc; }
+  .auc { display:flex; align-items:center; gap:16px; background:#ffffff10; border-radius:12px; padding:14px; margin:8px 0; }
+  .auc-bid { font-size:34px; font-weight:900; color:var(--accent); } .auc-lead { flex:1; font-weight:700; } .auc-t { font-size:22px; font-weight:800; }
+  .auc-log { font-size:13px; opacity:.8; min-height:60px; margin-bottom:10px; }
   .tabs { display:flex; gap:8px; margin-bottom:12px; } .cat { font-size:12px; text-transform:uppercase; letter-spacing:.08em; opacity:.6; margin:12px 0 6px; }
   #cross { position:fixed; left:50%; top:50%; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; background:#fff; box-shadow:0 0 0 2px #0008; pointer-events:none; }
   #hint { position:fixed; left:50%; bottom:64px; transform:translateX(-50%); font-size:16px; background:#000a; padding:8px 14px; border-radius:10px; white-space:nowrap; pointer-events:none; }
@@ -50,7 +53,7 @@
   .keys kbd { background:#fff2; padding:2px 8px; border-radius:5px; font-family:inherit; font-weight:700; text-align:center; }
   .achlist .row.locked { opacity:.45; }
 </style>
-<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }</script>
 </head>
 <body>
 <div id="hud-money">$0</div>
@@ -67,7 +70,7 @@
 <div id="start" class="overlay">
   <div class="panel">
     <h1>Junk Lot Tycoon</h1>
-    <p class="sub">Prototype v0.2 · Little Loop Games</p>
+    <p class="sub">v0.3 · 3D models &amp; textures: Poly Haven (CC0) · Little Loop Games</p>
     <p>Buy mystery lots. Clean the junk. Sell it. Fill requests, level up, unlock bigger lots. Collect every achievement.</p><p class="sub">A short tutorial will show you the ropes (press T to skip).</p>
     <div class="keys">
       <kbd>WASD</kbd><span>walk</span>
@@ -76,9 +79,11 @@
       <kbd>Hold click</kbd><span>scrub an item on the workbench (move the mouse!)</span>
       <kbd>Shift</kbd><span>run</span>
       <kbd>Tab</kbd><span>achievements</span>
+      <kbd>G</kbd><span>graphics High / Low</span>
       <kbd>Esc</kbd><span>pause</span>
     </div>
-    <button id="btn-play">Click to play</button>
+    <p class="sub" id="load-txt">Loading...</p>
+    <button id="btn-play" disabled>Click to play</button>
   </div>
 </div>
 

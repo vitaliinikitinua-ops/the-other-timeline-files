@@ -1,31 +1,36 @@
-// Junk Lot Tycoon - prototype v0.2 (three.js, first person)
+// Junk Lot Tycoon - v0.3 (three.js, first person, PBR models from Poly Haven - CC0)
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { ITEMS, LOTS, UPGRADES, ACHIEVEMENTS, BALANCE, TUTORIAL, rollLot } from "./data.js";
 
 const $ = (id) => document.getElementById(id);
-const SAVE_KEY = "junklot_save_v2";
-const VERSION = "0.2";
+const SAVE_KEY = "junklot_save_v3";
+const VERSION = "0.3";
 
 // ---------------------------------------------------------------- state
-const S = {
-  money: BALANCE.startMoney, xp: 0, lvl: 1, up: {}, ach: {}, tut: 0, quests: [], flags: {}, world: [],
-  stats: { earned: 0, sold: 0, trashed: 0, lots: 0, requests: 0, shinies: 0, bestStreak: 0, best: 0 },
-};
+const STATS0 = { earned: 0, sold: 0, trashed: 0, lots: 0, requests: 0, shinies: 0, bestStreak: 0, best: 0, online: 0, auctions: 0 };
+const S = { money: BALANCE.startMoney, xp: 0, lvl: 1, up: {}, ach: {}, tut: 0, quests: [], flags: {}, world: [], stats: { ...STATS0 } };
 try {
   const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
-  if (s && s.v === 2) { Object.assign(S, s.data); S.stats = Object.assign({ earned: 0, sold: 0, trashed: 0, lots: 0, requests: 0, shinies: 0, bestStreak: 0, best: 0 }, s.data.stats); }
+  if (s && s.v === 3) { Object.assign(S, s.data); S.stats = Object.assign({ ...STATS0 }, s.data.stats); }
 } catch (e) {}
-function save() { try { S.world = serializeWorld(); localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 2, data: S })); } catch (e) {} }
+let worldReady = false;
+function save() { if (!worldReady) return; try { S.world = serializeWorld(); localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 3, data: S })); } catch (e) {} }
 setInterval(save, 5000);
 addEventListener("beforeunload", save);
 
-// Combined effects of all owned upgrades
 function fx() {
-  const f = { clean: 1, price: 1, cust: 1, junk: 1, rare: 1, walk: 1, tables: 1, baths: 0, bathSpeed: 1, xp: 1 };
+  const f = { clean: 1, price: 1, cust: 1, junk: 1, rare: 1, walk: 1, tables: 1, baths: 0, bathSpeed: 1, xp: 1, online: 0, onlineSpeed: 1 };
   for (const u of UPGRADES) {
     if (!S.up[u.id]) continue;
     for (const [k, v] of Object.entries(u.fx)) {
-      if (k === "tables" || k === "baths") f[k] += v; else if (k === "junk") f.junk = Math.max(f.junk, v); else f[k] *= v;
+      if (k === "tables" || k === "baths" || k === "online") f[k] += v; else if (k === "junk") f.junk = Math.max(f.junk, v); else f[k] *= v;
     }
   }
   return f;
@@ -65,42 +70,122 @@ const sfx = {
   door() { beep(90, 1.6, "sawtooth", .05, 1.4); },
   trash() { beep(160, .2, "square", .07, .5); },
   no() { beep(200, .15, "square", .08, .7); },
+  bid() { beep(700, .06, "square", .07); },
+  gavel() { beep(150, .12, "square", .15, .5); setTimeout(() => beep(150, .12, "square", .15, .5), 160); },
 };
 
-// ---------------------------------------------------------------- renderer / scene
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+// ---------------------------------------------------------------- renderer / scene / post
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.prepend(renderer.domElement);
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x9cc9e8);
-scene.fog = new THREE.Fog(0x9cc9e8, 30, 75);
-const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, .05, 200);
+scene.background = new THREE.Color(0xa8cbe6);
+scene.fog = new THREE.Fog(0xb8d3e8, 35, 95);
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, .05, 300);
 camera.rotation.order = "YXZ";
 camera.position.set(0, 1.7, 3);
 scene.add(camera);
-addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
 
-scene.add(new THREE.HemisphereLight(0xdff1ff, 0x5d7f45, 1.15));
-const sun = new THREE.DirectionalLight(0xfff2d8, 1.3); sun.position.set(10, 20, 8); scene.add(sun);
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const gtao = new GTAOPass(scene, camera, innerWidth, innerHeight);
+gtao.updateGtaoMaterial({ radius: .35, distanceExponent: 1.4, thickness: 1.2, scale: 1.1 });
+gtao.blendIntensity = .9;
+composer.addPass(gtao);
+composer.addPass(new OutputPass());
+let HIGH = S.flags.gfx !== "low";
+function setQuality(high) {
+  HIGH = high; S.flags.gfx = high ? "high" : "low";
+  renderer.shadowMap.enabled = high; scene.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => (m.needsUpdate = true)); });
+  renderer.setPixelRatio(high ? Math.min(devicePixelRatio, 1.5) : 1); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
+}
+addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); });
 
-const mat = (c) => new THREE.MeshLambertMaterial({ color: c, flatShading: true });
-function box(w, h, d, c, x, y, z, parent = scene) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(c)); m.position.set(x, y, z); parent.add(m); return m; }
+scene.add(new THREE.HemisphereLight(0xdff1ff, 0x5d7f45, .35));
+const sun = new THREE.DirectionalLight(0xfff0d8, 2.6); sun.position.set(14, 22, 10);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0004; sun.shadow.normalBias = .03;
+Object.assign(sun.shadow.camera, { left: -32, right: 32, top: 26, bottom: -26, near: 1, far: 70 });
+sun.target.position.set(4, 0, 0); scene.add(sun, sun.target);
 
+// loading
+const manager = new THREE.LoadingManager();
+manager.onProgress = (url, done, total) => { const el = $("load-txt"); if (el) el.textContent = `Loading ${done}/${total}...`; };
+const texLoader = new THREE.TextureLoader(manager);
+const gltfLoader = new GLTFLoader(manager);
+new RGBELoader(manager).load("tex/sky.hdr", (t) => { t.mapping = THREE.EquirectangularReflectionMapping; scene.environment = t; scene.background = t; });
+
+function tex(name, rep) {
+  const d = texLoader.load(`tex/${name}_diff.jpg`), n = texLoader.load(`tex/${name}_nor.jpg`);
+  for (const t of [d, n]) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep[0], rep[1]); t.anisotropy = 8; }
+  d.colorSpace = THREE.SRGBColorSpace; return { map: d, normalMap: n };
+}
+const MAT = {
+  grass: new THREE.MeshStandardMaterial({ ...tex("grass", [40, 40]), roughness: 1, color: 0xd8e8c0 }),
+  asphalt: new THREE.MeshStandardMaterial({ ...tex("asphalt", [30, 1.5]), roughness: .95 }),
+  concrete: new THREE.MeshStandardMaterial({ ...tex("concrete", [3, 3]), roughness: .9 }),
+  wall: new THREE.MeshStandardMaterial({ ...tex("concrete", [2, 1]), roughness: .95, color: 0xe8dcc8 }),
+  wood: new THREE.MeshStandardMaterial({ ...tex("wood", [6, 2]), roughness: .7 }),
+  ply: new THREE.MeshStandardMaterial({ ...tex("plywood", [2, 1]), roughness: .75 }),
+  plyDark: new THREE.MeshStandardMaterial({ ...tex("plywood", [1, 1]), roughness: .8, color: 0x8a6a4a }),
+  roof: new THREE.MeshStandardMaterial({ color: 0x6b2f25, roughness: .6, metalness: .2 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0x5a5f66, roughness: .4, metalness: .8 }),
+  white: new THREE.MeshStandardMaterial({ color: 0xf2f2f0, roughness: .5 }),
+  water: new THREE.MeshStandardMaterial({ color: 0x5ec8ff, roughness: .05, metalness: .1, transparent: true, opacity: .8 }),
+  leaf: new THREE.MeshStandardMaterial({ color: 0x4f8a3a, roughness: .9 }),
+  bark: new THREE.MeshStandardMaterial({ color: 0x6b4a2e, roughness: 1 }),
+};
+function shadowy(o, cast = true, receive = true) { o.traverse((c) => { if (c.isMesh) { c.castShadow = cast; c.receiveShadow = receive; } }); return o; }
+function rbox(w, h, d, material, x, y, z, parent = scene, r = .03) {
+  const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2.1, h / 2.1, d / 2.1)), material);
+  m.position.set(x, y, z); shadowy(m); parent.add(m); return m;
+}
 function labelMesh(text, w, h, bg = "#2b2420", fg = "#ffb02e", size = 64) {
   const cv = document.createElement("canvas"); cv.width = 512; cv.height = Math.round(512 * h / w);
   const g = cv.getContext("2d"); g.fillStyle = bg; g.fillRect(0, 0, cv.width, cv.height);
   g.fillStyle = fg; g.font = `800 ${size}px system-ui, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle";
   const lines = text.split("\n"); lines.forEach((l, i) => g.fillText(l, cv.width / 2, cv.height / 2 + (i - (lines.length - 1) / 2) * size * 1.1));
-  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
-  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex }));
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, toneMapped: false }));
 }
 function priceSprite(text) {
   const cv = document.createElement("canvas"); cv.width = 256; cv.height = 96;
   const g = cv.getContext("2d"); g.fillStyle = "#fff6d8"; g.beginPath(); g.roundRect(6, 6, 244, 84, 18); g.fill();
   g.fillStyle = "#2b2420"; g.font = "800 56px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, 128, 50);
-  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
-  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false })); s.scale.set(.5, .19, 1); s.renderOrder = 5; return s;
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false, toneMapped: false })); s.scale.set(.5, .19, 1); s.renderOrder = 5; return s;
+}
+
+// ---------------------------------------------------------------- models
+const modelCache = new Map();
+function loadModel(name) {
+  if (!modelCache.has(name)) modelCache.set(name, new Promise((res, rej) => gltfLoader.load(`models/${name}.glb`, (g) => res(g.scene), undefined, rej)));
+  return modelCache.get(name);
+}
+// Normalise a model: optional sub-object filter, rotation, scale; centred on x/z, standing on y = 0.
+function shapeModel(src, o = {}) {
+  const root = src.clone(true);
+  if (o.keepX) {
+    root.updateMatrixWorld(true);
+    for (const c of [...root.children]) { const b = new THREE.Box3().setFromObject(c); const cx = (b.min.x + b.max.x) / 2; if (cx < o.keepX[0] || cx > o.keepX[1]) root.remove(c); }
+  }
+  if (o.rot) root.rotation.set(o.rot[0], o.rot[1], o.rot[2]);
+  if (o.scale) root.scale.multiplyScalar(o.scale);
+  const wrap = new THREE.Group(); wrap.add(root); wrap.updateMatrixWorld(true);
+  let bb = new THREE.Box3().setFromObject(root), size = bb.getSize(new THREE.Vector3());
+  const md = Math.max(size.x, size.y, size.z);
+  if (o.minSize && md < o.minSize) { root.scale.multiplyScalar(o.minSize / md); wrap.updateMatrixWorld(true); bb = new THREE.Box3().setFromObject(root); size = bb.getSize(new THREE.Vector3()); }
+  root.position.x -= (bb.min.x + bb.max.x) / 2; root.position.z -= (bb.min.z + bb.max.z) / 2; root.position.y -= bb.min.y;
+  return { obj: wrap, size };
+}
+async function prop(name, x, y, z, ry = 0, o = {}) {
+  const src = await loadModel(name); const { obj, size } = shapeModel(src, o);
+  obj.position.set(x, y, z); obj.rotation.y = ry; shadowy(obj); scene.add(obj);
+  if (o.collide) { const hx = (Math.abs(Math.cos(ry)) * size.x + Math.abs(Math.sin(ry)) * size.z) / 2, hz = (Math.abs(Math.sin(ry)) * size.x + Math.abs(Math.cos(ry)) * size.z) / 2; rect(x - hx, x + hx, z - hz, z + hz); }
+  if (o.kind) obj.traverse((c) => { if (c.isMesh) { c.userData.kind = o.kind; targets.push(c); } });
+  return obj;
 }
 
 // ---------------------------------------------------------------- world
@@ -108,137 +193,177 @@ const colliders = [];
 const rect = (minX, maxX, minZ, maxZ) => { const r = { minX, maxX, minZ, maxZ, active: true }; colliders.push(r); return r; };
 const targets = [];
 
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), mat(0x77a856)); ground.rotation.x = -Math.PI / 2; scene.add(ground);
-const road = new THREE.Mesh(new THREE.PlaneGeometry(120, 6), mat(0x55585e)); road.rotation.x = -Math.PI / 2; road.position.set(0, .01, 17); scene.add(road);
-for (let x = -50; x < 50; x += 4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(2, .15), mat(0xeeeeee)); l.rotation.x = -Math.PI / 2; l.position.set(x, .02, 17); scene.add(l); }
-for (const [x, z] of [[-14, -6], [-12, 8], [-18, 2], [16, -8], [20, -2], [-9, -16], [9, -15], [27, 4], [-16, -12]]) {
-  box(.4, 1.4, .4, 0x7a5230, x, .7, z); const c = new THREE.Mesh(new THREE.ConeGeometry(1.4, 3, 7), mat(0x3f8a3a)); c.position.set(x, 2.8, z); scene.add(c);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), MAT.grass); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+const road = new THREE.Mesh(new THREE.PlaneGeometry(160, 6), MAT.asphalt); road.rotation.x = -Math.PI / 2; road.position.set(0, .01, 17); road.receiveShadow = true; scene.add(road);
+const lineMat = new THREE.MeshStandardMaterial({ color: 0xf0f0e8, roughness: .6 });
+for (let x = -70; x < 70; x += 4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(2, .15), lineMat); l.rotation.x = -Math.PI / 2; l.position.set(x, .02, 17); scene.add(l); }
+const pathM = new THREE.Mesh(new THREE.PlaneGeometry(28, 2.4), MAT.concrete); pathM.rotation.x = -Math.PI / 2; pathM.position.set(5, .011, 2); pathM.receiveShadow = true; scene.add(pathM);
+// trees: smooth stylised
+function tree(x, z, s = 1) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s);
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.16, .24, 2.2, 10), MAT.bark); trunk.position.y = 1.1; g.add(trunk);
+  for (let i = 0; i < 5; i++) {
+    const r = .9 + Math.random() * .6, b = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 2), MAT.leaf);
+    b.position.set((Math.random() - .5) * 1.4, 2.6 + Math.random() * 1.3, (Math.random() - .5) * 1.4); b.scale.y = .85; g.add(b);
+  }
+  shadowy(g); scene.add(g); rect(x - .3, x + .3, z - .3, z + .3);
 }
+for (const [x, z, s] of [[-14, -6, 1.1], [-12, 8, 1], [-18, 2, 1.3], [16, -8, 1.2], [21, -3, 1], [-9, -17, 1.4], [9, -16, 1.2], [29, 3, 1.1], [-17, -12, 1], [-22, -4, 1.2], [24, -12, 1.3]]) tree(x, z, s);
 
 // Garage (opening faces +z)
 const GZ0 = -13, GZ1 = -7;
-box(.15, 3, 6, 0xc8b89a, -2.95, 1.5, -10); box(.15, 3, 6, 0xc8b89a, 2.95, 1.5, -10); box(6, 3, .15, 0xc8b89a, 0, 1.5, -12.95);
-box(6.3, .2, 6.3, 0x8f3b2b, 0, 3.1, -10);
-const gFloor = new THREE.Mesh(new THREE.PlaneGeometry(5.8, 5.8), mat(0x9a9a92)); gFloor.rotation.x = -Math.PI / 2; gFloor.position.set(0, .015, -10); scene.add(gFloor);
+rbox(.2, 3, 6, MAT.wall, -2.95, 1.5, -10); rbox(.2, 3, 6, MAT.wall, 2.95, 1.5, -10); rbox(6, 3, .2, MAT.wall, 0, 1.5, -12.95);
+rbox(6.5, .22, 6.6, MAT.roof, 0, 3.1, -10.05);
+rbox(6.3, .5, .25, MAT.wall, 0, 2.75, -7.05);
+const gFloor = new THREE.Mesh(new THREE.PlaneGeometry(5.8, 5.8), MAT.concrete); gFloor.rotation.x = -Math.PI / 2; gFloor.position.set(0, .015, -10); gFloor.receiveShadow = true; scene.add(gFloor);
 rect(-3.05, -2.85, GZ0, GZ1); rect(2.85, 3.05, GZ0, GZ1); rect(-3, 3, -13.05, -12.85);
-const door = box(5.8, 2.9, .08, 0xd9d4c6, 0, 1.45, -7.05); door.userData.kind = "door"; targets.push(door);
-for (let i = 0; i < 7; i++) box(5.8, .03, .1, 0xbab4a3, 0, 0, 0, door).position.set(0, -1.15 + i * .4, .01);
-const gLight = new THREE.PointLight(0xfff0d0, 18, 12, 1.4); gLight.position.set(0, 2.6, -10); scene.add(gLight);
-const doorRect = rect(-3, 3, -7.15, -6.95);
-const gLabel = labelMesh("YOUR LOT", 2.2, .5); gLabel.position.set(0, 3.45, -6.85); scene.add(gLabel);
+const door = new THREE.Group(); door.position.set(0, 0, -7.0); scene.add(door);
+const doorRect = rect(-3, 3, -7.15, -6.85);
+const gLight = new THREE.PointLight(0xfff0d0, 14, 10, 1.6); gLight.position.set(0, 2.6, -10); scene.add(gLight);
+const gLabel = labelMesh("YOUR LOT", 2.2, .45); gLabel.position.set(0, 3.0, -6.91); scene.add(gLabel);
 let doorOpen = 1, doorTarget = 1;
 
-// Lots board
-box(.12, 2.2, .12, 0x6b4a2a, 3.6, 1.1, -5.5); box(.12, 2.2, .12, 0x6b4a2a, 5.4, 1.1, -5.5);
-const board = labelMesh("LOTS FOR SALE\n▶ press E", 1.9, 1.1, "#3b2f26", "#ffd27a", 54); board.position.set(4.5, 1.7, -5.43); scene.add(board);
-board.userData.kind = "board"; targets.push(board); rect(3.5, 5.5, -5.6, -5.4);
+// Lots board (chalkboard)
+const board = labelMesh("LOTS & AUCTIONS\n▶ press E", .8, .62, "#1e2a22", "#f4f1e0", 56); board.position.set(4.5, 1.05, -5.3); scene.add(board);
+board.userData.kind = "board"; targets.push(board); rect(3.9, 5.1, -5.9, -5.0);
 
 // Workbench
-box(2, .1, 1, 0x9b6b3d, -6, .88, -2); for (const [dx, dz] of [[-.9, -.4], [.9, -.4], [-.9, .4], [.9, .4]]) box(.08, .85, .08, 0x6b4421, -6 + dx, .42, -2 + dz);
-box(2, 1.2, .08, 0x6d5642, -6, 1.5, -2.55);
-const benchLbl = labelMesh("WORKBENCH", 1.4, .3); benchLbl.position.set(-6, 1.95, -2.5); scene.add(benchLbl);
-const benchTop = box(1.9, .02, .9, 0x9b6b3d, -6, .94, -2); benchTop.userData.kind = "bench"; targets.push(benchTop);
+const benchTop = rbox(2, .08, 1, MAT.ply, -6, .9, -2, scene, .02); benchTop.userData.kind = "bench"; targets.push(benchTop);
+for (const [dx, dz] of [[-.92, -.42], [.92, -.42], [-.92, .42], [.92, .42]]) rbox(.07, .86, .07, MAT.metal, -6 + dx, .43, -2 + dz, scene, .01);
+rbox(1.9, .04, .8, MAT.metal, -6, .25, -2, scene, .01);
+rbox(2, 1.1, .05, MAT.plyDark, -6, 1.5, -2.52, scene, .01);
+const benchLbl = labelMesh("WORKBENCH", 1.1, .22); benchLbl.position.set(-6, 1.92, -2.49); scene.add(benchLbl);
+const benchLight = new THREE.PointLight(0xfff2dd, 4, 4, 1.8); benchLight.position.set(-6, 2.0, -1.6); scene.add(benchLight);
 rect(-7.05, -4.95, -2.6, -1.45);
-const BENCH_POS = new THREE.Vector3(-6, .95, -1.95);
+const BENCH_POS = new THREE.Vector3(-6, .945, -1.95);
 const bench = { pos: BENCH_POS, item: null, active: true, kind: "bench" };
 
 // Ultrasonic baths (hidden until bought)
 const baths = [];
 for (const [x, z] of [[-9.2, -2], [-9.2, .6]]) {
   const g = new THREE.Group(); scene.add(g);
-  box(1.1, .6, .9, 0xe8eef2, x, .3, z, g);
-  const water = new THREE.Mesh(new THREE.BoxGeometry(.95, .02, .75), new THREE.MeshLambertMaterial({ color: 0x5ec8ff })); water.position.set(x, .61, z); g.add(water);
-  const lbl = labelMesh("ULTRASONIC BATH", 1.1, .22, "#16405a", "#bff0ff", 50); lbl.position.set(x, 1.05, z); lbl.rotation.y = Math.PI / 2; g.add(lbl);
+  rbox(1.1, .62, .9, MAT.white, x, .31, z, g, .06);
+  const water = new THREE.Mesh(new THREE.BoxGeometry(.95, .02, .75), MAT.water); water.position.set(x, .62, z); g.add(water);
+  const lbl = labelMesh("ULTRASONIC BATH", 1.0, .2, "#16405a", "#bff0ff", 50); lbl.position.set(x + .56, .45, z); lbl.rotation.y = Math.PI / 2; g.add(lbl);
   const b = { pos: new THREE.Vector3(x, .45, z), item: null, active: false, kind: "bath", group: g, r: rect(x - .55, x + .55, z - .45, z + .45) };
   water.userData.kind = "bath"; water.userData.slot = b; targets.push(water); baths.push(b);
 }
 
-// Trash container
-const bin = new THREE.Mesh(new THREE.CylinderGeometry(.55, .45, 1.05, 12), mat(0x2f6b3f)); bin.position.set(-6, .52, 2.6); scene.add(bin);
-bin.userData.kind = "trash"; targets.push(bin); rect(-6.6, -5.4, 2, 3.2);
-const binLbl = labelMesh("RECYCLE JUNK", 1, .25, "#1d3d25", "#ffffff", 60); binLbl.position.set(-6, 1.3, 2.6); binLbl.rotation.y = Math.PI / 4; scene.add(binLbl);
-
-// Shop: floor, tables with 4 slots each, computer, delivery crate, sign
-const shopFloor = new THREE.Mesh(new THREE.PlaneGeometry(22, 7), mat(0xc79a62)); shopFloor.rotation.x = -Math.PI / 2; shopFloor.position.set(15.5, .012, 6.5); scene.add(shopFloor);
+// Shop: floor, tables, computer desk, online photo tables, delivery crate, sign, billboard
+const shopFloor = new THREE.Mesh(new THREE.PlaneGeometry(22, 7), MAT.wood); shopFloor.rotation.x = -Math.PI / 2; shopFloor.position.set(15.5, .012, 6.5); shopFloor.receiveShadow = true; scene.add(shopFloor);
 const slots = [];
 function makeTable(cx) {
   const g = new THREE.Group(); scene.add(g);
-  box(6, .1, 1, 0xa77a48, cx, .86, 8, g); for (const dx of [-2.9, 2.9]) for (const dz of [-.42, .42]) box(.08, .82, .08, 0x6b4421, cx + dx, .41, 8 + dz, g);
+  rbox(6, .08, 1, MAT.ply, cx, .88, 8, g, .02); for (const dx of [-2.85, 2.85]) for (const dz of [-.4, .4]) rbox(.07, .84, .07, MAT.metal, cx + dx, .42, 8 + dz, g, .01);
   const r = rect(cx - 3, cx + 3, 7.5, 8.5);
   const list = [];
   for (let i = 0; i < 4; i++) {
     const sx = cx - 2.25 + i * 1.5;
-    const pad = new THREE.Mesh(new THREE.BoxGeometry(1.2, .02, .8), new THREE.MeshLambertMaterial({ color: 0xfff1d0 }));
-    pad.position.set(sx, .92, 8); g.add(pad);
-    const slot = { pos: new THREE.Vector3(sx, .93, 8), item: null, reserved: false, active: false, kind: "slot" };
+    const pad = new THREE.Mesh(new THREE.BoxGeometry(1.25, .01, .85), new THREE.MeshStandardMaterial({ color: 0xc23b22, roughness: .9, transparent: true, opacity: .25 }));
+    pad.position.set(sx, .925, 8); g.add(pad);
+    const slot = { pos: new THREE.Vector3(sx, .925, 8), item: null, reserved: false, active: false, kind: "slot" };
     pad.userData.kind = "slot"; pad.userData.slot = slot; targets.push(pad); slots.push(slot); list.push(slot);
   }
   return { g, r, list };
 }
 const tables = [makeTable(9), makeTable(15.6), makeTable(22.2)];
-box(1.2, .8, .7, 0x5b4636, 4.2, .4, 5); const mon = box(.1, .55, .8, 0x222222, 4.2, 1.1, 5);
-const monLbl = labelMesh("COMPUTER\nupgrades · requests", .72, .48, "#10202f", "#7fe0ff", 52); monLbl.position.set(4.14, 1.1, 5); monLbl.rotation.y = -Math.PI / 2; scene.add(monLbl);
-monLbl.userData.kind = "terminal"; mon.userData.kind = "terminal"; targets.push(monLbl, mon); rect(3.6, 4.8, 4.65, 5.35);
-const crate = box(.9, .7, .9, 0xb07a3a, 2.6, .35, 7.4); crate.userData.kind = "deliver"; targets.push(crate); rect(2.15, 3.05, 6.95, 7.85);
-const crateLbl = labelMesh("DELIVERY\nfor requests", .9, .45, "#2b2420", "#ffd27a", 70); crateLbl.position.set(2.6, 1.0, 7.86); crateLbl.rotation.y = Math.PI; scene.add(crateLbl);
-const crateLbl2 = crateLbl.clone(); crateLbl2.rotation.y = 0; crateLbl2.position.z = 6.94; scene.add(crateLbl2);
+const termLbl = labelMesh("COMPUTER\nupgrades · requests", .7, .3, "#10202f", "#7fe0ff", 46); termLbl.position.set(4.2, 1.55, 5.2); termLbl.rotation.y = -Math.PI / 2; scene.add(termLbl);
+termLbl.userData.kind = "terminal"; targets.push(termLbl); rect(3.75, 4.65, 4.2, 6.2);
+const onlineSpots = [];
+for (const [x, z] of [[1.0, 4.4], [1.0, 2.4]]) {
+  const g = new THREE.Group(); scene.add(g);
+  rbox(1.0, .8, .8, MAT.white, x, .4, z, g, .05);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(.95, .01, .75), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .3 })); top.position.set(x, .805, z); g.add(top);
+  const bd = labelMesh("JUNKBAY PHOTO\n+30% online", .9, .5, "#2a1a4a", "#ffd2ff", 60); bd.position.set(x, 1.65, z - .45); g.add(bd);
+  rbox(.04, 1.6, .04, MAT.metal, x - .45, .8, z - .45, g, .01); rbox(.04, 1.6, .04, MAT.metal, x + .45, .8, z - .45, g, .01);
+  const lamp = new THREE.PointLight(0xffffff, 3, 2.5, 2); lamp.position.set(x, 1.6, z + .3); g.add(lamp);
+  const spot = { pos: new THREE.Vector3(x, .81, z), item: null, active: false, kind: "online", group: g, r: rect(x - .5, x + .5, z - .4, z + .4), timer: 0 };
+  top.userData.kind = "online"; top.userData.slot = spot; targets.push(top); onlineSpots.push(spot);
+}
+const crateLbl = labelMesh("DELIVERY\nfor requests", .9, .42, "#2b2420", "#ffd27a", 70); crateLbl.position.set(2.6, 1.15, 6.88); scene.add(crateLbl);
+crateLbl.userData.kind = "deliver"; targets.push(crateLbl);
 const shopSign = new THREE.Group(); scene.add(shopSign);
-box(.15, 3.2, .15, 0x6b4a2a, 6, 1.6, 9.2, shopSign); box(.15, 3.2, .15, 0x6b4a2a, 18.6, 1.6, 9.2, shopSign);
-const signLbl = labelMesh("JUNK & WONDERS", 7, .9, "#c23b22", "#fff6d8", 110); signLbl.position.set(12.3, 3, 9.25); signLbl.rotation.y = Math.PI; shopSign.add(signLbl);
-const signLbl2 = signLbl.clone(); signLbl2.rotation.y = 0; signLbl2.position.z = 9.15; shopSign.add(signLbl2);
+rbox(.15, 3.4, .15, MAT.metal, 6, 1.7, 9.3, shopSign); rbox(.15, 3.4, .15, MAT.metal, 18.6, 1.7, 9.3, shopSign);
+const signLbl = labelMesh("JUNK & WONDERS", 7, .9, "#c23b22", "#fff6d8", 110); signLbl.position.set(12.3, 3.1, 9.35); signLbl.rotation.y = Math.PI; shopSign.add(signLbl);
+const signLbl2 = signLbl.clone(); signLbl2.rotation.y = 0; signLbl2.position.z = 9.25; shopSign.add(signLbl2);
 const billboard = new THREE.Group(); scene.add(billboard);
-box(.2, 4, .2, 0x555555, -8, 2, 19.5, billboard); box(.2, 4, .2, 0x555555, -2, 2, 19.5, billboard);
-const bbLbl = labelMesh("JUNK & WONDERS\nwe buy everything", 6.4, 2.2, "#ffb02e", "#2b2420", 80); bbLbl.position.set(-5, 4.5, 19.4); bbLbl.rotation.y = Math.PI; billboard.add(bbLbl);
+rbox(.25, 4.2, .25, MAT.metal, -8, 2.1, 20.5, billboard); rbox(.25, 4.2, .25, MAT.metal, -2, 2.1, 20.5, billboard);
+const bbLbl = labelMesh("JUNK & WONDERS\nwe buy everything", 6.4, 2.2, "#ffb02e", "#2b2420", 80); bbLbl.position.set(-5, 4.6, 20.4); bbLbl.rotation.y = Math.PI; billboard.add(bbLbl);
+
+async function buildProps() {
+  const P = [];
+  for (let i = 0; i < 5; i++) P.push(prop("rollershutter_door", -2.4 + i * 1.2, 0, 0, 0, { keepX: [-1, 1] }).then((o) => { o.position.z = 0; door.add(o); o.scale.x = 1.12; o.traverse((c) => { if (c.isMesh) { c.userData.kind = "door"; targets.push(c); } }); }));
+  P.push(prop("standing_chalkboard_01", 4.5, 0, -5.45, 0, { kind: "board" }));
+  P.push(prop("steel_frame_shelves_01", -2.4, 0, -11.8, Math.PI / 2, { scale: .1 }));
+  P.push(prop("steel_frame_shelves_01", 2.4, 0, -11.8, -Math.PI / 2, { scale: .1 }));
+  P.push(prop("bench_vice_01", -6.75, .94, -2.2, 0));
+  P.push(prop("metal_tool_chest", -7.6, 0, -2.6, 0, { collide: true }));
+  P.push(prop("metal_trash_can", -6, 0, 2.6, Math.PI / 6, { keepX: [-2, 0], scale: 1.2, kind: "trash", collide: true }));
+  P.push(prop("metal_office_desk", 4.2, 0, 5.2, Math.PI / 2));
+  P.push(prop("classic_laptop", 4.25, .79, 5.2, -Math.PI / 2, { kind: "terminal" }));
+  P.push(prop("wooden_crate_01", 2.6, 0, 7.3, 0, { scale: 1.3, kind: "deliver", collide: true }));
+  P.push(prop("wooden_crate_01", 2.6, .45, 7.3, .2, { scale: 1.1, kind: "deliver" }));
+  P.push(prop("CashRegister_01", 5.6, 0, 8.4, Math.PI, {}).then((o) => { o.position.y = 0; }));
+  P.push(prop("covered_car", -8.5, 0, -10, .15, { collide: true }));
+  P.push(prop("Barrel_01", 3.7, 0, -12.2, 0, { collide: true })); P.push(prop("Barrel_01", 3.7, 0, -11.5, 1, { collide: true }));
+  P.push(prop("hand_truck", 3.6, 0, -8.6, -.6));
+  P.push(prop("propane_tank", -10.3, 0, -3.2, 0, { collide: true }));
+  P.push(prop("plastic_crate_01", -7.1, 0, 3.1, .3)); P.push(prop("plastic_crate_01", -7.1, .27, 3.1, .5));
+  P.push(prop("potted_plant_01", 6.2, 0, 10.1, 0)); P.push(prop("potted_plant_01", 25.6, 0, 10.1, 1));
+  P.push(prop("fire_hydrant", -3.2, 0, 13.6, 0, { keepX: [-1, 0] }));
+  for (const x of [-22, -6, 10, 26]) P.push(prop("street_lamp_01", x, 0, 13.9, Math.PI, { collide: true }));
+  P.push(prop("wooden_display_shelves_01", 25.8, 0, 6, -Math.PI / 2, { collide: true }));
+  await Promise.all(P.map((p) => p.catch((e) => console.warn("prop failed", e))));
+}
 
 function applyUpgrades() {
   F = fx();
   tables.forEach((t, i) => { const on = i < F.tables; t.g.visible = on; t.r.active = on; t.list.forEach((s) => (s.active = on)); });
   baths.forEach((b, i) => { const on = i < F.baths; b.group.visible = on; b.r.active = on; b.active = on; });
+  onlineSpots.forEach((b, i) => { const on = i < F.online; b.group.visible = on; b.r.active = on; b.active = on; });
   shopSign.visible = !!S.up.sign; billboard.visible = !!S.up.billboard;
 }
 
-// ---------------------------------------------------------------- items
+// ---------------------------------------------------------------- items (PBR models + procedural grime shader)
 const items = [];
-const DIRT = new THREE.Color(0x5b4a36);
-const spotGeo = new THREE.SphereGeometry(1, 6, 4);
-const spotMat = new THREE.MeshLambertMaterial({ color: 0x3e2f1f });
-
-function partMesh(p) {
-  let g;
-  if (p.s === "box") g = new THREE.BoxGeometry(p.sx, p.sy, p.sz);
-  else if (p.s === "cyl") g = new THREE.CylinderGeometry(p.sx, p.sx, p.sy, 10);
-  else if (p.s === "cone") g = new THREE.ConeGeometry(p.sx, p.sy, 10);
-  else if (p.s === "tor") g = new THREE.TorusGeometry(p.sx, p.sz, 6, 16);
-  else g = new THREE.SphereGeometry(1, 10, 8);
-  const m = new THREE.Mesh(g, mat(p.c)); m.material.userData.clean = new THREE.Color(p.c);
-  if (p.s === "sph") m.scale.set(p.sx, p.sy, p.sz);
-  m.position.set(p.x, p.y, p.z); return m;
+const DIRT_GLSL = `
+varying vec3 vDirtPos; uniform float uDirt; uniform float uDirtScale;
+float dh(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,45.164)))*43758.5453); }
+float dn(vec3 p){ vec3 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(mix(dh(i),dh(i+vec3(1,0,0)),f.x),mix(dh(i+vec3(0,1,0)),dh(i+vec3(1,1,0)),f.x),f.y),
+             mix(mix(dh(i+vec3(0,0,1)),dh(i+vec3(1,0,1)),f.x),mix(dh(i+vec3(0,1,1)),dh(i+vec3(1,1,1)),f.x),f.y),f.z); }
+float dfbm(vec3 p){ return dn(p)*.5 + dn(p*2.07)*.3 + dn(p*4.3)*.2; }`;
+function dirtify(m, uni) {
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.uDirt = uni.uDirt; sh.uniforms.uDirtScale = uni.uDirtScale;
+    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying vec3 vDirtPos;").replace("#include <begin_vertex>", "#include <begin_vertex>\nvDirtPos = (modelMatrix * vec4(position, 1.0)).xyz - (modelMatrix * vec4(0.,0.,0.,1.)).xyz;");
+    sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\n" + DIRT_GLSL)
+      .replace("#include <map_fragment>", `#include <map_fragment>
+        float dN = dfbm(vDirtPos * uDirtScale);
+        float dG = dn(vDirtPos * uDirtScale * 7.0);
+        float dMask = smoothstep(1.0 - uDirt - 0.05, 1.0 - uDirt + 0.05, dN * 0.85 + dG * 0.15) * step(0.002, uDirt);
+        vec3 dCol = mix(vec3(0.13,0.095,0.06), vec3(0.34,0.26,0.17), dG);
+        diffuseColor.rgb *= 1.0 - uDirt * 0.3;
+        diffuseColor.rgb = mix(diffuseColor.rgb, dCol, dMask * 0.95);`)
+      .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, dMask);")
+      .replace("#include <metalnessmap_fragment>", "#include <metalnessmap_fragment>\nmetalnessFactor = mix(metalnessFactor, 0.0, dMask);");
+  };
+  m.customProgramCacheKey = () => "dirt1";
 }
-
-function createItem(id, saved) {
+async function createItem(id, saved) {
   const def = ITEMS[id]; if (!def) return null;
-  const group = new THREE.Group();
-  const meshes = def.parts.map(partMesh); meshes.forEach((m) => group.add(m));
-  const bb = new THREE.Box3().setFromObject(group), size = bb.getSize(new THREE.Vector3());
-  const it = { id, def, name: def.name, value: def.value, junk: !!def.junk, mystery: !!def.mystery, group, meshes, size, maxDim: Math.max(size.x, size.y, size.z),
+  const src = await loadModel(def.model);
+  const { obj: group, size } = shapeModel(src, { keepX: def.keepX, rot: def.rot, scale: def.scale, minSize: .28 });
+  const uni = { uDirt: { value: .7 }, uDirtScale: { value: 11 } };
+  group.traverse((c) => { if (c.isMesh) { c.material = Array.isArray(c.material) ? c.material.map((m) => m.clone()) : c.material.clone(); [].concat(c.material).forEach((m) => dirtify(m, uni)); c.castShadow = c.receiveShadow = true; } });
+  const it = { id, def, name: def.name, value: def.value, junk: !!def.junk, mystery: !!def.mystery, group, uni, size, maxDim: Math.max(size.x, size.y, size.z),
     condition: BALANCE.startCondition[0] + Math.random() * (BALANCE.startCondition[1] - BALANCE.startCondition[0]),
-    rare: !!(def.rare && Math.random() < def.rare.chance * F.rare), shinyDone: false, place: "ground", holder: null, tag: null, spots: [] };
+    rare: !!(def.rare && Math.random() < def.rare.chance * F.rare), shinyDone: false, place: "ground", holder: null, tag: null };
   if (saved) Object.assign(it, { condition: saved.c, name: saved.n, value: saved.v, junk: saved.j, mystery: saved.m, rare: saved.r, shinyDone: saved.s });
-  for (let i = 0; i < 8; i++) {
-    const s = new THREE.Mesh(spotGeo, spotMat); const r = .03 + Math.random() * .05; s.scale.set(r, r * .35, r);
-    const face = Math.floor(Math.random() * 3);
-    s.position.set(bb.min.x + Math.random() * size.x, face === 0 ? bb.max.y : bb.min.y + Math.random() * size.y, face === 1 ? bb.max.z : bb.min.z + Math.random() * size.z);
-    if (face === 2) s.position.x = Math.random() < .5 ? bb.min.x : bb.max.x;
-    s.userData.th = .15 + i * .1; group.add(s); it.spots.push(s);
-  }
   group.traverse((o) => { o.userData.item = it; if (o.isMesh) targets.push(o); });
   applyCondition(it); scene.add(group); items.push(it); return it;
 }
-function applyCondition(it) {
-  const k = (1 - it.condition) * .72;
-  for (const m of it.meshes) m.material.color.copy(m.material.userData.clean).lerp(DIRT, k);
-  for (const s of it.spots) s.visible = it.condition < s.userData.th;
-}
+function applyCondition(it) { it.uni.uDirt.value = Math.max(0, (1 - it.condition) * .88); }
 function removeItem(it) {
   if (it.holder) { it.holder.item = null; it.holder.reserved = false; it.holder = null; }
   if (it.tag) { it.tag.parent && it.tag.parent.remove(it.tag); it.tag = null; }
@@ -251,14 +376,14 @@ function basePrice(it) { const c = it.condition, v = it.value; return v * (BALAN
 function priceOf(it) { if (it.junk) return F.junk; return Math.max(1, Math.round(basePrice(it) * F.price * (1 + BALANCE.levelPriceBonus * (S.lvl - 1)))); }
 
 // ---------------------------------------------------------------- particles + marker
-const parts = []; const pGeo = new THREE.BoxGeometry(.03, .03, .03);
+const parts = []; const pGeo = new THREE.SphereGeometry(.018, 6, 4);
 function burst(pos, color, n = 8, speed = 1.5, life = .6) {
   for (let i = 0; i < n; i++) {
-    const m = new THREE.Mesh(pGeo, new THREE.MeshBasicMaterial({ color })); m.position.copy(pos); scene.add(m);
+    const m = new THREE.Mesh(pGeo, new THREE.MeshBasicMaterial({ color, toneMapped: false })); m.position.copy(pos); scene.add(m);
     parts.push({ m, v: new THREE.Vector3((Math.random() - .5) * speed, Math.random() * speed, (Math.random() - .5) * speed), life, max: life });
   }
 }
-const marker = new THREE.Mesh(new THREE.ConeGeometry(.22, .45, 4), new THREE.MeshBasicMaterial({ color: 0xffd23f, depthTest: false }));
+const marker = new THREE.Mesh(new THREE.ConeGeometry(.2, .42, 24), new THREE.MeshBasicMaterial({ color: 0xffd23f, depthTest: false, toneMapped: false }));
 marker.rotation.x = Math.PI; marker.renderOrder = 10; scene.add(marker); marker.visible = false;
 
 // ---------------------------------------------------------------- UI helpers
@@ -269,10 +394,7 @@ function unlock(id) {
   S.ach[id] = Date.now(); sfx.ach(); toast(`🏆 Achievement unlocked: <b>${a.name}</b><small>${a.desc}</small>`, "ach"); save();
   if (ACHIEVEMENTS.every((x) => S.ach[x.id])) setTimeout(finale, 1500);
 }
-function earn(n) {
-  S.money += n; S.stats.earned += n;
-  if (S.stats.earned >= 1000) unlock("grand"); if (S.stats.earned >= 10000) unlock("rich");
-}
+function earn(n) { S.money += n; S.stats.earned += n; if (S.stats.earned >= 1000) unlock("grand"); if (S.stats.earned >= 10000) unlock("rich"); }
 function addXP(n) {
   S.xp += Math.round(n * F.xp);
   let need = BALANCE.xpForLevel(S.lvl);
@@ -287,18 +409,18 @@ function forward() { return new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw))
 function updateHUD() {
   $("hud-money").textContent = money(S.money);
   const need = BALANCE.xpForLevel(S.lvl);
-  $("hud-lvl").innerHTML = `Lv <b>${S.lvl}</b> <span class="bar"><i style="width:${Math.min(100, S.xp / need * 100)}%"></i></span> ${S.xp}/${need} XP`;
+  const lv = `Lv <b>${S.lvl}</b> <span class="bar"><i style="width:${Math.min(100, S.xp / need * 100)}%"></i></span> ${S.xp}/${need} XP`;
+  if ($("hud-lvl").innerHTML !== lv) $("hud-lvl").innerHTML = lv;
   const got = ACHIEVEMENTS.filter((a) => S.ach[a.id]).length;
   $("hud-ach").textContent = `🏆 ${got}/${ACHIEVEMENTS.length} (Tab)`;
   const st = streak.n > 1 && performance.now() / 1000 - streak.last < BALANCE.streakWindow;
   $("hud-streak").hidden = !st; if (st) $("hud-streak").textContent = `🔥 x${streak.n} streak  +${Math.round((streak.n - 1) * BALANCE.streakBonus * 100)}%`;
-  // tutorial or goal
   let html;
   if (S.tut >= 0 && S.tut < TUTORIAL.length) html = `<div class="tut-h">Tutorial ${S.tut + 1}/${TUTORIAL.length}</div>${TUTORIAL[S.tut].text}<div class="tut-skip">T = skip tutorial</div>`;
   else {
     const inGarage = items.filter((i) => i.place === "garage").length;
-    if (inGarage) html = `${inGarage} items left in your lot.`;
-    else html = `Garage empty: buy another lot at the <b>LOTS</b> board.`;
+    const online = onlineSpots.filter((s) => s.item).map((s) => `📸 ${s.item.name}: offer in ${Math.max(0, Math.ceil(s.timer))}s`).join("<br>");
+    html = (inGarage ? `${inGarage} items left in your lot.` : `Garage empty: buy another lot at the <b>LOTS</b> board.`) + (online ? `<br>${online}` : "");
   }
   if ($("hud-goal").innerHTML !== html) $("hud-goal").innerHTML = html;
   const qh = S.quests.map((q) => `<div class="q ${q.done ? "done" : ""}"><span>${q.text}</span><b>${q.n > 1 ? `${Math.min(q.prog, q.n)}/${q.n}` : ""}</b><em>${money(q.reward)}</em></div>`).join("");
@@ -316,7 +438,7 @@ function newQuest() {
   const type = pick(types); let q;
   if (type === "restore") { const [id, d] = pick(goods); q = { type, item: id, n: 1, text: `Restore to 100%: ${d.name}`, reward: Math.round(d.value * .8 + 20), xp: 40 }; }
   else if (type === "deliver") { const [id, d] = pick(goods); q = { type, item: id, n: 1, text: `Deliver (80%+ clean): ${d.name}`, reward: Math.round(d.value * 2.2 + 15), xp: 60 }; }
-  else if (type === "sell") { const n = 3 + Math.floor(Math.random() * 5); q = { type, n, text: `Sell ${n} items in your shop`, reward: Math.round(12 * n * top * top), xp: 40 }; }
+  else if (type === "sell") { const n = 3 + Math.floor(Math.random() * 5); q = { type, n, text: `Sell ${n} items`, reward: Math.round(12 * n * top * top), xp: 40 }; }
   else if (type === "trash") { const n = 3 + Math.floor(Math.random() * 4); q = { type, n, text: `Recycle ${n} junk items`, reward: 10 * n * top, xp: 25 }; }
   else if (type === "earn") { const amt = 150 * top * top * (1 + Math.floor(Math.random() * 3)); q = { type, n: amt, text: `Earn ${money(amt)} from sales`, reward: Math.round(amt * .25), xp: 50 }; }
   else { const lot = LOTS.filter((l) => tiers.includes(l.tier)).pop(); q = { type: "lot", lot: lot.id, n: 1, text: `Buy a lot: ${lot.name}`, reward: Math.round(lot.price * .35 + 10), xp: 35 }; }
@@ -341,23 +463,68 @@ function completeQuest(q) {
 }
 
 // ---------------------------------------------------------------- panels
-let panelOpen = false;
+let panelOpen = false, auction = null;
 function openPanel(html, bind) {
   panelOpen = true; scrubbing = null; keys.clear();
   if (document.pointerLockElement) document.exitPointerLock();
   $("panel-body").innerHTML = html + `<div style="text-align:right;margin-top:10px"><button class="ghost" id="p-close">Back to game (Esc)</button></div>`;
   $("panel").hidden = false; $("p-close").onclick = closePanel; bind && bind();
 }
-function closePanel() { $("panel").hidden = true; panelOpen = false; lockPointer(); }
+function closePanel() { if (auction && auction.running) return toast("The auction is still running!"); $("panel").hidden = true; panelOpen = false; auction = null; lockPointer(); }
 function lotsPanel() {
   const rows = LOTS.map((l) => {
     const need = l.needs && UPGRADES.find((u) => u.id === l.needs), locked = need && !S.up[l.needs];
     return `<div class="row"><div class="t"><b>${l.name} — ${money(l.price)}</b><span>${locked ? "🔒 Needs the " + need.name + " upgrade" : l.hint}</span></div>
       <button data-lot="${l.id}" ${locked || S.money < l.price ? "disabled" : ""}>Buy</button></div>`;
   }).join("");
-  openPanel(`<h2>Lots for sale</h2><p class="sub">You have ${money(S.money)}. What's inside? Nobody knows. That's the fun.</p>${rows}`, () => {
+  const now = Date.now(), ready = !S.flags.auctionAt || now >= S.flags.auctionAt;
+  const aucRows = S.up.paddle ? LOTS.filter((l) => !l.needs || S.up[l.needs]).map((l) =>
+    `<div class="row"><div class="t"><b>🔨 Sealed ${l.name}</b><span>Bigger lot (+3 items) with a guaranteed rare. Bidding starts at ${money(l.price * .6)}.</span></div>
+     <button data-auc="${l.id}" ${!ready || S.money < l.price * .6 ? "disabled" : ""}>${ready ? "Join" : "Soon"}</button></div>`).join("")
+    + (ready ? "" : `<p class="sub">Next auction in ${Math.ceil((S.flags.auctionAt - now) / 1000)}s.</p>`)
+    : `<p class="sub">🔒 Buy the <b>Auction Paddle</b> upgrade to join storage auctions.</p>`;
+  openPanel(`<h2>Lots for sale</h2><p class="sub">You have ${money(S.money)}. What's inside? Nobody knows. That's the fun.</p>${rows}<div class="cat">Auctions</div>${aucRows}`, () => {
     document.querySelectorAll("[data-lot]").forEach((b) => (b.onclick = () => { buyLot(LOTS.find((l) => l.id === b.dataset.lot)); closePanel(); }));
+    document.querySelectorAll("[data-auc]").forEach((b) => (b.onclick = () => startAuction(LOTS.find((l) => l.id === b.dataset.auc))));
   });
+}
+// ---- auctions: bots with hidden max bids, 7-second countdown resets on every bid
+const BOTS = ["Gary_Storage_King", "xX_FlipQueen_Xx", "Uncle Bob", "AntiqueAndy", "BargainBarbara"];
+function startAuction(lot) {
+  const bots = [...BOTS].sort(() => Math.random() - .5).slice(0, 3).map((n) => ({ n, max: lot.price * (1.1 + Math.random() * 1.3) }));
+  auction = { lot, bid: Math.round(lot.price * .6), leader: null, t: 7, bots, running: true, step: Math.max(5, Math.round(lot.price * .08)), botWait: 1.2, log: [] };
+  renderAuction();
+}
+function renderAuction() {
+  const a = auction; if (!a) return;
+  const you = a.leader === "You";
+  const html = `<h2>🔨 Auction: Sealed ${a.lot.name}</h2><p class="sub">Highest bid wins when the timer hits 0. You have ${money(S.money)}.</p>
+    <div class="auc"><div class="auc-bid">${money(a.bid)}</div><div class="auc-lead">${a.leader ? (you ? "🟢 You are winning!" : "🔴 " + a.leader + " leads") : "No bids yet"}</div>
+    <div class="auc-t" id="auc-t">${a.running ? `⏱ ${a.t.toFixed(1)}s` : "SOLD!"}</div></div>
+    <div class="auc-log">${a.log.slice(-5).reverse().join("<br>")}</div>
+    ${a.running ? `<button id="a-bid" ${you || S.money < a.bid + a.step ? "disabled" : ""}>Bid ${money(a.bid + a.step)}</button> <button class="ghost" id="a-quit">Give up</button>` : ""}`;
+  $("panel-body").innerHTML = html + (a.running ? "" : `<div style="text-align:right;margin-top:10px"><button class="ghost" id="p-close">Back to game (Esc)</button></div>`);
+  $("panel").hidden = false; panelOpen = true; if (document.pointerLockElement) document.exitPointerLock();
+  if ($("a-bid")) $("a-bid").onclick = () => { a.bid += a.step; a.leader = "You"; a.t = Math.max(a.t, 5); a.botWait = .8 + Math.random() * 1.6; a.log.push(`You bid ${money(a.bid)}`); sfx.bid(); renderAuction(); };
+  if ($("a-quit")) $("a-quit").onclick = () => { a.running = false; S.flags.auctionAt = Date.now() + 60000; auction = null; closePanel(); };
+  if ($("p-close")) $("p-close").onclick = () => { auction = null; closePanel(); };
+}
+function updateAuction(dt) {
+  const a = auction; if (!a || !a.running) return;
+  a.t -= dt; a.botWait -= dt;
+  if (a.botWait <= 0 && a.leader !== null || (a.leader === null && a.botWait <= 0)) {
+    const next = a.bid + a.step, cands = a.bots.filter((b) => b.max >= next && b.n !== a.leader);
+    if (cands.length && Math.random() < .85) { const b = pick(cands); a.bid = next; a.leader = b.n; a.t = Math.max(a.t, 4); a.log.push(`${b.n} bids ${money(a.bid)}`); sfx.bid(); a.dirty = true; }
+    a.botWait = 1 + Math.random() * 2.2;
+  }
+  if (a.t <= 0) {
+    a.running = false; sfx.gavel(); S.flags.auctionAt = Date.now() + 90000;
+    if (a.leader === "You") {
+      S.money -= a.bid; S.stats.auctions++; unlock("auction"); addXP(40 * a.lot.tier);
+      a.log.push(`🎉 SOLD to you for ${money(a.bid)}!`); buyLot(a.lot, { free: true, extra: 3, rare: true });
+    } else a.log.push(a.leader ? `Sold to ${a.leader}. Better luck next time.` : "No bids. Auction closed.");
+  }
+  if (a.dirty || !a.running) { a.dirty = false; renderAuction(); } else if ($("auc-t")) $("auc-t").textContent = `⏱ ${Math.max(0, a.t).toFixed(1)}s`;
 }
 function computerPanel(tab = "up") {
   S.flags.sawComputer = 1; if (tab === "req") S.flags.sawRequests = 1;
@@ -378,9 +545,10 @@ function computerPanel(tab = "up") {
   } else {
     const st = S.stats;
     body = `<div class="row"><div class="t"><b>Level ${S.lvl}</b><span>Sale price bonus +${Math.round(BALANCE.levelPriceBonus * (S.lvl - 1) * 100)}%</span></div></div>
-      <div class="row"><div class="t"><b>Lots bought: ${st.lots} · Items sold: ${st.sold}</b><span>Junk recycled: ${st.trashed} · Requests done: ${st.requests} · Best streak: x${st.bestStreak}</span></div></div>
+      <div class="row"><div class="t"><b>Lots bought: ${st.lots} · Auctions won: ${st.auctions} · Items sold: ${st.sold} (online ${st.online})</b><span>Junk recycled: ${st.trashed} · Requests done: ${st.requests} · Best streak: x${st.bestStreak}</span></div></div>
       <div class="row"><div class="t"><b>Total earned: ${money(st.earned)}</b><span>Most expensive sale: ${money(st.best)}</span></div></div>
-      <p class="sub">Version ${VERSION} · Little Loop Games</p>`;
+      <div class="row"><div class="t"><b>Graphics: ${HIGH ? "High" : "Low"}</b><span>Press G in game to switch (Low = faster on weak PCs)</span></div></div>
+      <p class="sub">Version ${VERSION} · Little Loop Games · 3D models & textures: Poly Haven (CC0)</p>`;
   }
   openPanel(`<h2>Computer</h2><p class="sub">You have ${money(S.money)} · Level ${S.lvl}</p>${tabs}${body}`, () => {
     document.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => computerPanel(b.dataset.tab)));
@@ -401,34 +569,37 @@ function achPanel() {
   const got = ACHIEVEMENTS.filter((a) => S.ach[a.id]).length;
   openPanel(`<h2>Achievements ${got}/${ACHIEVEMENTS.length}</h2><p class="sub">Collect them all to finish the game.</p><div class="achlist">${rows}</div>
     <div style="margin-top:8px"><button class="ghost" id="p-reset">Reset progress</button></div>`, () => {
-    $("p-reset").onclick = () => { if (confirm("Delete all progress?")) { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} resetting = true; location.reload(); } };
+    $("p-reset").onclick = () => { if (confirm("Delete all progress?")) { worldReady = false; try { localStorage.removeItem(SAVE_KEY); } catch (e) {} location.reload(); } };
   });
 }
-let resetting = false;
 function finale() {
   openPanel(`<h2>🏆 100% — Junk Lord of the Year!</h2><p class="sub">You collected every achievement.</p>
     <p>Lots bought: <b>${S.stats.lots}</b> · Items sold: <b>${S.stats.sold}</b> · Total earned: <b>${money(S.stats.earned)}</b></p>
-    <p>Thanks for playing the prototype! Keep playing as long as you like.</p>`);
+    <p>Thanks for playing! Keep going as long as you like.</p>`);
   sfx.level(); for (let i = 0; i < 6; i++) setTimeout(() => burst(camera.position.clone().addScaledVector(forward(), 2), 0xffd23f, 30, 3, 1.2), i * 250);
 }
 
 // ---------------------------------------------------------------- lots
-function buyLot(lot) {
-  if (S.money < lot.price) return sfx.no();
-  S.money -= lot.price; S.stats.lots++; addXP(15 * lot.tier); unlock("first_lot");
-  if (lot.id === "student") unlock("student"); if (lot.id === "pizzeria") unlock("pizza"); if (lot.id === "circus") unlock("circus");
+async function buyLot(lot, opt = {}) {
+  if (!opt.free) { if (S.money < lot.price) return sfx.no(); S.money -= lot.price; }
+  S.stats.lots++; addXP(15 * lot.tier); unlock("first_lot");
+  if (lot.id === "student") unlock("student"); if (lot.id === "workshop") unlock("workshop"); if (lot.id === "mansion") unlock("mansion");
   questEvent("lot", { lot: lot.id });
   const left = items.filter((i) => i.place === "garage"); if (left.length) { left.forEach(removeItem); toast(`Leftovers from the last lot were hauled away.`); }
-  const ids = rollLot(lot);
-  const cells = []; for (let gx = 0; gx < 3; gx++) for (let gz = 0; gz < 3; gz++) cells.push([-1.8 + gx * 1.8, -11.9 + gz * 1.5]);
+  doorOpen = 0; doorTarget = 0; sfx.door();
+  toast(`You got <b>${lot.name}</b>. Opening the shutter...`);
+  const ids = rollLot(lot, Math.random, opt.extra || 0);
+  if (opt.rare) { const r = Object.entries(ITEMS).filter(([, d]) => d.tier === lot.tier && d.rare); if (r.length) ids[0] = pick(r)[0]; }
+  await Promise.all(ids.map((id) => loadModel(ITEMS[id].model)));
+  const cells = []; for (let gx = 0; gx < 4; gx++) for (let gz = 0; gz < 3; gz++) cells.push([-2.0 + gx * 1.33, -11.6 + gz * 1.35]);
   cells.sort(() => Math.random() - .5);
-  ids.forEach((id, i) => {
-    const it = createItem(id); it.place = "garage";
-    const [x, z] = cells[i % cells.length]; it.group.position.set(x + (Math.random() - .5) * .5, 0, z + (Math.random() - .5) * .4);
+  for (let i = 0; i < ids.length; i++) {
+    const it = await createItem(ids[i]); it.place = "garage";
+    if (opt.rare && i === 0) it.rare = true;
+    const [x, z] = cells[i % cells.length]; it.group.position.set(x + (Math.random() - .5) * .4, 0, z + (Math.random() - .5) * .3);
     it.group.rotation.y = Math.random() * Math.PI * 2;
-  });
-  doorOpen = 0; doorTarget = 1; sfx.door(); save();
-  toast(`You bought <b>${lot.name}</b>. The door is opening...`);
+  }
+  doorTarget = 1; save();
 }
 
 // ---------------------------------------------------------------- input
@@ -440,15 +611,16 @@ document.addEventListener("pointerlockerror", () => { if (!fallbackLook) { fallb
 document.addEventListener("pointerlockchange", () => {
   if (!document.pointerLockElement && started && !panelOpen && !fallbackLook) openPanel(`<h2>Paused</h2><p class="sub">Your junk is waiting.</p>`);
 });
-$("btn-play").onclick = () => { $("start").hidden = true; started = true; audio(); lockPointer(); };
+$("btn-play").onclick = () => { $("start").hidden = true; started = true; audio(); lockPointer(); preloadAll(); };
 
 addEventListener("keydown", (e) => {
   if (!started) return;
   if (e.code === "Tab") { e.preventDefault(); panelOpen ? closePanel() : achPanel(); return; }
-  if (e.code === "Escape" && panelOpen) { closePanel(); return; }
+  if (e.code === "Escape" && panelOpen) { if (auction && !auction.running) auction = null; closePanel(); return; }
   if (panelOpen) return;
   keys.add(e.code);
   if (e.code === "KeyE") interact();
+  if (e.code === "KeyG") { setQuality(!HIGH); toast(`Graphics: <b>${HIGH ? "High" : "Low"}</b>`); save(); }
   if (e.code === "KeyT" && S.tut >= 0) { S.tut = -1; fillQuests(); toast("Tutorial skipped. Requests are on the computer."); save(); }
 });
 addEventListener("keyup", (e) => keys.delete(e.code));
@@ -476,19 +648,19 @@ function scrub(it, px) {
   applyCondition(it);
   if (noiseGain) noiseGain.gain.value = Math.min(.12, px * .004);
   const now = performance.now();
-  if (now - lastScrubFx > 60) { lastScrubFx = now; burst(BENCH_POS.clone().add(new THREE.Vector3((Math.random() - .5) * .4, .15 + Math.random() * .2, .2)), 0x6b5236, 3, 1.2, .4); }
+  if (now - lastScrubFx > 50) { lastScrubFx = now; burst(BENCH_POS.clone().add(new THREE.Vector3((Math.random() - .5) * .4, .1 + Math.random() * it.size.y * it.group.scale.x, .25)), Math.random() < .5 ? 0x6b5236 : 0xe8f4ff, 3, 1.2, .45); }
   if (it.condition >= 1) { if (noiseGain) noiseGain.gain.value = 0; scrubbing = null; onCleaned(it, BENCH_POS); }
 }
 function onCleaned(it, pos, auto = false) {
   if (it.shinyDone) return; it.shinyDone = true;
-  sfx.shiny(); burst(pos.clone().add(new THREE.Vector3(0, .3, 0)), 0xfff3a0, 24, 2.2, .9);
+  sfx.shiny(); burst(pos.clone().add(new THREE.Vector3(0, .3, 0)), 0xfff3a0, 26, 2.2, .9);
   S.stats.shinies++; unlock("shiny"); if (auto) unlock("automation");
   addXP(it.junk ? 2 : 8 + Math.round(it.value / 20));
   if (it.mystery) {
     unlock("mystery"); const r = Math.random(), tier = it.def.tier;
-    if (r < .12) { it.name = "Golden Pocket Watch"; it.value = 700 * tier; it.junk = false; toast(`📦 The box held a <b>${it.name}</b>! Worth ${money(priceOf(it))}!`, "ach"); unlock("jackpot"); }
-    else if (r < .6) { it.name = "Box of Old Coins"; it.value = Math.round((60 + Math.random() * 180) * tier); it.junk = false; toast(`📦 The box held <b>old coins</b>. Worth ${money(priceOf(it))}.`); }
-    else { it.name = "A Smaller Box (Empty)"; it.value = 0; it.junk = true; toast(`📦 Inside the box... a smaller box. It's empty. Recycle it.`); }
+    if (r < .12) { it.name = "Chest of Gold Coins"; it.value = 700 * tier; it.junk = false; toast(`🧰 The chest was full of <b>gold coins</b>! Worth ${money(priceOf(it))}!`, "ach"); unlock("jackpot"); }
+    else if (r < .6) { it.name = "Chest of Old Coins"; it.value = Math.round((60 + Math.random() * 180) * tier); it.junk = false; toast(`🧰 The chest held <b>old coins</b>. Worth ${money(priceOf(it))}.`); }
+    else { it.name = "Empty Chest (Nice Chest Though)"; it.value = 40 * tier; it.junk = false; toast(`🧰 The chest is empty... but it's a nice chest. Worth ${money(priceOf(it))}.`); }
     return;
   }
   if (it.rare) { it.name = it.def.rare.name; it.value = it.def.rare.value; unlock("jackpot"); toast(`💎 <b>${it.name}</b><small>It's worth ${money(priceOf(it))}!</small>`, "ach"); }
@@ -503,22 +675,22 @@ function findAim() {
   const hits = ray.intersectObjects(targets, false);
   for (const h of hits) {
     const o = h.object;
-    let vis = true; o.traverseAncestors((a) => { if (a.visible === false) vis = false; }); if (!vis || !o.visible) continue;
+    let vis = o.visible; o.traverseAncestors((a) => { if (a.visible === false) vis = false; }); if (!vis) continue;
     if (o.userData.item) { if (o.userData.item === carrying) continue; if (h.distance > 3.4) return null; return { item: o.userData.item, point: h.point }; }
     const k = o.userData.kind; if (!k) continue;
-    if ((k === "slot" || k === "bath") && !o.userData.slot.active) continue;
+    if ((k === "slot" || k === "bath" || k === "online") && !o.userData.slot.active) continue;
     return { kind: k, slot: o.userData.slot, point: h.point, dist: h.distance };
   }
   return null;
 }
 function pickUp(it) {
-  if (it.holder && it.holder.reserved) return sfx.no();
+  if (it.holder && (it.holder.reserved || it.holder.kind === "online")) return it.holder.kind === "online" ? toast("It's listed on JunkBay. Wait for the offer!") : sfx.no();
   if (it.holder) { it.holder.item = null; it.holder = null; }
   if (it.tag) { it.tag.parent.remove(it.tag); it.tag = null; }
   scene.remove(it.group); camera.add(it.group);
   it.group.position.set(.42, -.42, -.95); it.group.rotation.set(.15, -.5, 0); setScaleFit(it, .5);
   it.place = "carry"; carrying = it; sfx.pick();
-  if (it.junk && !S.flags.junkTip) { S.flags.junkTip = 1; toast("This is <b>junk</b>. Recycle it in the green bin for a little cash."); }
+  if (it.junk && !S.flags.junkTip) { S.flags.junkTip = 1; toast("This is <b>junk</b>. Recycle it in the rusty bin for a little cash."); }
 }
 function putDown(it, pos, place, fit = 9, holder = null) {
   camera.remove(it.group); scene.add(it.group);
@@ -538,9 +710,17 @@ function interact() {
     if (a && a.kind === "bench") { if (bench.item) return toast("The workbench is busy. Take that item off first."); return putDown(it, BENCH_POS, "bench", 1.1, bench); }
     if (a && a.kind === "bath") { if (a.slot.item) return toast("This bath is busy."); if (it.condition >= 1) return toast("It's already spotless!"); return putDown(it, a.slot.pos, "bath", .8, a.slot); }
     if (a && a.kind === "slot") { if (a.slot.item) return toast("That spot is taken."); return placeOnSlot(it, a.slot); }
+    if (a && a.kind === "online") {
+      if (a.slot.item) return toast("Already listing something here.");
+      if (it.junk) return toast("Nobody buys junk online. Recycle it!");
+      putDown(it, a.slot.pos, "online", .85, a.slot);
+      a.slot.timer = (BALANCE.onlineWait[0] + Math.random() * (BALANCE.onlineWait[1] - BALANCE.onlineWait[0])) / F.onlineSpeed;
+      burst(a.slot.pos.clone().add(new THREE.Vector3(0, .6, 0)), 0xffffff, 12, 1.5, .3);
+      return toast(`📸 Listed <b>${it.name}</b> on JunkBay for ${money(priceOf(it) * BALANCE.onlineBonus)}. Waiting for offers...`);
+    }
     if (a && a.kind === "deliver") return deliver(it);
     if (a && a.kind === "trash") {
-      camera.remove(it.group); removeItem(it); carrying = null; sfx.trash(); burst(bin.position.clone().add(new THREE.Vector3(0, .6, 0)), 0x555555, 10);
+      camera.remove(it.group); removeItem(it); carrying = null; sfx.trash(); burst(new THREE.Vector3(-6, 1.1, 2.6), 0x555555, 10);
       if (it.junk) { earn(F.junk); addXP(2); S.stats.trashed++; if (S.stats.trashed >= 10) unlock("trash10"); questEvent("trash"); toast(`Junk recycled: +${money(F.junk)}`); }
       else toast(`You threw away ${it.name}. It was worth ${money(priceOf(it))}... bold.`);
       save(); return;
@@ -559,7 +739,7 @@ function deliver(it) {
   const q = S.quests.find((x) => !x.done && x.type === "deliver" && x.item === it.id);
   if (!q) return toast("Nobody requested this item. Check the Requests tab on the computer.");
   if (it.condition < .8) return toast(`They want it in 80%+ condition. This one is ${Math.round(it.condition * 100)}%. Clean it first!`);
-  camera.remove(it.group); removeItem(it); carrying = null; burst(crate.position.clone().add(new THREE.Vector3(0, .6, 0)), 0xffd27a, 16, 2);
+  camera.remove(it.group); removeItem(it); carrying = null; burst(new THREE.Vector3(2.6, 1.2, 7.3), 0xffd27a, 16, 2);
   completeQuest(q); save();
 }
 function hintFor(a) {
@@ -568,6 +748,7 @@ function hintFor(a) {
     if (a && a.kind === "bench") return `<b>E</b> place ${n} on the workbench`;
     if (a && a.kind === "bath") return a.slot.item ? "Bath busy" : `<b>E</b> put ${n} in the bath (cleans by itself)`;
     if (a && a.kind === "slot") return a.slot.item ? "Spot taken" : `<b>E</b> sell ${n} for <b>${money(priceOf(carrying))}</b>`;
+    if (a && a.kind === "online") return a.slot.item ? "Already listing" : `<b>E</b> list ${n} on JunkBay for <b>${money(priceOf(carrying) * BALANCE.onlineBonus)}</b>`;
     if (a && a.kind === "trash") return carrying.junk ? `<b>E</b> recycle junk (+${money(F.junk)})` : `<b>E</b> throw away?! (worth ${money(priceOf(carrying))})`;
     if (a && a.kind === "deliver") return `<b>E</b> deliver ${n} for a request`;
     return `<b>E</b> drop ${n}`;
@@ -579,34 +760,40 @@ function hintFor(a) {
     if (it.place === "bench") return it.condition >= 1 ? `<b>${it.name}</b> is spotless · <b>E</b> pick up` : `<b>Hold click + move mouse</b> to scrub · <b>E</b> pick up · ${info}`;
     if (it.place === "bath") return `<b>${it.name}</b> bubbling... ${c}% · <b>E</b> take out`;
     if (it.place === "slot") return `<b>${it.name}</b> on sale for ${money(priceOf(it))} · <b>E</b> take back`;
+    if (it.place === "online") return `<b>${it.name}</b> listed on JunkBay · offer in ${Math.ceil(it.holder ? it.holder.timer : 0)}s`;
     return `<b>E</b> pick up <b>${it.name}</b> · ${info}`;
   }
-  return { board: "<b>E</b> browse lots", terminal: "<b>E</b> computer: upgrades & requests", door: "Your garage. Buy a lot to open it.", bench: "Workbench: bring an item here", slot: "Shop table: bring an item to sell", trash: "Recycle junk here", deliver: "Delivery crate: bring requested items here", bath: "Ultrasonic bath: drop a dirty item in" }[a.kind] || "";
+  return { board: "<b>E</b> lots & auctions", terminal: "<b>E</b> computer: upgrades & requests", door: "Your garage. Buy a lot to open it.", bench: "Workbench: bring an item here", slot: "Shop table: bring an item to sell", trash: "Recycle junk here", deliver: "Delivery crate: bring requested items here", bath: "Ultrasonic bath: drop a dirty item in", online: "JunkBay photo table: list an item online (+30%)" }[a.kind] || "";
 }
 
 // ---------------------------------------------------------------- customers
 const customers = []; let custTimer = 3;
-const bodyGeo = new THREE.CylinderGeometry(.22, .26, 1.1, 8), headGeo = new THREE.SphereGeometry(.2, 10, 8);
-const custColors = [0x8fa3b8, 0xb89f8f, 0x9fb88f, 0xb88fae, 0xa8a8a8];
+const bodyGeo = new THREE.CapsuleGeometry(.24, .8, 6, 16), headGeo = new THREE.SphereGeometry(.17, 24, 16);
+const custColors = [0x8fa3b8, 0xb89f8f, 0x9fb88f, 0xb88fae, 0xa8a8a8, 0xd9b26a];
 function spawnCustomer() {
   const free = slots.filter((s) => s.active && s.item && !s.reserved); if (!free.length) return;
   const slot = free[Math.floor(Math.random() * free.length)]; slot.reserved = true;
   const g = new THREE.Group(), c = custColors[Math.floor(Math.random() * custColors.length)];
-  const b = new THREE.Mesh(bodyGeo, mat(c)); b.position.y = .55; g.add(b);
-  const h = new THREE.Mesh(headGeo, mat(0xe6d6c4)); h.position.y = 1.32; g.add(h);
+  const b = new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ color: c, roughness: .6 })); b.position.y = .66; g.add(b);
+  const h = new THREE.Mesh(headGeo, new THREE.MeshStandardMaterial({ color: 0xe9e4dc, roughness: .35 })); h.position.y = 1.42; g.add(h);
+  shadowy(g, true, false);
   g.position.set(slot.pos.x + (Math.random() - .5) * 8, 0, 20); scene.add(g);
   customers.push({ g, slot, state: "in", t: 0, target: new THREE.Vector3(slot.pos.x, 0, 8.95) });
 }
-function sell(it) {
+function sell(it, online = false) {
   const now = performance.now() / 1000;
-  streak.n = now - streak.last < BALANCE.streakWindow ? Math.min(5, streak.n + 1) : 1; streak.last = now;
-  S.stats.bestStreak = Math.max(S.stats.bestStreak, streak.n); if (streak.n >= 5) unlock("streak5");
-  const p = Math.round(priceOf(it) * (1 + (streak.n - 1) * BALANCE.streakBonus));
+  let p;
+  if (online) { p = Math.round(priceOf(it) * BALANCE.onlineBonus); S.stats.online++; unlock("online"); }
+  else {
+    streak.n = now - streak.last < BALANCE.streakWindow ? Math.min(5, streak.n + 1) : 1; streak.last = now;
+    S.stats.bestStreak = Math.max(S.stats.bestStreak, streak.n); if (streak.n >= 5) unlock("streak5");
+    p = Math.round(priceOf(it) * (1 + (streak.n - 1) * BALANCE.streakBonus));
+  }
   earn(p); addXP(5 + Math.round(p / 15)); S.stats.sold++; S.stats.best = Math.max(S.stats.best, p);
   unlock("first_sale"); if (S.stats.sold >= 50) unlock("sold50"); if (p >= 1000) unlock("whale");
   questEvent("sell"); questEvent("earn", { amount: p });
-  sfx.cash(); burst(it.group.position.clone().add(new THREE.Vector3(0, .5, 0)), 0x5fd38d, 10, 1.6);
-  toast(`Sold <b>${it.name}</b> for <b>${money(p)}</b>${streak.n > 1 ? ` · 🔥x${streak.n}` : ""}`);
+  sfx.cash(); burst(it.group.position.clone().add(new THREE.Vector3(0, .5, 0)), 0x5fd38d, 12, 1.6);
+  toast(online ? `📦 JunkBay: <b>${it.name}</b> sold for <b>${money(p)}</b> and shipped!` : `Sold <b>${it.name}</b> for <b>${money(p)}</b>${streak.n > 1 ? ` · 🔥x${streak.n}` : ""}`);
   removeItem(it); save();
 }
 function updateCustomers(dt) {
@@ -620,9 +807,9 @@ function updateCustomers(dt) {
         if (c.state === "in") { c.state = "browse"; c.t = 0; }
         else { scene.remove(c.g); customers.splice(i, 1); continue; }
       } else { d.multiplyScalar(Math.min(1, 1.9 * dt / L)); c.g.position.add(d); c.g.rotation.y = Math.atan2(d.x, d.z); }
-      c.g.position.y = Math.abs(Math.sin(c.t * 9)) * .05;
+      c.g.position.y = Math.abs(Math.sin(c.t * 9)) * .04; c.g.rotation.z = Math.sin(c.t * 9) * .04;
     } else if (c.state === "browse") {
-      c.g.rotation.y = Math.PI; c.g.children[1].position.y = 1.32 + Math.sin(c.t * 4) * .03;
+      c.g.rotation.y = Math.PI; c.g.rotation.z = 0; c.g.children[1].position.y = 1.42 + Math.sin(c.t * 4) * .03;
       if (c.t > 1.4) {
         if (c.slot.item) sell(c.slot.item);
         c.slot.reserved = false; c.state = "out"; c.target = new THREE.Vector3(c.g.position.x + (Math.random() - .5) * 6, 0, 21);
@@ -658,37 +845,40 @@ function updateTutorial() {
 function markerTarget() {
   if (S.tut < 0 || panelOpen) return null;
   const t = TUTORIAL[S.tut].target;
-  if (t === "board") return new THREE.Vector3(4.5, 2.9, -5.4);
-  if (t === "garage") { const g = items.find((i) => i.place === "garage"); return g ? g.group.position.clone().add(new THREE.Vector3(0, 1.4, 0)) : new THREE.Vector3(0, 2.5, -9); }
+  if (t === "board") return new THREE.Vector3(4.5, 2.1, -5.4);
+  if (t === "garage") { const g = items.find((i) => i.place === "garage"); return g ? g.group.position.clone().add(new THREE.Vector3(0, 1.3, 0)) : new THREE.Vector3(0, 2.4, -9); }
   if (t === "bench") return carrying || bench.item ? new THREE.Vector3(-6, 2.0, -1.95) : null;
   if (t === "table") { const s = slots.find((x) => x.active && !x.item) || slots[0]; return new THREE.Vector3(s.pos.x, 2.0, s.pos.z); }
-  if (t === "computer") return new THREE.Vector3(4.2, 2.1, 5);
+  if (t === "computer") return new THREE.Vector3(4.2, 2.1, 5.2);
   return null;
 }
 
 // ---------------------------------------------------------------- save / load world
+function holderCode(h) { if (!h) return null; if (h.kind === "slot") return "s" + slots.indexOf(h); if (h.kind === "bath") return "b" + baths.indexOf(h); if (h.kind === "online") return "o" + onlineSpots.indexOf(h); return "w"; }
 function serializeWorld() {
   return items.map((it) => {
-    const h = it.holder; const p = it.place === "carry" ? "ground" : it.place;
     let x = it.group.position.x, z = it.group.position.z;
     if (it.place === "carry") { const f = forward(); x = camera.position.x + f.x; z = camera.position.z + f.z; }
-    return { id: it.id, c: +it.condition.toFixed(3), n: it.name, v: it.value, j: it.junk, m: it.mystery, r: it.rare, s: it.shinyDone, p,
-      h: h ? (h.kind === "slot" ? "s" + slots.indexOf(h) : h.kind === "bath" ? "b" + baths.indexOf(h) : "w") : null, x: +x.toFixed(2), z: +z.toFixed(2), ry: +it.group.rotation.y.toFixed(2) };
+    return { id: it.id, c: +it.condition.toFixed(3), n: it.name, v: it.value, j: it.junk, m: it.mystery, r: it.rare, s: it.shinyDone, p: it.place === "carry" ? "ground" : it.place,
+      h: holderCode(it.holder), t: it.holder && it.holder.kind === "online" ? Math.round(it.holder.timer) : 0, x: +x.toFixed(2), z: +z.toFixed(2), ry: +it.group.rotation.y.toFixed(2) };
   });
 }
-function loadWorld() {
+async function loadWorld() {
   for (const w of S.world || []) {
-    const it = createItem(w.id, w); if (!it) continue;
+    const it = await createItem(w.id, w).catch(() => null); if (!it) continue;
     let holder = null;
-    if (w.h === "w") holder = bench; else if (w.h && w.h[0] === "s") holder = slots[+w.h.slice(1)]; else if (w.h && w.h[0] === "b") holder = baths[+w.h.slice(1)];
-    if (holder && (!holder.active && holder.kind !== "bench" || holder.item)) holder = null;
+    if (w.h === "w") holder = bench; else if (w.h && w.h[0] === "s") holder = slots[+w.h.slice(1)]; else if (w.h && w.h[0] === "b") holder = baths[+w.h.slice(1)]; else if (w.h && w.h[0] === "o") holder = onlineSpots[+w.h.slice(1)];
+    if (holder && ((!holder.active && holder.kind !== "bench") || holder.item)) holder = null;
     if (holder) {
       it.place = holder.kind === "bench" ? "bench" : holder.kind; it.holder = holder; holder.item = it;
-      setScaleFit(it, holder.kind === "slot" ? 1.0 : holder.kind === "bath" ? .8 : 1.1); it.group.position.copy(holder.pos);
+      setScaleFit(it, { slot: 1.0, bath: .8, online: .85 }[holder.kind] || 1.1); it.group.position.copy(holder.pos);
+      if (holder.kind === "online") holder.timer = w.t || 20;
       if (holder.kind === "slot") { it.tag = priceSprite(money(priceOf(it))); it.tag.position.set(holder.pos.x, holder.pos.y + Math.min(1.2, it.size.y * it.group.scale.x) + .25, holder.pos.z - .3); scene.add(it.tag); }
     } else { it.place = w.p === "garage" ? "garage" : "ground"; it.group.position.set(w.x, 0, w.z); it.group.rotation.y = w.ry || 0; }
   }
 }
+let preloading = false;
+async function preloadAll() { if (preloading) return; preloading = true; for (const d of Object.values(ITEMS)) { await loadModel(d.model).catch(() => {}); } }
 
 // ---------------------------------------------------------------- movement + loop
 function collide(p) {
@@ -703,8 +893,14 @@ function collide(p) {
   p.x = Math.max(-28, Math.min(28, p.x)); p.z = Math.max(-28, Math.min(14, p.z));
 }
 applyUpgrades();
-loadWorld();
-if (S.tut < 0) fillQuests();
+if (!HIGH) setQuality(false);
+(async () => {
+  const tier1 = Object.values(ITEMS).filter((d) => d.tier === 1).map((d) => loadModel(d.model).catch(() => {}));
+  await Promise.all([buildProps(), ...tier1]);
+  await loadWorld(); worldReady = true;
+  if (S.tut < 0) fillQuests();
+  $("load-txt").textContent = "Ready!"; $("btn-play").disabled = false;
+})();
 let last = performance.now();
 function loop(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
@@ -722,20 +918,24 @@ function loop(now) {
   }
   camera.rotation.set(pitch, yaw, 0);
   if (doorOpen < doorTarget) doorOpen = Math.min(doorTarget, doorOpen + dt * .45);
-  door.position.y = 1.45 + doorOpen * 2.8; door.scale.y = 1 - doorOpen * .92; doorRect.active = doorOpen < .6;
-  // baths clean by themselves
+  door.position.y = doorOpen * 2.35; door.scale.y = 1 - doorOpen * .85; door.visible = doorOpen < .98; doorRect.active = doorOpen < .6;
   for (const b of baths) {
     const it = b.item; if (!b.active || !it || it.condition >= 1) continue;
     it.condition = Math.min(1, it.condition + BALANCE.bathRate * F.bathSpeed * dt); applyCondition(it);
     it.group.position.y = b.pos.y + Math.sin(now / 200) * .02;
-    if (Math.random() < dt * 8) burst(b.pos.clone().add(new THREE.Vector3((Math.random() - .5) * .6, .25, (Math.random() - .5) * .5)), 0xd8f6ff, 1, .6, .7);
+    if (Math.random() < dt * 10) burst(b.pos.clone().add(new THREE.Vector3((Math.random() - .5) * .6, .2, (Math.random() - .5) * .5)), 0xd8f6ff, 1, .6, .7);
     if (it.condition >= 1) onCleaned(it, b.pos, true);
+  }
+  for (const o of onlineSpots) {
+    if (!o.active || !o.item) continue;
+    o.timer -= dt; o.item.group.rotation.y += dt * .6;
+    if (o.timer <= 0) { const it = o.item; sell(it, true); o.item = null; }
   }
   for (let i = parts.length - 1; i >= 0; i--) {
     const p = parts[i]; p.life -= dt; p.v.y -= 4 * dt; p.m.position.addScaledVector(p.v, dt); p.m.scale.setScalar(Math.max(.01, p.life / p.max));
     if (p.life <= 0) { scene.remove(p.m); p.m.material.dispose(); parts.splice(i, 1); }
   }
-  updateCustomers(dt);
+  updateCustomers(dt); updateAuction(dt);
   if (started) updateTutorial();
   const mt = started ? markerTarget() : null; marker.visible = !!mt;
   if (mt) { marker.position.copy(mt); marker.position.y += Math.sin(now / 200) * .12; marker.rotation.y += dt * 2; }
@@ -746,9 +946,9 @@ function loop(now) {
   if (showC) $("cond").firstChild.style.width = Math.round(aim.item.condition * 100) + "%";
   if (carrying) carrying.group.position.y = -.42 + Math.sin(now / 160) * .01;
   updateHUD();
-  renderer.render(scene, camera);
+  if (HIGH) composer.render(); else renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-window.__game = { S, items, slots, baths, bench, buyLot, LOTS, camera, get aim() { return aim; }, get carrying() { return carrying; }, interact, scrub, sell, computerPanel, closePanel,
-  setLook(y, p) { yaw = y; pitch = p; }, lookAt(x, y, z) { const c = camera.position, dx = x - c.x, dz = z - c.z; yaw = Math.atan2(-dx, -dz); pitch = Math.atan2(y - c.y, Math.hypot(dx, dz)); }, customers, applyUpgrades, addXP };
+window.__game = { S, items, slots, baths, onlineSpots, bench, buyLot, LOTS, camera, get aim() { return aim; }, get carrying() { return carrying; }, interact, scrub, sell, computerPanel, closePanel, lotsPanel, startAuction,
+  get auction() { return auction; }, setQuality, setLook(y, p) { yaw = y; pitch = p; }, lookAt(x, y, z) { const c = camera.position, dx = x - c.x, dz = z - c.z; yaw = Math.atan2(-dx, -dz); pitch = Math.atan2(y - c.y, Math.hypot(dx, dz)); }, customers, applyUpgrades, addXP };
