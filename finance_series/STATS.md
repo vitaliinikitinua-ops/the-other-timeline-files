@@ -15,3 +15,18 @@
 Notes: finance Shorts got 84-102 views in ~5 h, 2.5-3x the memory Shorts in a full day -> finance direction confirmed.
 The long finance video has only 2 views: long videos get almost no traffic yet; Shorts are the discovery engine (80% from the Shorts feed).
 Idea for next runs: pin a link to the long video in each Short's description (already done) and keep the hook number on frame 1.
+
+## 27.11.2026 14:08 Warsaw (views / likes / comments)
+| Video | Published (UTC) | Views | Likes | Comm. |
+|---|---|---|---|---|
+| EP03 long: Only Paid the Minimum | 27.11 12:09 | 0 | 0 | 1 |
+| EP02 short: 12 Years and LESS Money | 27.11 11:08 | 30 | 0 | 0 |
+| EP02 long: Invest at 18 vs 30 | 27.11 10:08 | 1 | 0 | 1 |
+| EP01 short: Every NO Paid You $1 | 27.11 09:08 | 115 | 2 | 0 |
+| EP01 long: $1 Every Time You Said No | 27.11 08:09 | 0 | 0 | 1 |
+| $1 vs $5 vs $10 a Day #shorts | 26.11 08:33 | 136 | 2 | 0 |
+| 2020 Crash: Sell or Hold #shorts | 26.11 08:33 | 107 | 1 | 0 |
+| 6,114 Coffees vs $99,172 #shorts | 26.11 08:08 | 112 | 3 | 0 |
+| $5 a Day Since 2010 (long, 5 min) | 25.11 18:02 | 4 | 0 | 1 |
+| Memory Shorts x3 / long (old series) | 25.11 | 18-41 / 24 | 0 | 0 |
+Takeaway: finance Shorts reliably get 100-140 views in the first day (EP01 short: 115 in 5 h); long videos stay at 0-4 views - the channel gets no long-form browse traffic yet.

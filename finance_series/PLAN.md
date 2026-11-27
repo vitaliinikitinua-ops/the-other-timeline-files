@@ -34,3 +34,8 @@ Publish queue: `finance_series/QUEUE.md`, worked by a scheduled task twice a day
 - QA done per episode via contact sheets (see skills/episode-qa). Fixes made: chart side panel cropped by camera zoom
   (all chart beats re-rendered), y-axis labels, Anton missing glyphs (≠, →), EP04 single end date, EP05 key-date values.
 - Publishing: QUEUE.json + scheduled task (14:02 / 18:02 Warsaw). EP01 long goes out 26.11 18:00.
+
+## Notes 27.11.2026 (from stats)
+- Shorts are the only traffic source right now (100-140 views each); long videos 0-4 views.
+- Ideas: pin the "Full video" link as first comment on each Short (manual), add an end-screen to longs (manual),
+  consider 2-3 extra Shorts per long episode (more entry points) instead of 1, and test a stronger first frame on longs.
