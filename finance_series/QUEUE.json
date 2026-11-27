@@ -105,7 +105,7 @@
   "ep": "ep03",
   "kind": "long",
   "due_warsaw": "2026-11-28T18:00",
-  "status": "pending",
+  "status": "done",
   "title": "What If You Only Paid the Minimum on Your Credit Card?",
   "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep03/EP03_Only_Paid_the_Minimum.mp4",
   "thumbnail": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep03/thumb_A.jpg",
@@ -125,7 +125,8 @@
    "animated story"
   ],
   "comment": "Have you ever been stuck paying only the minimum? No judgement, tell me below 👇",
-  "url": null
+  "url": "https://www.youtube.com/watch?v=dNrWLsh3NuY",
+  "published_at": "2026-11-27T12:09:20Z"
  },
  {
   "ep": "ep03",
