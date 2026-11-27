@@ -1,0 +1,30 @@
+{
+  "name": "pipeline_test_v1",
+  "note": "ТЕХНІЧНИЙ ТЕСТ монтажу (фото замість відео). Не для публікації.",
+  "target_duration": [30, 40],
+  "voice": {"mode": "tts", "model": "../../models/piper/uk_UA-tetiana-high.onnx", "length_scale": 0.95},
+  "music": null,
+  "subtitle_style": {"size": 74, "margin_v": 600},
+  "thumbnail": {"scene": "s01", "offset": 0.4, "text": "Сніданок за 1 хвилину"},
+  "scenes": [
+    {"id": "s01", "visual": {"type": "photo", "src": "../../references/model/model_ref_01.jpg", "move": "in", "focus_y": 0.25},
+      "line": "Дівчата, я знайшла сніданок, який готується за одну хвилину.",
+      "overlays": [{"text": "Сніданок за 1 хвилину?", "style": "badge", "at": 0.0, "until": 3.0}]},
+    {"id": "s02", "visual": {"type": "video", "src": "raw_footage/fake_phone_clip.mp4", "in": 0.0, "focus": "center"},
+      "audio": "clip", "line": "Ось так виглядає мій ранок, коли немає часу на сніданок."},
+    {"id": "s03", "visual": {"type": "photo", "src": "../../references/model/model_ref_03.jpg", "move": "out", "focus_y": 0.3},
+      "line": "Раніше я просто пила каву і до обіду була голодна."},
+    {"id": "s04", "visual": {"type": "product", "src": "../../references/products/lr_figu_active_crusty_raspberry.jpg", "move": "in"},
+      "line": "Тепер у мене є оці хрусткі пластівці з малиною від LR.",
+      "overlays": [{"text": "LR FIGUACTIVE\nCrusty Raspberry", "style": "top", "at": 0.2}]},
+    {"id": "s05", "visual": {"type": "photo", "src": "../../references/model/model_ref_02.jpg", "move": "in", "focus_y": 0.3},
+      "line": "Шість ложок, склянка соєвого напою, і все. Двадцять грамів білка в порції.",
+      "overlays": [{"text": "20 г білка в порції", "style": "badge", "at": 0.3}]},
+    {"id": "s06", "visual": {"type": "product", "src": "../../references/products/lr_figu_active_crusty_raspberry.jpg", "move": "out"},
+      "line": "Веганські, без лактози, з клітковиною, і на смак як десерт.",
+      "overlays": [{"text": "веган • без лактози • клітковина", "style": "top", "at": 0.2}]},
+    {"id": "s07", "visual": {"type": "photo", "src": "../../references/model/model_ref_04.jpg", "move": "in", "focus_y": 0.3},
+      "line": "Хочеш спробувати? Пиши мені в директ слово «сніданок».",
+      "overlays": [{"text": "Пиши «СНІДАНОК» у директ", "style": "cta", "at": 0.2}]}
+  ]
+}

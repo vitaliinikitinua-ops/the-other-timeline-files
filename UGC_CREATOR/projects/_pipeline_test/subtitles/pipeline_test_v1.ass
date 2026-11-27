@@ -1,0 +1,91 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Sub,DejaVu Sans,74,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,1,0,0,0,100,100,0,0,1,7,2,2,90,90,600,1
+Style: Top,DejaVu Sans,66,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,6,2,8,80,80,190,1
+Style: Badge,DejaVu Sans,60,&H00FFFFFF,&H00FFFFFF,&H006A2BD6,&H006A2BD6,1,0,0,0,100,100,0,0,3,18,0,8,80,80,330,1
+Style: Cta,DejaVu Sans,64,&H00FFFFFF,&H00FFFFFF,&H006A2BD6,&H006A2BD6,1,0,0,0,100,100,0,0,3,20,0,2,80,80,260,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:00.15,0:00:00.83,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Дівчата,{\c&H00FFFFFF&}
+Dialogue: 1,0:00:01.19,0:00:01.35,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}я{\c&H00FFFFFF&} знайшла сніданок,
+Dialogue: 1,0:00:01.35,0:00:01.81,Sub,,0,0,0,,я {\c&H0000E5FF}знайшла{\c&H00FFFFFF&} сніданок,
+Dialogue: 1,0:00:01.81,0:00:02.53,Sub,,0,0,0,,я знайшла {\c&H0000E5FF}сніданок,{\c&H00FFFFFF&}
+Dialogue: 1,0:00:02.81,0:00:03.07,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}який{\c&H00FFFFFF&} готується за
+Dialogue: 1,0:00:03.07,0:00:03.65,Sub,,0,0,0,,який {\c&H0000E5FF}готується{\c&H00FFFFFF&} за
+Dialogue: 1,0:00:03.65,0:00:03.90,Sub,,0,0,0,,який готується {\c&H0000E5FF}за{\c&H00FFFFFF&}
+Dialogue: 1,0:00:03.77,0:00:03.97,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}одну{\c&H00FFFFFF&} хвилину.
+Dialogue: 1,0:00:03.97,0:00:04.61,Sub,,0,0,0,,одну {\c&H0000E5FF}хвилину.{\c&H00FFFFFF&}
+Dialogue: 1,0:00:05.01,0:00:05.27,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Ось{\c&H00FFFFFF&} так виглядає
+Dialogue: 1,0:00:05.27,0:00:05.41,Sub,,0,0,0,,Ось {\c&H0000E5FF}так{\c&H00FFFFFF&} виглядає
+Dialogue: 1,0:00:05.41,0:00:06.11,Sub,,0,0,0,,Ось так {\c&H0000E5FF}виглядає{\c&H00FFFFFF&}
+Dialogue: 1,0:00:06.11,0:00:06.35,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}мій{\c&H00FFFFFF&} ранок,
+Dialogue: 1,0:00:06.35,0:00:06.79,Sub,,0,0,0,,мій {\c&H0000E5FF}ранок,{\c&H00FFFFFF&}
+Dialogue: 1,0:00:07.13,0:00:07.45,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}коли{\c&H00FFFFFF&} немає часу
+Dialogue: 1,0:00:07.45,0:00:07.93,Sub,,0,0,0,,коли {\c&H0000E5FF}немає{\c&H00FFFFFF&} часу
+Dialogue: 1,0:00:07.93,0:00:08.37,Sub,,0,0,0,,коли немає {\c&H0000E5FF}часу{\c&H00FFFFFF&}
+Dialogue: 1,0:00:08.37,0:00:08.47,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}на{\c&H00FFFFFF&} сніданок.
+Dialogue: 1,0:00:08.47,0:00:09.09,Sub,,0,0,0,,на {\c&H0000E5FF}сніданок.{\c&H00FFFFFF&}
+Dialogue: 1,0:00:09.39,0:00:09.85,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Раніше{\c&H00FFFFFF&} я просто
+Dialogue: 1,0:00:09.85,0:00:09.99,Sub,,0,0,0,,Раніше {\c&H0000E5FF}я{\c&H00FFFFFF&} просто
+Dialogue: 1,0:00:09.99,0:00:10.27,Sub,,0,0,0,,Раніше я {\c&H0000E5FF}просто{\c&H00FFFFFF&}
+Dialogue: 1,0:00:10.27,0:00:10.61,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}пила{\c&H00FFFFFF&} каву і
+Dialogue: 1,0:00:10.61,0:00:11.09,Sub,,0,0,0,,пила {\c&H0000E5FF}каву{\c&H00FFFFFF&} і
+Dialogue: 1,0:00:11.09,0:00:11.63,Sub,,0,0,0,,пила каву {\c&H0000E5FF}і{\c&H00FFFFFF&}
+Dialogue: 1,0:00:11.63,0:00:11.77,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}до{\c&H00FFFFFF&} обіду була
+Dialogue: 1,0:00:11.77,0:00:12.13,Sub,,0,0,0,,до {\c&H0000E5FF}обіду{\c&H00FFFFFF&} була
+Dialogue: 1,0:00:12.13,0:00:12.41,Sub,,0,0,0,,до обіду {\c&H0000E5FF}була{\c&H00FFFFFF&}
+Dialogue: 1,0:00:12.41,0:00:12.95,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}голодна.{\c&H00FFFFFF&}
+Dialogue: 1,0:00:13.48,0:00:13.82,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Тепер{\c&H00FFFFFF&} у мене
+Dialogue: 1,0:00:13.82,0:00:13.86,Sub,,0,0,0,,Тепер {\c&H0000E5FF}у{\c&H00FFFFFF&} мене
+Dialogue: 1,0:00:13.86,0:00:14.12,Sub,,0,0,0,,Тепер у {\c&H0000E5FF}мене{\c&H00FFFFFF&}
+Dialogue: 1,0:00:14.12,0:00:14.30,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}є{\c&H00FFFFFF&} оці хрусткі
+Dialogue: 1,0:00:14.30,0:00:14.50,Sub,,0,0,0,,є {\c&H0000E5FF}оці{\c&H00FFFFFF&} хрусткі
+Dialogue: 1,0:00:14.50,0:00:15.00,Sub,,0,0,0,,є оці {\c&H0000E5FF}хрусткі{\c&H00FFFFFF&}
+Dialogue: 1,0:00:15.00,0:00:15.58,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}пластівці{\c&H00FFFFFF&} з малиною
+Dialogue: 1,0:00:15.58,0:00:15.72,Sub,,0,0,0,,пластівці {\c&H0000E5FF}з{\c&H00FFFFFF&} малиною
+Dialogue: 1,0:00:15.72,0:00:16.20,Sub,,0,0,0,,пластівці з {\c&H0000E5FF}малиною{\c&H00FFFFFF&}
+Dialogue: 1,0:00:16.20,0:00:16.34,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}від{\c&H00FFFFFF&} LR.
+Dialogue: 1,0:00:16.34,0:00:16.84,Sub,,0,0,0,,від {\c&H0000E5FF}LR.{\c&H00FFFFFF&}
+Dialogue: 1,0:00:17.51,0:00:17.69,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Шість{\c&H00FFFFFF&} ложок,
+Dialogue: 1,0:00:17.69,0:00:18.21,Sub,,0,0,0,,Шість {\c&H0000E5FF}ложок,{\c&H00FFFFFF&}
+Dialogue: 1,0:00:18.51,0:00:18.99,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}склянка{\c&H00FFFFFF&} соєвого напою,
+Dialogue: 1,0:00:18.99,0:00:19.41,Sub,,0,0,0,,склянка {\c&H0000E5FF}соєвого{\c&H00FFFFFF&} напою,
+Dialogue: 1,0:00:19.41,0:00:19.87,Sub,,0,0,0,,склянка соєвого {\c&H0000E5FF}напою,{\c&H00FFFFFF&}
+Dialogue: 1,0:00:19.87,0:00:20.23,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}і{\c&H00FFFFFF&} все.
+Dialogue: 1,0:00:20.23,0:00:20.48,Sub,,0,0,0,,і {\c&H0000E5FF}все.{\c&H00FFFFFF&}
+Dialogue: 1,0:00:20.89,0:00:21.27,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Двадцять{\c&H00FFFFFF&} грамів білка
+Dialogue: 1,0:00:21.27,0:00:21.83,Sub,,0,0,0,,Двадцять {\c&H0000E5FF}грамів{\c&H00FFFFFF&} білка
+Dialogue: 1,0:00:21.83,0:00:22.21,Sub,,0,0,0,,Двадцять грамів {\c&H0000E5FF}білка{\c&H00FFFFFF&}
+Dialogue: 1,0:00:22.21,0:00:22.31,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}в{\c&H00FFFFFF&} порції.
+Dialogue: 1,0:00:22.31,0:00:22.81,Sub,,0,0,0,,в {\c&H0000E5FF}порції.{\c&H00FFFFFF&}
+Dialogue: 1,0:00:23.42,0:00:24.04,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Веганські,{\c&H00FFFFFF&}
+Dialogue: 1,0:00:24.04,0:00:24.20,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}без{\c&H00FFFFFF&} лактози,
+Dialogue: 1,0:00:24.20,0:00:24.92,Sub,,0,0,0,,без {\c&H0000E5FF}лактози,{\c&H00FFFFFF&}
+Dialogue: 1,0:00:25.26,0:00:25.26,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}з{\c&H00FFFFFF&} клітковиною,
+Dialogue: 1,0:00:25.26,0:00:26.22,Sub,,0,0,0,,з {\c&H0000E5FF}клітковиною,{\c&H00FFFFFF&}
+Dialogue: 1,0:00:26.22,0:00:26.74,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}і{\c&H00FFFFFF&} на смак
+Dialogue: 1,0:00:26.74,0:00:26.86,Sub,,0,0,0,,і {\c&H0000E5FF}на{\c&H00FFFFFF&} смак
+Dialogue: 1,0:00:26.86,0:00:27.24,Sub,,0,0,0,,і на {\c&H0000E5FF}смак{\c&H00FFFFFF&}
+Dialogue: 1,0:00:27.24,0:00:27.24,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}як{\c&H00FFFFFF&} десерт.
+Dialogue: 1,0:00:27.24,0:00:27.84,Sub,,0,0,0,,як {\c&H0000E5FF}десерт.{\c&H00FFFFFF&}
+Dialogue: 1,0:00:28.43,0:00:28.85,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Хочеш{\c&H00FFFFFF&} спробувати?
+Dialogue: 1,0:00:28.85,0:00:29.53,Sub,,0,0,0,,Хочеш {\c&H0000E5FF}спробувати?{\c&H00FFFFFF&}
+Dialogue: 1,0:00:29.81,0:00:30.27,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}Пиши{\c&H00FFFFFF&} мені в
+Dialogue: 1,0:00:30.27,0:00:30.49,Sub,,0,0,0,,Пиши {\c&H0000E5FF}мені{\c&H00FFFFFF&} в
+Dialogue: 1,0:00:30.49,0:00:30.74,Sub,,0,0,0,,Пиши мені {\c&H0000E5FF}в{\c&H00FFFFFF&}
+Dialogue: 1,0:00:30.51,0:00:31.01,Sub,,0,0,0,,{\fscx88\fscy88\t(0,90,\fscx100\fscy100)}{\c&H0000E5FF}директ{\c&H00FFFFFF&} слово «сніданок».
+Dialogue: 1,0:00:31.01,0:00:32.19,Sub,,0,0,0,,директ {\c&H0000E5FF}слово{\c&H00FFFFFF&} «сніданок».
+Dialogue: 1,0:00:32.19,0:00:32.65,Sub,,0,0,0,,директ слово {\c&H0000E5FF}«сніданок».{\c&H00FFFFFF&}
+Dialogue: 2,0:00:00.00,0:00:03.00,Badge,,0,0,0,,{\fad(120,120)\fscx92\fscy92\t(0,120,\fscx100\fscy100)}Сніданок за 1 хвилину?
+Dialogue: 2,0:00:13.53,0:00:17.36,Top,,0,0,0,,{\fad(120,120)\fscx92\fscy92\t(0,120,\fscx100\fscy100)}LR FIGUACTIVE\NCrusty Raspberry
+Dialogue: 2,0:00:17.66,0:00:23.27,Badge,,0,0,0,,{\fad(120,120)\fscx92\fscy92\t(0,120,\fscx100\fscy100)}20 г білка в порції
+Dialogue: 2,0:00:23.47,0:00:28.28,Top,,0,0,0,,{\fad(120,120)\fscx92\fscy92\t(0,120,\fscx100\fscy100)}веган • без лактози • клітковина
+Dialogue: 2,0:00:28.48,0:00:34.02,Cta,,0,0,0,,{\fad(120,120)\fscx92\fscy92\t(0,120,\fscx100\fscy100)}Пиши «СНІДАНОК» у директ

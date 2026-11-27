@@ -1,0 +1,13 @@
+# Особисті фото моделі та медіа не публікуємо в git
+references/model/
+projects/*/raw_footage/
+projects/*/audio/
+projects/*/scenes/
+projects/*/images/
+projects/*/renders/
+projects/*/final/
+exports/
+models/piper/*.onnx
+*.mp4
+*.wav
+*.mov
