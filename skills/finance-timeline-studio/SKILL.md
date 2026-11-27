@@ -7,7 +7,9 @@ description: Make educational personal-finance "What IF" videos (8-10 min 16:9 +
 
 Finance episodes of **The Other Timeline** (@theothertimeline-toti): "What IF You ...?" told as two or
 three timelines of the same person ("You"), or as a superpower story ("every NO pays $1"), always ending
-with real numbers. Everything is code: no ElevenLabs credits, no image AI. Load with it:
+with real numbers. Everything is code: no ElevenLabs credits (user decision 27.11: Piper only), no image AI.
+Cadence (27.11): one NEW 8-10 min episode per day for the user to publish at 18:00 + 2-4 Shorts cut from it in the
+current winning style (shorts_v2.py) for the automatic Shorts queue. Old EP04-EP10 longs are not published. Load with it:
 **other-timeline-studio** (look), **story-shorts-studio** (Short captions), **youtube-publisher** (upload),
 **episode-qa** (self-check before publishing), **youtube-playbook** (hooks, layout, titles, tests - read first).
 

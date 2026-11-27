@@ -3,19 +3,33 @@ name: youtube-playbook
 description: The rulebook for making The Other Timeline videos and Shorts interesting and well packaged - what each second should look like, where hooks, text, numbers, CTAs and end screens go, title/thumbnail rules, styles, publishing rhythm and how to A/B test - built from our own channel data (Nov 2026), competitor breakdowns and viral Reels. Use before writing any script, Short, title or thumbnail, and for "як зробити цікавіше", "хук", "превю", "що поставити", "коли публікувати", "чому не дивляться", "make it more engaging".
 ---
 
-# YouTube Playbook (v1, 27.11.2026)
+# YouTube Playbook (v2, 27.11.2026)
 
 Load together with: `finance-timeline-studio` (production), `episode-qa` (check), `youtube-publisher` (upload),
 `channel-analyst` (data). This file says WHAT to make and WHERE things go; the others say HOW.
 Mark every rule as **[data]** (seen in our numbers), **[competitor]** (seen in outliers we analysed) or
 **[practice]** (common creator practice, not yet proven for us). Update the rule labels when tests finish.
 
+## 00. Channel decisions by the user (27.11.2026) - these override any recommendation below
+| Topic | Decision |
+|---|---|
+| Long videos | 8-10 min, a NEW episode every day, published by the USER manually at 18:00 Warsaw (I prepare the package) |
+| Shorts | Published by ME automatically, up to 5 per day (Zapier limit), slots ~13:00, 15:00, 17:00, 19:00, 21:00 Warsaw |
+| Voice | Piper only (free). No ElevenLabs. |
+| Platforms | YouTube only (no TikTok/Reels for now) |
+| CTA | NO keyword CTA, no "comment X to get Y". A plain question in the first comment is fine. |
+| Style of long videos | Decided after the Shorts style test (winner style becomes the long-video style) |
+| Old long EP04-EP10 | Not published. New episodes are made from scratch. |
+| Old hourly queue task | Disabled 27.11 (trig_01FmjYgwucogcmCG1FL8f6N2) |
+Package for every long video (user uploads in Studio): mp4, 3 thumbnails A/B/C for Test & Compare, title (<= 55 chars),
+description with chapters + method + sources + not financial advice, tags, first comment (question), suggested end screen.
+
 ## 0. What our data says so far (snapshot 27.11.2026, channel 3 days old)
 - 13 videos, 473 views, 0 subscribers. Shorts: 100-160 views each, then stop. Long videos: 0-6 views. **[data]**
 - Meaning: Shorts get YouTube's small test pool and are not pushed further -> viewers swipe early;
   long videos get no browse traffic until the channel has an audience. **Shorts first, longs later.** **[data]**
 - Mixed topics (memory series + finance) confuse who to show us to. One niche: money "what if" with real numbers. **[practice]**
-- Robotic Piper voice + static letterboxed layout are the most likely swipe reasons (not yet tested). Next test: ElevenLabs voice (user's credits - ask first).
+- Robotic Piper voice + static letterboxed layout are likely swipe reasons. The user keeps Piper (free): compensate with faster pacing (SPEED, tight gaps), stronger hooks and visual styles.
 
 ## 1. The first 3 seconds (decides everything)
 - Frame 1 is never empty, never a logo, never a fade-in. It already shows the conflict: a giant number, a question
@@ -62,7 +76,7 @@ y 1906-1920 progress bar (amber), grows with time
 | 60-75% | Twist (stopper, late start, crash) | mid-video dip |
 | last 90 s | Honest part, 3 practical rules, question for comments | trust + engagement |
 | last 15 s | End screen (next video + subscribe) | session time |
-- Don't publish longs while subscribers < ~500: turn each long into 2-4 Shorts instead. **[data]**
+- Our data says longs get 0-6 views without an audience **[data]**, but the user chose daily longs: so every long gets 2-4 Shorts cut from it (new styles), published in the Shorts slots, so viewers have a path to the long.
 
 ## 5. Titles and thumbnails
 - Title <= 55 characters, the hook in the first 40 (mobile truncation). Pattern: "What If You ...?" / "He ... and Had LESS Money" /
@@ -73,9 +87,8 @@ y 1906-1920 progress bar (amber), grows with time
   YouTube Studio -> Test & Compare (manual; the user uploads them). **[practice]**
 
 ## 6. Engagement mechanics (when to put what)
-- **Comment keyword CTA** (from a viral "10 Claude animation styles" Reel: 2,050 likes, 1,477 comments, 1,640 shares):
-  "Comment MONEY and I'll send you the calculator" - comments become the main ranking signal. Needs something to
-  give (a free sheet/calculator page) and a way to deliver it (pinned comment link / Instagram DM automation). **[competitor]**
+- Comment keyword CTA ("comment MONEY to get X") worked hugely on a viral Reel **[competitor]**, but the USER DECLINED it
+  (27.11): don't use keyword CTAs. Use a plain question or the A/B quiz instead.
 - **Quiz** at the start, answer at the end -> loops + comments. **[practice]**
 - **Numbered list** visible from the start ("1 of 10 ... 10") -> people wait for the last item. **[competitor]**
 - First comment on every long video = a question (automated); pin it (manual). Shorts: pinned comment with the full-video link (manual).
@@ -98,4 +111,4 @@ y 1906-1920 progress bar (amber), grows with time
 ## 9. Publishing rhythm
 - Max 5 uploads per rolling 24 h through Zapier (failed runs count). Prefer 2-3 Shorts/day over longs right now.
 - Same posting time daily. Shorts of an episode 30-60 min after its long (when longs return).
-- Cross-post Shorts to TikTok/Reels when the user connects accounts (same file, native captions).
+- YouTube only for now (user decision 27.11).

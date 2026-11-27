@@ -6,8 +6,7 @@ description: Publish or schedule finished videos and Shorts to the user's YouTub
 # YouTube Publisher (Zapier) v3
 
 Publishing is outward-facing and permanent: publish only what the user asked for, with the privacy they chose.
-On 26.11.2026 the user gave standing permission: publish the finance series myself, 1 long video 18:00 +
-1 Short 14:00 Warsaw per day, first comment = question, daily stats.
+Standing permission (27.11.2026): I publish Shorts automatically (max 5/day); the user publishes long videos. Daily stats after 14:00.
 
 ## Connection
 - Zapier app `YouTubeV4CLIAPI`; no default connection, always pass `connection_id 02a61b1b-aa32-8b7c-9dde-25c46b2d6c04`.
@@ -32,6 +31,14 @@ On 26.11.2026 the user gave standing permission: publish the finance series myse
 - Scheduled task trig_01FmjYgwucogcmCG1FL8f6N2, hourly 09:07-23:07 Warsaw: publishes the next item as soon as
   fewer than 5 uploads happened in the last 24 h and the last upload is 30+ min old; a Short only 30+ min after its
   long video; then first comment + playlist; daily stats after 14:00. User wants the maximum the limits allow.
+
+## Workflow from 27.11.2026 (user decision)
+- Long videos: the USER publishes manually at 18:00 Warsaw. I deliver the package (see youtube-playbook 00) and never
+  upload longs myself.
+- Shorts: I publish automatically from `finance_series/SHORTS_QUEUE.json`, max 5 per rolling 24 h, slots 13/15/17/19/21
+  Warsaw, via a scheduled task. Shorts titles must differ from any already published title; description links the
+  long video only if it is published (ask/verify by title in the uploads playlist).
+- The old hourly long+short task (trig_01FmjYgwucogcmCG1FL8f6N2) is disabled; don't re-enable it.
 
 ## Testing mode (27.11.2026)
 The user tests new Short styles and publishes test files manually. Before auto-publishing anything from the queue, check
