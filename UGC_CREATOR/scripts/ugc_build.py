@@ -101,9 +101,20 @@ def norm(w):
     return re.sub(r"[^\wʼ']", "", w.lower()).replace("ʼ", "'")
 
 
+def tokens(text):
+    """Слова сценарію; тире та інша пунктуація без літер приклеюються до попереднього слова."""
+    out = []
+    for t in text.split():
+        if out and not re.search(r"\w", t):
+            out[-1] += " " + t
+        else:
+            out.append(t)
+    return out
+
+
 def align(script_text, heard, total_dur, offset=0.0):
     """Ставить слова СЦЕНАРІЮ на таймінги РОЗПІЗНАНИХ слів (правильний правопис + точний час)."""
-    sw = script_text.split()
+    sw = tokens(script_text)
     if not sw:
         return []
     if not heard:  # рівномірний розподіл
@@ -249,16 +260,24 @@ Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
 Style: Sub,{FONT_NAME},{size},&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,1,0,0,0,100,100,0,0,1,7,2,2,90,90,{margin},1
 Style: Top,{FONT_NAME},66,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,6,2,8,80,80,190,1
 Style: Badge,{FONT_NAME},60,&H00FFFFFF,&H00FFFFFF,&H006A2BD6,&H006A2BD6,1,0,0,0,100,100,0,0,3,18,0,8,80,80,330,1
+Style: Ph,{FONT_NAME},44,&H00FFFFFF,&H00FFFFFF,&H00404040,&H96404040,1,0,0,0,100,100,0,0,3,14,0,5,80,80,0,1
 Style: Cta,{FONT_NAME},64,&H00FFFFFF,&H00FFFFFF,&H006A2BD6,&H006A2BD6,1,0,0,0,100,100,0,0,3,20,0,2,80,80,260,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     lines = []
+    flat_starts = [w["s"] for w in words]
+    k = 0
     for ch in chunk_words(words):
         for i, w in enumerate(ch):
             st = w["s"]
             en = ch[i + 1]["s"] if i + 1 < len(ch) else max(w["e"], w["s"] + 0.25)
+            if k + 1 < len(flat_starts):  # ніколи не перекривати наступне слово
+                en = min(en, flat_starts[k + 1])
+            k += 1
+            if en - st < 0.04:
+                continue
             parts = []
             for j, x in enumerate(ch):
                 t = esc(x["w"])
@@ -266,7 +285,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             pop = "{\\fscx88\\fscy88\\t(0,90,\\fscx100\\fscy100)}" if i == 0 else ""
             lines.append(f"Dialogue: 1,{ass_time(st)},{ass_time(en)},Sub,,0,0,0,,{pop}{' '.join(parts)}")
     for o in overlays:
-        st_name = {"top": "Top", "badge": "Badge", "cta": "Cta"}.get(o.get("style", "top"), "Top")
+        st_name = {"top": "Top", "badge": "Badge", "cta": "Cta", "ph": "Ph"}.get(o.get("style", "top"), "Top")
         txt = esc(o["text"]).replace("\n", "\\N")
         fx = "{\\fad(120,120)\\fscx92\\fscy92\\t(0,120,\\fscx100\\fscy100)}"
         lines.append(f"Dialogue: 2,{ass_time(o['start'])},{ass_time(o['end'])},{st_name},,0,0,0,,{fx}{txt}")
@@ -392,6 +411,15 @@ def build(cfg_path):
             fit_audio(raw, wav, dur, lead)
         else:
             silence(wav, dur)
+        # живий звук кліпу під голосом (напр. хрускіт)
+        if sc.get("ambient_db") is not None and vis["type"] == "video" and rp(vis["src"]).exists():
+            amb = d_audio / f"{sid}_amb.wav"
+            to_wav(rp(vis["src"]), amb, vis.get("in", 0.0), dur)
+            mixed = d_audio / f"{sid}_mix.wav"
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(wav), "-i", str(amb), "-filter_complex",
+                 f"[1:a]volume={sc['ambient_db']}dB,apad[b];[0:a][b]amix=inputs=2:duration=first:"
+                 f"normalize=0", "-c:a", "pcm_s16le", str(mixed)])
+            mixed.replace(wav)
         # слова для субтитрів
         if line and raw and sc.get("subtitles", True):
             heard = transcribe_words(raw)
@@ -399,6 +427,15 @@ def build(cfg_path):
         # візуал
         out = d_scenes / f"{sid}.mp4"
         kind = vis["type"]
+        if kind == "video" and not rp(vis["src"]).exists():
+            if not cfg.get("allow_placeholders"):
+                raise FileNotFoundError(f"Немає кліпу {vis['src']} для сцени {sid}")
+            # чорновий перегляд: фото-заглушка + підпис, що треба зняти
+            vis = {"type": "photo", "src": vis.get("placeholder", cfg["product_image"]),
+                   "move": "in", "focus_y": 0.3}
+            kind = "product" if vis["src"] == cfg.get("product_image") else "photo"
+            overlays.append({"text": f"ЗАГЛУШКА\n{sc.get('shot', sid)}", "style": "ph",
+                             "start": t, "end": t + dur})
         if kind == "video":
             render_clip(rp(vis["src"]), out, vis.get("in", 0.0), dur, vis.get("focus", "center"),
                         vis.get("speed", 1.0))

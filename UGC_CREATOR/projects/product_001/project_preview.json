@@ -1,0 +1,206 @@
+{
+  "name": "PREVIEW_animatic_hookA",
+  "allow_placeholders": true,
+  "product_image": "../../references/products/lr_figu_active_crusty_raspberry.jpg",
+  "target_duration": [
+    30,
+    40
+  ],
+  "voice": {
+    "mode": "file",
+    "source": "audio/voiceover_nadiia_v2.mp3",
+    "voice": "ElevenLabs Nadiia (GyDcLo7liHxK3VGsWSgy), eleven_v4"
+  },
+  "music": null,
+  "subtitle_style": {
+    "size": 74,
+    "margin_v": 600
+  },
+  "thumbnail": {
+    "scene": "s07",
+    "offset": 1.0,
+    "text": "Сніданок за 1 хвилину"
+  },
+  "scenes": [
+    {
+      "id": "s01",
+      "shot": "кадр 1 — ключі, годинник, погляд у камеру",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/01.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/model/model_ref_01.jpg"
+      },
+      "line": "Немає часу на сніданок? Дивись.",
+      "lead": 0.05,
+      "tail": 0.15,
+      "overlays": [
+        {
+          "text": "Сніданок за 1 хвилину?",
+          "style": "top",
+          "at": 0.0
+        }
+      ],
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s01.wav"
+    },
+    {
+      "id": "s02",
+      "shot": "кадр 2 — ковток кави, знизує плечима",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/02.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/model/model_ref_03.jpg"
+      },
+      "line": "Знайомо? Зранку лише кава, а о десятій уже хочеться булочку.",
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s02.wav"
+    },
+    {
+      "id": "s03",
+      "shot": "кадр 3 — банка етикеткою в камеру",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/03.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/products/lr_figu_active_crusty_raspberry.jpg"
+      },
+      "line": "Тримай лайфхак: пластівці від LR.",
+      "overlays": [
+        {
+          "text": "LR FIGUACTIVE\nCrusty Raspberry",
+          "style": "top",
+          "at": 0.2
+        }
+      ],
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s03.wav"
+    },
+    {
+      "id": "s04",
+      "shot": "кадр 4 — зверху: насипає 6 ложок",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/04.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/products/lr_figu_active_crusty_raspberry.jpg"
+      },
+      "line": "Шість ложок,",
+      "ambient_db": -14,
+      "overlays": [
+        {
+          "text": "6 ложок",
+          "style": "top",
+          "at": 0.1
+        }
+      ],
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s04.wav"
+    },
+    {
+      "id": "s05",
+      "shot": "кадр 5 — зверху: заливає соєвим напоєм",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/05.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/products/lr_figu_active_crusty_raspberry.jpg"
+      },
+      "line": "склянка соєвого напою — і сніданок готовий.",
+      "ambient_db": -14,
+      "overlays": [
+        {
+          "text": "+ 300 мл соєвого напою",
+          "style": "top",
+          "at": 0.1
+        }
+      ],
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s05.wav"
+    },
+    {
+      "id": "s06",
+      "shot": "кадр 6 — крупно: ложка, хрускіт",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/06.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/products/lr_figu_active_crusty_raspberry.jpg"
+      },
+      "line": "Хрусткі, з малиною і шматочками шоколаду.",
+      "ambient_db": -6,
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s06.wav"
+    },
+    {
+      "id": "s07",
+      "shot": "кадр 7 — їсть, усміхається, киває",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/07.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/model/model_ref_02.jpg"
+      },
+      "line": "У порції — двадцять грамів білка і клітковина. І вони веганські, без лактози.",
+      "overlays": [
+        {
+          "text": "20 г білка в порції",
+          "style": "badge",
+          "at": 0.2,
+          "until": 3.2
+        },
+        {
+          "text": "веган • без лактози",
+          "style": "badge",
+          "at": 3.3
+        }
+      ],
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s07.wav"
+    },
+    {
+      "id": "s08",
+      "shot": "кадр 8 — банка + миска, наближення",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/08.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/products/lr_figu_active_crusty_raspberry.jpg"
+      },
+      "line": "Готується за хвилину — встигнеш, навіть коли запізнюєшся.",
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s08.wav"
+    },
+    {
+      "id": "s09",
+      "shot": "кадр 9 — сумка, вихід, показує в камеру",
+      "visual": {
+        "type": "video",
+        "src": "raw_footage/09.mp4",
+        "in": 0.0,
+        "focus": "center",
+        "placeholder": "../../references/model/model_ref_04.jpg"
+      },
+      "line": "Хочеш спробувати? Пиши мені в директ слово «сніданок».",
+      "tail": 0.9,
+      "overlays": [
+        {
+          "text": "Пиши «СНІДАНОК» у директ",
+          "style": "cta",
+          "at": 0.3
+        }
+      ],
+      "audio": "file",
+      "audio_file": "audio/vo_lines/s09.wav"
+    }
+  ]
+}
