@@ -66,12 +66,12 @@ for i,t in enumerate(["Документи","Гроші · 800+","Робота ·
 ctext(d,cy+470,"простими словами",font(54),"white",cx=mx)
 # right: subscribe
 rx=2*W+W//2
-ctext(d,cy-400,"Нове відео",font(90),"white",cx=rx)
-ctext(d,cy-290,"щотижня",font(90),YEL,cx=rx)
+ctext(d,cy-400,"Нові відео",font(90),"white",cx=rx)
+ctext(d,cy-290,"щодня",font(110),YEL,cx=rx)
 d.rounded_rectangle((2*W+130,cy-80,3*W-130,cy+90),60,fill=YEL)
 ctext(d,cy-55,"ПІДПИШИСЬ",font(88),NAVY,cx=rx)
 d.polygon([(rx-90,cy+200),(rx+90,cy+200),(rx,cy+330)],fill=YEL)
-ctext(d,cy+380,"джерела: gov.pl · ZUS",font(46),(190,200,225),cx=rx)
+ctext(d,cy+380,"@polshabezstresu",font(50),(190,200,225),cx=rx)
 for i in range(3):
     big.crop((i*W,0,(i+1)*W,H)).save(f"{OUT}/banner_{i+1}_of_3.png")
 # preview of profile grid (3:4 centre crop of each)
@@ -79,4 +79,33 @@ pv=Image.new("RGB",(3*360+20,480),"white")
 for i in range(3):
     tile=big.crop((i*W,240,(i+1)*W,1680)).resize((360,480)); pv.paste(tile,(i*370,0))
 pv.save(f"{OUT}/_pv_banner_grid.png")
+
+# ---------- wide profile background (content drawn on 3000x1000, centred into each size)
+def content():
+    C=Image.new("RGBA",(3000,1000),(0,0,0,0)); d=ImageDraw.Draw(C)
+    cx,cy=470,430
+    d.rounded_rectangle((cx-150,cy+170,cx+150,cy+470),70,fill=PINK)
+    mom(d,cx,cy,165)
+    d.line((cx+130,cy+230,cx+235,cy+30),fill=(250,210,175),width=44); d.ellipse((cx+195,cy-30,cx+285,cy+60),fill=(250,210,175))
+    for kx,col in ((cx-270,(90,170,220)),(cx+300,(250,200,70))):
+        d.rounded_rectangle((kx-75,cy+330,kx+75,cy+520),38,fill=col); face(d,kx,cy+265,78,"calm",1.3,skin=(255,220,185))
+    mx=1500
+    d.rounded_rectangle((mx-370,120,mx+370,290),40,fill=RED); ctext(d,140,"ПОЛЬЩА",font(118),"white",cx=mx)
+    ctext(d,320,"без стресу",font(130),YEL,cx=mx)
+    for i,t in enumerate(["Документи","Гроші · 800+","Робота · школа"]):
+        x0=mx-645+i*440; d.rounded_rectangle((x0,560,x0+410,665),52,fill=CREAM); ctext(d,591,t,font(42),NAVY,cx=x0+205)
+    ctext(d,720,"простими словами",font(56),"white",cx=mx)
+    rx=2530
+    ctext(d,170,"Нові відео",font(84),"white",cx=rx); ctext(d,275,"щодня",font(110),YEL,cx=rx)
+    d.rounded_rectangle((rx-330,470,rx+330,620),60,fill=YEL); ctext(d,500,"ПІДПИШИСЬ",font(72),NAVY,cx=rx)
+    ctext(d,680,"@polshabezstresu",font(46),(190,200,225),cx=rx)
+    return C
+CT=content()
+def wide(Wd,Hd,name):
+    bg=Image.new("RGB",(Wd,Hd),NAVY); g=ImageDraw.Draw(bg)
+    sw=max(10,Wd//60)
+    for x in range(-Hd,Wd,sw*3): g.line((x,Hd,x+Hd,0),fill=(52,65,99),width=sw)
+    sc=min(Wd*0.97/3000,Hd*0.9/1000); c=CT.resize((int(3000*sc),int(1000*sc)),Image.LANCZOS)
+    bg.paste(c,((Wd-c.width)//2,(Hd-c.height)//2),c); bg.save(f"{OUT}/{name}.png"); return bg
+pv=[wide(1920,1080,"fon_16x9_1920x1080"),wide(1500,500,"fon_3x1_1500x500")]
 print("ok")
