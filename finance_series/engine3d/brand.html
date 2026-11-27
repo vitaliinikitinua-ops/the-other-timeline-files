@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<script type="module">
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, makeStage, makeSet, shot, coin, bill } from "./rig.js";
+window.renderAvatar = () => {
+  const st = makeStage(800, 800, 0x2a1d48); st.scene.fog = null;
+  const you = makeChar("you"); st.scene.add(you.root); setFace(you, "money"); applyPose(you, "cheer", 0.3);
+  for (let i = 0; i < 14; i++) { const b = bill(i % 2 ? "100" : "1"); const a = i / 14 * Math.PI * 2; b.position.set(Math.cos(a) * 1.9, 2.9 + Math.sin(a) * 1.5, -0.8); b.rotation.set(a, a * 2, a); st.scene.add(b); }
+  st.camera.fov = 30; st.camera.aspect = 1; st.camera.updateProjectionMatrix();
+  shot(st.camera, [0, 3.1, 7.2], [0, 3.1, 7.2], [0, 2.9, 0], 1);
+  st.renderer.render(st.scene, st.camera); const d = st.renderer.domElement.toDataURL("image/png"); st.renderer.domElement.remove(); return d;
+};
+window.renderBanner = () => {
+  const st = makeStage(2560, 1440, 0x30285a); st.scene.fog = null; makeSet(st.scene, "void");
+  const line = ["teen", "crypto_bro", "max", "banker", "grandma", "you", "dad", "mom", "kid", "landlord", "boss", "realtor", "scammer"];
+  const emos = { you: "money", max: "smug", grandma: "happy", banker: "smug", crypto_bro: "smug", teen: "wink", dad: "happy", mom: "happy", kid: "laugh", landlord: "angry", boss: "neutral", realtor: "happy", scammer: "smug" };
+  const poses = { you: "cheer", max: "shrug", grandma: "thumbsup", kid: "jump", crypto_bro: "point", landlord: "hold", scammer: "idle" };
+  line.forEach((w, i) => { const c = makeChar(w); st.scene.add(c.root); const x = (i - (line.length - 1) / 2) * 1.75; const zc = -Math.abs(x) * 0.18;
+    c.root.position.set(x, 0, zc + (w === "you" ? 0.8 : 0)); c.root.rotation.y = -x * 0.06; setFace(c, emos[w] || "happy"); applyPose(c, poses[w] || "idle", 0.5 + i); });
+  for (let i = 0; i < 60; i++) { const k = coin(); k.position.set((Math.random() - 0.5) * 24, Math.random() * 0.15, 1 + Math.random() * 2); k.rotation.set(Math.random(), Math.random(), Math.random()); st.scene.add(k); }
+  st.camera.fov = 26; st.camera.aspect = 2560 / 1440; st.camera.updateProjectionMatrix();
+  shot(st.camera, [0, 3.6, 30], [0, 3.6, 30], [0, 4.4, 0], 1);
+  st.renderer.render(st.scene, st.camera); return st.renderer.domElement.toDataURL("image/png");
+};
+window.ready = true;
+</script></body></html>

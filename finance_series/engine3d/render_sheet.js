@@ -7,10 +7,11 @@ const { chromium } = require('playwright'); const fs = require('fs');
   const jobs = [];
   const poses = ['idle','no','cheer','point','shrug','facepalm','thumbsup','panic','slump','hold','jump'];
   const emos = ['neutral','happy','shock','smug','sad','panic','money','laugh','angry'];
-  for (const who of ['you','max','grandma','banker']) jobs.push([who,'idle','neutral']);
-  poses.forEach((po,i) => jobs.push(['you', po, ['happy','smug','money','neutral','smug','sad','happy','panic','sad','happy','laugh'][i]]));
-  emos.forEach(e => jobs.push(['max','idle',e]));
-  jobs.push(['grandma','thumbsup','happy'],['banker','point','smug'],['max','facepalm','sad'],['max','panic','panic']);
+  const mode = process.argv[3] || 'cast';
+  const keys = await p.evaluate(() => window.castKeys);
+  const moods = ['happy','smug','happy','smug','neutral','happy','smug','neutral','smug','happy','wink','smug','happy','laugh','neutral','happy','neutral','happy','wink'];
+  if (mode === 'cast') keys.forEach((k, i) => jobs.push([k, 'idle', moods[i % moods.length]]));
+  else { poses.forEach((po,i) => jobs.push(['you', po, ['happy','smug','money','neutral','smug','sad','happy','panic','sad','happy','laugh'][i]])); emos.forEach(e => jobs.push(['max','idle',e])); }
   let i = 0;
   for (const [who,pose,emo] of jobs) { const d = await p.evaluate(([w,po,e]) => window.renderSheet(w,po,e), [who,pose,emo]); fs.writeFileSync(`${out}/${String(i).padStart(2,'0')}_${who}_${pose}_${emo}.jpg`, Buffer.from(d.split(',')[1],'base64')); i++; }
   console.log('frames', i, 'errors', JSON.stringify(errs));
