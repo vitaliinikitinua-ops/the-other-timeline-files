@@ -115,7 +115,14 @@ const manager = new THREE.LoadingManager();
 manager.onProgress = (url, done, total) => { const el = $("load-txt"); if (el) el.textContent = `Loading ${done}/${total}...`; };
 const texLoader = new THREE.TextureLoader(manager);
 const gltfLoader = new GLTFLoader(manager);
-new RGBELoader(manager).load("tex/sky.hdr", (t) => { t.mapping = THREE.EquirectangularReflectionMapping; scene.environment = t; scene.background = t; });
+manager.itemStart("sky");
+fetch("tex/sky.hdr.json").then((r) => r.json()).then((j) => {
+  const bin = Uint8Array.from(atob(j.b64), (c) => c.charCodeAt(0));
+  const r = new RGBELoader().parse(bin.buffer);
+  const t = new THREE.DataTexture(r.data, r.width, r.height, THREE.RGBAFormat, r.type);
+  t.colorSpace = THREE.LinearSRGBColorSpace; t.minFilter = t.magFilter = THREE.LinearFilter; t.generateMipmaps = false; t.flipY = true; t.needsUpdate = true;
+  t.mapping = THREE.EquirectangularReflectionMapping; scene.environment = t; scene.background = t;
+}).catch((e) => console.warn("sky failed", e)).finally(() => manager.itemEnd("sky"));
 
 function tex(name, rep) {
   const d = texLoader.load(`tex/${name}_diff.jpg`), n = texLoader.load(`tex/${name}_nor.jpg`);
@@ -161,7 +168,7 @@ function priceSprite(text) {
 // ---------------------------------------------------------------- models
 const modelCache = new Map();
 function loadModel(name) {
-  if (!modelCache.has(name)) modelCache.set(name, new Promise((res, rej) => gltfLoader.load(`models/${name}.glb`, (g) => res(g.scene), undefined, rej)));
+  if (!modelCache.has(name)) modelCache.set(name, new Promise((res, rej) => gltfLoader.load(`models/${name}/${name}.json`, (g) => res(g.scene), undefined, rej)));
   return modelCache.get(name);
 }
 // Normalise a model: optional sub-object filter, rotation, scale; centred on x/z, standing on y = 0.
@@ -342,7 +349,7 @@ function dirtify(m, uni) {
         float dN = dfbm(vDirtPos * uDirtScale);
         float dG = dn(vDirtPos * uDirtScale * 7.0);
         float dMask = smoothstep(1.0 - uDirt - 0.05, 1.0 - uDirt + 0.05, dN * 0.85 + dG * 0.15) * step(0.002, uDirt);
-        vec3 dCol = mix(vec3(0.13,0.095,0.06), vec3(0.34,0.26,0.17), dG);
+        vec3 dCol = mix(vec3(0.085,0.065,0.04), vec3(0.24,0.18,0.115), dG);
         diffuseColor.rgb *= 1.0 - uDirt * 0.3;
         diffuseColor.rgb = mix(diffuseColor.rgb, dCol, dMask * 0.95);`)
       .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, dMask);")
