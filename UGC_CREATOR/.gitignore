@@ -12,3 +12,4 @@ models/piper/*.onnx
 *.wav
 *.mov
 tools/sadtalker/
+__pycache__/
