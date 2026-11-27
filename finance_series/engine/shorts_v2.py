@@ -11,6 +11,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import build as B
 from build import *  # noqa  (kit helpers, SC, T, paste_center, AMBER, ...)
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import styles as STY
 
 SW, SH = 1080, 1920
 TESTS = {
@@ -33,7 +34,11 @@ def text_center(c, txt, size, y, col=(255, 255, 255), maxw=980, stroke=None):
     d.text(((SW - (bb[2] - bb[0])) / 2 - bb[0], y - (bb[3] - bb[1]) / 2 - bb[1]), txt, font=f, fill=col, stroke_width=sw, stroke_fill=(0, 0, 0))
 
 def make(ep, style):
-    m = B.load_ep(ep); sp = m.SHORT; bd = B.bdir(ep); cfg = TESTS[ep]
+    m = B.load_ep(ep); sp = m.SHORT; bd = B.bdir(ep)
+    fx = None
+    if style.startswith("fx-"):
+        fx = style[3:]
+    cfg = dict(TESTS.get(ep, {})); cfg.setdefault("head", sp["title"]); cfg.setdefault("number", dict(text="", sub="", col=GREEN)); cfg.setdefault("quiz", {})
     timing = json.load(open(os.path.join(bd, "timing.json")))
     clips = []; t = 0.0; names = [b_[0] for b_ in m.BEATS]
     for bi, sis in sp["segs"]:
@@ -70,12 +75,14 @@ def make(ep, style):
         tb = timing[bi]["sents"][si]
         ot = tb["start"] + clamp01((t - st) / max(d, 0.01)) * (tb["end"] - tb["start"])
         sc = SC.render(ot, SC.B(timing[bi]), m.BEATS[bi][2]).convert("RGB")
+        if fx:
+            sc = STY.STYLES[fx](sc, t)
         # background: the same frame, zoomed to fill, blurred and darkened
         bgs = sc.resize((int(sc.width * SH / sc.height), SH), Image.BILINEAR)
         x0 = (bgs.width - SW) // 2; bg = bgs.crop((x0, 0, x0 + SW, SH)).resize((SW // 8, SH // 8)).filter(ImageFilter.GaussianBlur(3)).resize((SW, SH), Image.BILINEAR)
         c = Image.blend(bg, Image.new("RGB", (SW, SH), (8, 6, 24)), 0.45).convert("RGBA")
         # foreground: zoomed scene with a slow push-in per sentence
-        k = 1.42 + 0.05 * clamp01((t - st) / max(d, 0.01))
+        k = (1.0 if fx == "explainer3d" else 1.42) + 0.05 * clamp01((t - st) / max(d, 0.01))
         fw = int(SW * k); fh = int(fw * sc.height / sc.width)
         fg = sc.resize((fw, fh), Image.LANCZOS); cx = (fw - SW) // 2; fg = fg.crop((cx, 0, cx + SW, fh))
         y0 = 560; c.paste(fg, (0, y0))
