@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<script type="module">
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, makeStage, makeSet, shot } from "./rig.js";
+const st = makeStage(600, 800, 0x30285a);
+makeSet(st.scene, "void");
+const chars = {}; for (const w of ["you","max","grandma","banker"]) { chars[w] = makeChar(w); st.scene.add(chars[w].root); chars[w].root.visible = false; }
+window.renderSheet = (who, pose, emo, yaw = 0.35) => {
+  for (const k in chars) chars[k].root.visible = k === who;
+  const ch = chars[who]; ch.root.rotation.y = yaw; ch.root.position.set(0, 0, 0);
+  setFace(ch, emo); applyPose(ch, pose, 0);
+  shot(st.camera, [0, 2.3, 7.2], [0, 2.3, 7.2], [0, 1.9, 0], 1);
+  st.renderer.render(st.scene, st.camera);
+  return st.renderer.domElement.toDataURL("image/jpeg", 0.92);
+};
+window.ready = true;
+</script></body></html>

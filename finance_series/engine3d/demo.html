@@ -1,0 +1,75 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<script type="module">
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, makeStage, makeSet, shot, blinkAt, bill, coin, cup, shoebox, jar } from "./rig.js";
+const st = makeStage(1080, 1920, 0x30285a);
+const sets = { rich: makeSet(st.scene, "rich"), cafe: makeSet(st.scene, "cafe"), street: makeSet(st.scene, "street"), void: makeSet(st.scene, "void") };
+const you = makeChar("you"), max = makeChar("max"), gma = makeChar("grandma");
+for (const c of [you, max, gma]) st.scene.add(c.root);
+// props
+const rain = []; for (let i = 0; i < 40; i++) { const b = bill(i % 3 ? "100" : "1"); st.scene.add(b); rain.push({ m: b, x: (Math.random() - .5) * 6, z: (Math.random() - .5) * 3, sp: 1 + Math.random(), ph: Math.random() * 6 }); }
+const hbill = bill("1"); st.scene.add(hbill);
+const latte = cup(); st.scene.add(latte); const box = shoebox(); st.scene.add(box); const jr = jar(); st.scene.add(jr);
+const show = (name) => { for (const k in sets) sets[k].visible = k === name; };
+function hideAll() { for (const o of [you.root, max.root, gma.root, hbill, latte, box, jr]) o.visible = false; rain.forEach(r => r.m.visible = false); }
+// timeline (seconds)
+window.renderDemo = (t) => {
+  hideAll();
+  if (t < 2.6) {                         // END FIRST: rich, money rain, cheering
+    show("rich"); st.scene.background.set(0x2a1d48);
+    you.root.visible = true; you.root.position.set(0, 0.9, 0); you.root.rotation.y = 0;
+    setFace(you, "money", blinkAt(t)); applyPose(you, { from: "idle", to: "cheer", t0: 0.05, dur: 0.25 }, t, { squash: 0.1, hop: true });
+    rain.forEach(r => { r.m.visible = true; const y = 7 - ((t * 2.2 * r.sp + r.ph) % 7); r.m.position.set(r.x, y, r.z); r.m.rotation.set(t * 3 * r.sp + r.ph, t * 2 + r.ph, t * r.sp); });
+    shot(st.camera, [0, 3.0, 9.5], [0, 2.9, 6.8], [0, 2.6, 0], t / 2.6, t < 0.12 ? 0.25 * (1 - t / 0.12) : 0, 0.02, t);
+  } else if (t < 3.3) {                  // REWIND: spin
+    show("void"); st.scene.background.set(0x1a1630);
+    you.root.visible = true; you.root.position.set(0, 0, 0); const k = (t - 2.6) / 0.7; you.root.rotation.y = -k * Math.PI * 4;
+    setFace(you, "shock"); applyPose(you, "idle", t);
+    shot(st.camera, [0, 2.4, 7], [0, 2.4, 9], [0, 2.0, 0], k, 0, 0.06, t);
+  } else if (t < 7.6) {                  // CAFE: Max offers latte, You says NO, $1 appears
+    show("cafe"); st.scene.background.set(0xf0d9b5);
+    const lt = t - 3.3;
+    you.root.visible = max.root.visible = true;
+    you.root.position.set(-0.9, 0, 0.5); you.root.rotation.y = 0.55; max.root.position.set(1.1, 0, 0.3); max.root.rotation.y = -0.6;
+    applyPose(max, lt < 1.2 ? "hold" : { from: "hold", to: "shrug", t0: 1.2 + 3.3, dur: 0.3 }, t, { seed: 1 });
+    setFace(max, lt < 1.2 ? "smug" : "shock", blinkAt(t, 1));
+    latte.visible = lt < 1.6; latte.position.copy(max.arms.R.grip.getWorldPosition(new THREE.Vector3())); 
+    applyPose(you, lt < 0.9 ? "idle" : lt < 2.4 ? { from: "idle", to: "no", t0: 0.9 + 3.3, dur: 0.18 } : { from: "no", to: "cheer", t0: 2.6 + 3.3, dur: 0.25 }, t, { squash: lt > 2.4 ? 2.6 + 3.3 : 0 });
+    setFace(you, lt < 0.9 ? "neutral" : lt < 2.4 ? "smug" : lt < 3.0 ? "shock" : "happy", blinkAt(t));
+    if (lt > 1.9) { hbill.visible = true; const k = Math.min(1, (lt - 1.9) / 0.5); hbill.position.set(-0.9, 4.2 - k * 0.9, 0.6); hbill.rotation.set(0, lt * 4, 0.3); hbill.scale.setScalar(1 + (1 - k) * 0.8); }
+    const punch = lt > 1.9 && lt < 2.3 ? 0.22 * Math.sin((lt - 1.9) / 0.4 * Math.PI) : 0;
+    shot(st.camera, [0.4, 2.4, 9.5], [0.0, 2.6, 8.2], [0, 2.2, 0], lt / 4.3, punch, lt > 0.9 && lt < 1.2 ? 0.05 : 0.008, t);
+  } else if (t < 10.6) {                 // QUICK MONTAGE: no to sneakers / Grandma thumbs up / Max facepalm
+    const lt = t - 7.6;
+    if (lt < 1.0) { show("street"); st.scene.background.set(0x3a4566);
+      you.root.visible = max.root.visible = box.visible = true; you.root.position.set(-1, 0, 0); you.root.rotation.y = 0.5; max.root.position.set(1.2, 0, 0); max.root.rotation.y = -0.5;
+      applyPose(max, "hold", t); setFace(max, "smug"); box.position.copy(max.arms.R.grip.getWorldPosition(new THREE.Vector3())).add(new THREE.Vector3(-0.3, 0, 0));
+      applyPose(you, { from: "idle", to: "no", t0: 7.7, dur: 0.15 }, t); setFace(you, "smug");
+      shot(st.camera, [0, 2.4, 8], [0, 2.4, 7.4], [0, 2.1, 0], lt, lt < 0.1 ? 0.15 : 0, 0.01, t);
+    } else if (lt < 2.0) { show("void"); st.scene.background.set(0x46385e);
+      gma.root.visible = true; gma.root.position.set(0, 0, 0); gma.root.rotation.y = 0.2; applyPose(gma, { from: "idle", to: "thumbsup", t0: 8.65, dur: 0.2 }, t, { squash: 8.7 }); setFace(gma, "happy");
+      shot(st.camera, [0, 2.6, 6.5], [0, 2.7, 5.6], [0, 2.4, 0], lt - 1, 0, 0.01, t);
+    } else { show("street"); st.scene.background.set(0x3a4566);
+      max.root.visible = true; max.root.position.set(0, 0, 0); max.root.rotation.y = 0; applyPose(max, { from: "idle", to: "facepalm", t0: 9.65, dur: 0.2 }, t); setFace(max, "sad");
+      shot(st.camera, [0, 2.8, 6], [0, 2.9, 5.0], [0, 2.6, 0], lt - 2, 0, 0.012, t);
+    }
+  } else if (t < 13.2) {                 // GUESS: You walks with a jar
+    show("street"); st.scene.background.set(0x2e3a5c);
+    const lt = t - 10.6;
+    you.root.visible = jr.visible = true; you.root.position.set(-2.2 + lt * 1.4, 0, 0.3); you.root.rotation.y = Math.PI / 2 - 0.3;
+    applyPose(you, "hold", t, { walk: true }); setFace(you, "happy", blinkAt(t));
+    jr.position.copy(you.arms.R.grip.getWorldPosition(new THREE.Vector3())).add(new THREE.Vector3(0.25, 0, 0.35));
+    shot(st.camera, [-1.5 + lt * 1.4, 2.6, 8], [-1.5 + lt * 1.4, 2.6, 8], [-2.2 + lt * 1.4 + 0.4, 2.0, 0], 1, 0, 0.006, t);
+  } else {                               // MAX PANIC (loop back to start)
+    show("void"); st.scene.background.set(0x5a1e2e);
+    const lt = t - 13.2;
+    max.root.visible = true; max.root.position.set(0, 0, 0); max.root.rotation.y = 0;
+    applyPose(max, { from: "idle", to: "panic", t0: 13.25, dur: 0.15 }, t, { shake: true, baseX: 0 }); setFace(max, "panic");
+    shot(st.camera, [0, 2.7, 6.5], [0, 2.8, 4.6], [0, 2.6, 0], lt / 1.8, lt < 0.1 ? 0.2 : 0, 0.03, t);
+  }
+  st.renderer.render(st.scene, st.camera);
+  return st.renderer.domElement.toDataURL("image/jpeg", 0.9);
+};
+window.ready = true;
+</script></body></html>
