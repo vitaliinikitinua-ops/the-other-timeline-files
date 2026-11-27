@@ -45,3 +45,7 @@ irony + drama, 3D rounded cast, fast edit, 8-10 min, Piper voice, no keyword CTA
 - Package for the user (publishes at 18:00): mp4, 3 thumbnails A/B/C, title, description (chapters, method, sources,
   not financial advice), tags, first comment, end-screen suggestion. Add Shorts to SHORTS_QUEUE.json.
 - Log the video in `finance_series/VIDEOS.md` (number, topic, viewer, problem, date, links). Commit + push.
+
+## Standing user decisions (28.11.2026)
+- MAIN HERO of every video = **Charles** (cast.js key `you`, name "Charles"). Narration and on-screen text call him Charles; the story is still told so the viewer sees themselves in him.
+- ROUND all money on screen and in the voice-over so it looks clean ($1,200, ~$390, ~$2,850, ~32 hours). Exact values stay in BRIEF.md / the description's method section.

@@ -107,3 +107,7 @@ shake), eye blinks. Do this before the next new episode and show the user a test
   9 s, 18 s before sending (EP04 lego on dark charts was unreadable and had to be redone as glow).
 - Render ~5-8 min per Short on 4 CPUs; run 3 in parallel with `xargs -P 3`, then wait with a background until-loop.
 - Thumbnail C variants (huge number + one big face): `engine/thumbs_test.py` -> `epNN/tests/thumb_C.jpg`.
+
+## Standing user decisions (28.11.2026)
+- MAIN HERO of every video = **Charles** (cast.js key `you`, name "Charles"). Narration and on-screen text call him Charles; the story is still told so the viewer sees themselves in him.
+- ROUND all money on screen and in the voice-over so it looks clean ($1,200, ~$390, ~$2,850, ~32 hours). Exact values stay in BRIEF.md / the description's method section.
