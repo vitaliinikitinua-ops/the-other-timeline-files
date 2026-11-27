@@ -23,7 +23,7 @@ Mark every rule as **[data]** (seen in our numbers), **[competitor]** (seen in o
 | Old hourly queue task | Disabled 27.11 (trig_01FmjYgwucogcmCG1FL8f6N2) |
 | Hook (first 3 s) | **END FIRST** (flash-forward): open on the final outcome - rich/broke/shocked character + the final number - then "how did this happen?" and rewind to the start |
 | Tone | Irony + drama: funny recurring cast (You, Max, Grandma, Banker), serious real numbers |
-| Characters | Keep our cast but IMPROVE them: hands with gestures, more emotions, body motion (walk, jump, slump) - engine TODO |
+| Characters | 3D rounded "clay" low-poly cast with meme faces + fast viral-Shorts editing (punch-ins, shake, SFX). Cast bible: `finance_series/engine3d/cast.js` (19 characters) - reuse them, add new ones there |
 | Retention device (long videos) | **Viewer guesses**: an open question on screen in the first 30 s ("Who ends up richer? Guess now"), reminders mid-video, answer revealed near the end |
 Package for every long video (user uploads in Studio): mp4, 3 thumbnails A/B/C for Test & Compare, title (<= 55 chars),
 description with chapters + method + sources + not financial advice, tags, first comment (question), suggested end screen.

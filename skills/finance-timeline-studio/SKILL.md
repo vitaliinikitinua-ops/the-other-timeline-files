@@ -61,7 +61,21 @@ Ideas next: start at 25 vs 35 in Europe, rent vs buy with rent index, car new vs
 - Spoken text spells numbers ("twenty ten", "S and P five hundred", "four thousand nine hundred"); subtitle text uses digits.
 - Hook in the first sentence; scene changes every sentence; numbers in subtitles are amber automatically.
 
-## Character upgrade TODO (user decision 27.11)
+## 3D cast & engine (approved direction 28.11.2026: rounded "clay" 3D + viral-Shorts meme energy)
+- `finance_series/engine3d/`: `cast.js` = CHARACTER BIBLE (19 characters: you, max, grandma, banker + dad, mom, boss,
+  coworker, landlord, realtor, car_dealer, crypto_bro, scammer, kid, teen, grandpa, cashier, doctor, influencer), each with
+  role, colours, outfit, hair, face overlays, accessories, height, belly. ALWAYS reuse these; add new ones to cast.js.
+- `rig.js`: makeChar(who) rounded rig (capsule limbs, sphere hands, elbows/knees), meme faces `setFace(ch, emo)`
+  (neutral happy shock smug sad panic money laugh angry wink), poses `applyPose(ch, pose|{from,to,t0,dur}, t, {walk, hop, squash, shake})`
+  (idle cheer no point shrug facepalm hold thumbsup panic slump jump sit), props (bill coin cup shoebox jar), sets
+  (cafe rich street void), `shot()` camera with punch-in + shake.
+- Render: an HTML page exposing `window.renderX(t)` -> dataURL, driven by Playwright (`render_demo.js`, ~0.2 s/frame on
+  SwiftShader, 1080x1920); overlays + Piper VO + synth SFX + music in Python (`compose_demo.py`). Serve the repo root
+  with `python3 -m http.server 8790`.
+- Brand: `finance_series/brand/avatar_800.png`, `banner_2560x1440.png` (text inside the 1546x423 mobile safe area).
+  YouTube API can't set the avatar and Zapier can't upload binaries -> the user uploads them in Studio.
+
+## Character upgrade TODO (user decision 27.11) - DONE 28.11 in 3D (see above)
 Keep the cast, make them more alive in `engine/kit.py`: arms + hands with gesture poses (point, shrug, facepalm, hold
 money, thumbs up), more emotions (panic, smug-rich, crying-laughing), simple body motion (walk cycle, jump, slump,
 shake), eye blinks. Do this before the next new episode and show the user a test sheet first.
