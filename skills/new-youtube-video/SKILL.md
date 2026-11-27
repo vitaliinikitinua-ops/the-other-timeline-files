@@ -1,6 +1,6 @@
 ---
 name: new-youtube-video
-description: The fixed workflow for every new video of The Other Timeline - triggered when the user writes "нове відео ютуб" (or "new youtube video", "нове відео", "наступне відео"). Opens a dedicated chat (session) for the video, asks the user structured questions, analyses the viewer's problem and real solutions with real data, then writes the script with the user and produces the video. Use whenever a new video starts.
+description: The fixed workflow for every new video of The Other Timeline - triggered ONLY when the user writes "нове відео ютуб" (or "new youtube video"); NOT for "нове відео" alone, which belongs to the Polsha bez stresu channel skill (nove-video). Opens a dedicated chat (session) for the video, asks the user structured questions, analyses the viewer's problem and real solutions with real data, then writes the script with the user and produces the video. Use whenever a new video starts.
 ---
 
 # New YouTube video - workflow (agreed with the user 28.11.2026)
