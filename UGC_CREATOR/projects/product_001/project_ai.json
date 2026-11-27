@@ -106,10 +106,10 @@
       "line": "склянка соєвого напою — і сніданок готовий.",
       "sticker": {
         "src": "../../references/products/lr_figu_active_crusty_raspberry.jpg",
-        "w": 260,
-        "angle": 5,
-        "x": 700,
-        "y": 380,
+        "w": 230,
+        "angle": -6,
+        "x": 50,
+        "y": 470,
         "at": 0.1
       },
       "overlays": [
