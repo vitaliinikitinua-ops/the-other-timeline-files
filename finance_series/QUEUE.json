@@ -54,7 +54,7 @@
   "ep": "ep02",
   "kind": "long",
   "due_warsaw": "2026-11-27T18:00",
-  "status": "pending",
+  "status": "done",
   "title": "What If You Started Investing at 18 Instead of 30?",
   "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep02/EP02_Invest_at_18_vs_30.mp4",
   "thumbnail": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep02/thumb_A.jpg",
@@ -75,7 +75,8 @@
    "animated story"
   ],
   "comment": "How old were you when you started investing? (Or is today day one?) 👇",
-  "url": null
+  "url": "https://www.youtube.com/watch?v=tT16tJSWY5s",
+  "published_at": "2026-11-27T10:08:45Z"
  },
  {
   "ep": "ep02",
