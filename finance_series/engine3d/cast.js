@@ -7,7 +7,7 @@
 //   height: 1 = adult (kid 0.72, teen 0.9), belly: 0..1
 export const CAST = {
   // ---- core cast (since EP01)
-  you:        { name: "Charles", role: "MAIN HERO of every video (user decision 28.11.2026): Charles = the viewer's avatar, main hero of every timeline", skin: 0xf6ead2, top: 0xffb02e, accent: 0xe8962f, pants: 0x3a4a6b, outfit: "hoodie", hair: { style: "hood", color: 0xe8962f } },
+  you:        { name: "Karl", role: "MAIN HERO of every video (user decision 28.11.2026): Karl = the viewer's avatar, main hero of every timeline", skin: 0xf6ead2, top: 0xffb02e, accent: 0xe8962f, pants: 0x3a4a6b, outfit: "hoodie", hair: { style: "hood", color: 0xe8962f } },
   max:        { name: "Max", role: "friend, bad influence, impulsive spender, bad timing", skin: 0xf0cdaa, top: 0xff6b5b, pants: 0x2f3542, outfit: "tee", hair: { style: "spiky", color: 0x3c281e } },
   grandma:    { name: "Grandma", role: "wise saver, 'compound interest' voice", skin: 0xf5dec8, top: 0x9a6edc, pants: 0x5b4a7a, outfit: "cardigan", hair: { style: "bun", color: 0xe6e6ee }, face: ["glasses"] },
   banker:     { name: "Banker", role: "bank, loans, credit cards, mortgages", skin: 0xa06e4b, top: 0x28375a, pants: 0x19233c, outfit: "suit", hair: { style: "short", color: 0x1e1919 }, acc: ["tie:0x38c6b4"] },

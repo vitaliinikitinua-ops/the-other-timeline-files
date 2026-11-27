@@ -109,5 +109,5 @@ shake), eye blinks. Do this before the next new episode and show the user a test
 - Thumbnail C variants (huge number + one big face): `engine/thumbs_test.py` -> `epNN/tests/thumb_C.jpg`.
 
 ## Standing user decisions (28.11.2026)
-- MAIN HERO of every video = **Charles** (cast.js key `you`, name "Charles"). Narration and on-screen text call him Charles; the story is still told so the viewer sees themselves in him.
+- MAIN HERO of every video = **Karl** (cast.js key `you`, name "Karl"). Narration and on-screen text call him Karl; the story is still told so the viewer sees themselves in him.
 - ROUND all money on screen and in the voice-over so it looks clean ($1,200, ~$390, ~$2,850, ~32 hours). Exact values stay in BRIEF.md / the description's method section.

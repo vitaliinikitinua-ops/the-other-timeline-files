@@ -39,11 +39,11 @@ No provider or broker recommendations. Not financial advice.
 - B "Full Price Out Loud": same You, says each total aloud, buys the $400 that was planned, the $800 stays and grows -> ~$2,844 by 2026-scale 10 years.
 - END-FIRST scene: January, You stares at a phone calendar where six "$50" bubbles fall on the same Friday as rent; bank app: -$12.
 - GUESS: "6 'small' payments of $50 every two weeks... how much did You actually spend?" -> $1,200 (31.6 hours of work).
-- TWIST (chosen): "-40%" ends up costing MORE than full price. EXAMPLE: cart full price $2,000 -> $1,200 after -40%; in January Charles moves the whole $1,200 to the card (21.19%, minimum payments 1%+interest, min $25) -> 87 months (~7 years), $1,072 interest, $2,272 total > $2,000 (computed). On screen: $2,000 / $1,200 / ~7 years / ~$1,070 / ~$2,270.
+- TWIST (chosen): "-40%" ends up costing MORE than full price. EXAMPLE: cart full price $2,000 -> $1,200 after -40%; in January Karl moves the whole $1,200 to the card (21.19%, minimum payments 1%+interest, min $25) -> 87 months (~7 years), $1,072 interest, $2,272 total > $2,000 (computed). On screen: $2,000 / $1,200 / ~7 years / ~$1,070 / ~$2,270.
 ## User decisions round 2
-- Hero: Charles (cast key `you`). Side: Cashier. Timelines: A "Four Easy Payments" vs B "Full Price Out Loud" (my choice).
+- Hero: Karl (cast key `you`). Side: Cashier. Timelines: A "Four Easy Payments" vs B "Full Price Out Loud" (my choice).
 - End-first: January calendar. Guess: "how much did he really spend?" -> $1,200 = ~32 hours of work.
-- Thumbnail main: shocked Charles + $50 crossed -> $1,200. Round all on-screen money.
+- Thumbnail main: shocked Karl + $50 crossed -> $1,200. Round all on-screen money.
 
 ## Sources
 - CFPB, "Consumer Use of Buy Now, Pay Later and Other Unsecured Debt", Jan 2025: files.consumerfinance.gov/f/documents/cfpb_BNPL_Report_2025_01.pdf
