@@ -3,7 +3,7 @@ name: youtube-publisher
 description: Publish or schedule finished videos and Shorts to the user's YouTube channel "The Other Timeline" through Zapier - with a publish queue, a scheduled task, upload limits, duplicate checks, first comments and daily stats. Use for "опублікуй", "заплануй", "залий на ютуб", "publish", "schedule the Shorts", "check the stats".
 ---
 
-# YouTube Publisher (Zapier) v2
+# YouTube Publisher (Zapier) v3
 
 Publishing is outward-facing and permanent: publish only what the user asked for, with the privacy they chose.
 On 26.11.2026 the user gave standing permission: publish the finance series myself, 1 long video 18:00 +
@@ -33,12 +33,20 @@ On 26.11.2026 the user gave standing permission: publish the finance series myse
   fewer than 5 uploads happened in the last 24 h and the last upload is 30+ min old; a Short only 30+ min after its
   long video; then first comment + playlist; daily stats after 14:00. User wants the maximum the limits allow.
 
-## Limits (learned 25-26.11.2026)
+## Testing mode (27.11.2026)
+The user tests new Short styles and publishes test files manually. Before auto-publishing anything from the queue, check
+whether the user asked to pause automation; never auto-publish files from `epNN/tests/` unless the user asked.
+Read `youtube-playbook` for titles (<= 55 chars, Shorts title different from the long title), first comments and timing.
+
+## Limits (learned 25-27.11.2026)
 - Zapier free plan: max 5 YouTube upload *runs* per rolling 24 h ("This action has been throttled without retry.").
   Failed runs (e.g. YouTube 429) count too, so count your own upload attempts, not only the videos on the channel.
   Never retry a 429 within the same day: it burns a Zapier slot.
 - YouTube API project quota: "429 Too Many Requests" until the daily reset at midnight Pacific = 09:00 Warsaw;
   uploads worked right after 09:00. Don't hammer retries: one retry per run, then wait for the next slot.
+- Zapier counts every upload RUN in the rolling 24 h, including runs that failed with a YouTube 429. One 429 retry
+  burns a slot: never retry a 429 on the same day. Count your own attempts, not only the videos on the channel.
+- In practice: 5 uploads 08:09-12:09 UTC, then nothing until 08:09 UTC next day; the hourly task just exits.
 - `publish_at` scheduling is unreliable here; use the queue + scheduled task instead.
 - Description must not contain `<` or `>` ("invalid video description").
 

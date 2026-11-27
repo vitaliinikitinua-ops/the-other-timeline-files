@@ -3,13 +3,13 @@ name: finance-timeline-studio
 description: Make educational personal-finance "What IF" videos (8-10 min 16:9 + one Short each) for the user's YouTube channel The Other Timeline, fully in code with real market data and a free Piper TTS voice, then queue them for publishing. Use for any finance / money / investing / saving / debt / inflation / housing / crypto video, "фінансове відео", "відео про гроші", "зроби серію відео", "make the next finance episode".
 ---
 
-# Finance Timeline Studio (v2, 26.11.2026)
+# Finance Timeline Studio (v3, 27.11.2026)
 
 Finance episodes of **The Other Timeline** (@theothertimeline-toti): "What IF You ...?" told as two or
 three timelines of the same person ("You"), or as a superpower story ("every NO pays $1"), always ending
 with real numbers. Everything is code: no ElevenLabs credits, no image AI. Load with it:
 **other-timeline-studio** (look), **story-shorts-studio** (Short captions), **youtube-publisher** (upload),
-**episode-qa** (self-check before publishing).
+**episode-qa** (self-check before publishing), **youtube-playbook** (hooks, layout, titles, tests - read first).
 
 ## Where everything is
 Repo `vitaliinikitinua-ops/the-other-timeline-files`, branch `claude/awesome-hopper-sx7soy`, folder `finance_series/`:
@@ -72,3 +72,15 @@ Ideas next: start at 25 vs 35 in Europe, rent vs buy with rent index, car new vs
 - Don't `git add` while ffmpeg is still writing an mp4 (git error "unstable object source").
 - Shorts: SHORT["segs"] uses beat NAMES (not indexes), hook text on frame 1 (80% of viewers swipe in second 1),
   word-by-word captions, 30-45 s.
+
+## Shorts v2 (use these, not build.py short)
+`engine/shorts_v2.py epNN <style>` -> `epNN/tests/EPNN_short_<style>.mp4` (reuses build/tts + timing.json + music.wav).
+- `full`: no letterbox; blurred full-screen bg + 1.42x zoomed scene + push-in, 2-line hook headline (TESTS[ep]["head"] or
+  SHORT["title"]), big 1-2-word captions, progress bar, 0.07 s gaps.
+- `number`: + counting giant number on the first 1.8 s (TESTS[ep]["number"] = text/sub/col).
+- `quiz`: + A/B question headline and answer reveal + "Comment A or B" in the last 3 s (TESTS[ep]["quiz"]).
+- `fx-<style>`: full layout with a look from `engine/styles.py` (glow comic chalk lego pixel minimal explainer3d flat ps2 cgi).
+  Match style to scenes: charts -> glow/chalk/minimal; bright character scenes -> lego/pixel/comic. Check frames at 3 s,
+  9 s, 18 s before sending (EP04 lego on dark charts was unreadable and had to be redone as glow).
+- Render ~5-8 min per Short on 4 CPUs; run 3 in parallel with `xargs -P 3`, then wait with a background until-loop.
+- Thumbnail C variants (huge number + one big face): `engine/thumbs_test.py` -> `epNN/tests/thumb_C.jpg`.

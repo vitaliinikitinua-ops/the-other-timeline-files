@@ -36,6 +36,12 @@ Look at every frame and check:
 - Frame 1 already shows the hook number (no fade-in); captions inside the safe area; title lines short;
   "FULL VIDEO ON THE CHANNEL" at the end; segments chosen by beat name and they make sense in order.
 
+## 5b. Shorts v2 / style Shorts
+- Extract frames at 1 s, 3 s, 9 s, 18 s and the last 2 s; tile them and look: headline fully inside y 200-460, caption
+  readable, scene visible (not an empty part of a split-screen or a dark chart lost in a style filter), progress bar moves.
+- Quiz: the answer matches the real number in the script. Number cold-open: the final number equals the script's number.
+- Style check: if the scene is unreadable in the chosen style, switch the style (charts -> glow/chalk/minimal).
+
 ## 6. Report
 In the final report say what was checked, what was fixed, and what could not be checked (e.g. listening to the
 whole voice track). Never claim the video was watched end to end if only frames were inspected.
