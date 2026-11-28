@@ -38,7 +38,7 @@ Read this first in a new session, then the skills it names. Branch: `claude/awes
 
 ## Videos
 - **ep11 / Video #1** "Black Friday's Most Expensive Button" (old 3D look): final mp4 + package done (`finance_series/ep11/`).
-  Still TODO: cut its 2 Shorts (`engine3d/shorts3d.py ep11`, SHORTS in ep11/ep.py), add to SHORTS_QUEUE.json, finish episode-qa.
+  Superseded by karl02 (same topic in the new format). Old TODO: cut its 2 Shorts (`engine3d/shorts3d.py ep11`, SHORTS in ep11/ep.py), add to SHORTS_QUEUE.json, finish episode-qa.
 - **karl01** "What If You Could See Everyone's Bank Account?" (toon style, Karl 15-16, no cap, turquoise hoodie): script approved
   (v1 + small rhythm edits in `karl01/ep.py`), full video `karl01/KARL01_See_Everyones_Bank_Account.mp4` (~9.2 min),
   thumbs A/B/C, `audio/{es,pt-BR,de,fr,uk}.m4a`, captions x6, 2 Shorts (`KARL01_short_312.mp4`, `KARL01_short_400.mp4`,
@@ -46,6 +46,15 @@ Read this first in a new session, then the skills it names. Branch: `claude/awes
 - ep11 Shorts: skipped by user decision (Black Friday is remade in the new style as karl02 in another session).
 - 10 topic ideas offered (#3 chosen): it's only..., price tags in hours, see bank accounts, money ages like you, hear what
   ads mean, never feel FOMO, every lie costs $1, pause time, remember every dollar, paid to say no.
+
+- **karl02** "What If Every 'Pay in 4' Button Showed the Real Price?" (remake of ep11 in the new format, Karl 23): DONE 28.11 -
+  `finance_series/karl02/`: script.md, karl02_numbers.py, shots.js (shot list), build_ep.py (tts|stills|render|final), dub.py (5 tracks ->
+  audio/*.m4a), shorts.py (2 Shorts), package.py -> PACKAGE.md (incl. QA), thumb_A/B/C, TRAILER_karl02.mp4. Shorts are in SHORTS_QUEUE.json.
+  NEXT: user uploads the long + audio tracks; then publish the Shorts.
+- New toon pieces (engine3d/toon): `toon_ep.html?ep=<folder>` = generic full-episode player driven by `<folder>/shots.js` + build/ep_timing.json;
+  `sets2.js` (bedroom, store, office, mall+stage, street, studio, restaurant, lot), `props2.js`, `crowd2.js` (instanced crowd, phone prop),
+  `fx2.js` (phone checkout UI, amber real-price tag, $ bubbles), `rchunk.js` (render a time range / stills / SFX events), `rstill.js`.
+  Full render = 3 parallel chunks, ~50 min for 9.5 min. Encode finals with hqdn3d + CRF 28 (grain otherwise makes files 400+ MB).
 
 ## Research
 `research/yt1/` = frame-by-frame analysis of 3 IFNation videos + 3 thumbnails (contact sheets, transcripts, close-ups).

@@ -1,0 +1,56 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<canvas id="o" width="1920" height="1080" style="display:none"></canvas>
+<script type="module">
+// Karl #02 thumbnails A/B/C (renderAt(0|1|2)). Channel recipe: Karl huge in foreground, power as a glowing line, one lowercase quote, one yellow word.
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, makeStage, worldPos, extraSpec } from "./toon.js";
+import { makeSet2 } from "./sets2.js";
+import { crowd, phoneProp } from "./crowd2.js";
+import { loadFonts, glow, sparkles, receipt } from "../../engine2d/engine.js";
+import { realTag, bubble, AMBER } from "./fx2.js";
+await loadFonts("../../../ep2/fonts/");
+const W = 1920, H = 1080, st = makeStage(W, H), O = document.getElementById("o"), g = O.getContext("2d");
+const SETS = { store: makeSet2(st.scene, "store"), mall: makeSet2(st.scene, "mall"), bedroom: makeSet2(st.scene, "bedroom") };
+const C = {}; for (const id of ["karl", "max"]) { C[id] = makeChar(id); st.scene.add(C[id].root); C[id].ph = phoneProp(C[id]); }
+const EX = []; for (let i = 0; i < 24; i++) { const e = makeChar(extraSpec(i + 21)); st.scene.add(e.root); EX.push(e); }
+const CR = crowd(st.scene, 700, { x0: -24, x1: 24, z0: -3, z1: 14 }); st.scene.add(CR);
+const P = (v) => { const p = v.clone().project(st.camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; };
+function show(n) { for (const k in SETS) SETS[k].visible = k === n; }
+function beam(x0, y0, x1, y1, col = AMBER) { for (const [w, a] of [[46, 0.12], [22, 0.3], [8, 0.95]]) { g.strokeStyle = `rgba(${col},${a})`; g.lineWidth = w; g.lineCap = "round"; g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo((x0 + x1) / 2, Math.min(y0, y1) - 120, x1, y1); g.stroke(); } }
+function quote(parts) { g.font = "122px Anton"; let w = parts.reduce((s, [t]) => s + g.measureText(t).width, 0), x = W / 2 - w / 2;
+  g.lineJoin = "round"; g.textBaseline = "middle"; for (const [t, col] of parts) { g.lineWidth = 22; g.strokeStyle = "#0e0c14"; g.strokeText(t, x, 120); g.fillStyle = col; g.fillText(t, x, 120); x += g.measureText(t).width; } }
+function grade(top, bot) { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, top); gr.addColorStop(1, bot); g.globalCompositeOperation = "soft-light"; g.fillStyle = gr; g.fillRect(0, 0, W, H); g.globalCompositeOperation = "source-over";
+  const v = g.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 1.0); v.addColorStop(0, "rgba(10,6,20,0)"); v.addColorStop(1, "rgba(10,6,20,0.7)"); g.fillStyle = v; g.fillRect(0, 0, W, H); }
+function sweat(x, y) { g.fillStyle = "#8fd3ff"; g.beginPath(); g.moveTo(x, y - 50); g.quadraticCurveTo(x + 32, y + 10, x, y + 26); g.quadraticCurveTo(x - 32, y + 10, x, y - 50); g.fill(); g.fillStyle = "#fff"; g.beginPath(); g.arc(x - 8, y + 4, 7, 0, 7); g.fill(); }
+window.renderAt = (v) => {
+  for (const id in C) { C[id].root.visible = false; C[id].ph.visible = false; } EX.forEach(e => e.root.visible = false); CR.visible = false;
+  st.scene.background.set(0x221a3a); st.sun.intensity = 1.3;
+  const k = C.karl;
+  if (v === 0 || v === 1) {
+    show("store"); k.root.visible = true; k.root.position.set(-1.9, 0, 3.0); k.root.rotation.y = 0.3; applyPose(k, "panic", 0); setFace(k, "shock", 1, [0.8, -0.2]);
+    if (v === 0) { const m = C.max; m.root.visible = true; m.root.position.set(1.8, 0, -0.6); m.root.rotation.y = -0.3; applyPose(m, "idle", 0); m.ph.visible = true; m.arms.R.sh.rotation.set(-1.15, 0, 0.3); m.arms.R.el.rotation.set(-1.4, 0, 0); setFace(m, "happy", 1, [-0.3, 0]); }
+    st.camera.position.set(-0.6, 2.9, 7.8); st.camera.lookAt(-0.3, 2.4, 0);
+  } else {
+    show("mall"); CR.visible = true; CR.userData.update(0.3); k.root.visible = true; k.root.position.set(-2.6, 1.28, -8.0); k.root.rotation.y = -0.45; applyPose(k, "no", 0); setFace(k, "smug", 1, [0.6, 0]);
+    EX.forEach((e, j) => { e.root.visible = false; const r = Math.floor(j / 8); e.root.position.set(-7 + (j % 8) * 2 + (r % 2), 0, -4.5 + r * 1.6); e.root.rotation.y = Math.PI; applyPose(e, ["cheer", "point", "idle"][j % 3], 0.2 * j); setFace(e, "shock", 1); });
+    st.camera.position.set(-4.6, 3.4, -3.6); st.camera.lookAt(0.4, 3.3, -10);
+  }
+  st.renderer.render(st.scene, st.camera); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(st.renderer.domElement, 0, 0);
+  const kh = P(worldPos(k.head));
+  if (v === 0) { grade("rgba(255,60,160,0.45)", "rgba(40,30,140,0.5)"); const mh = P(worldPos(C.max.head).add(new THREE.Vector3(0, 1.2, 0)));
+    [[-260, 40], [-160, -60], [-40, 10], [80, -70], [200, 20], [300, -40]].forEach(([dx, dy]) => bubble(g, mh[0] + dx * 0.9 + 120, mh[1] + dy + 40, "$50", 1));
+    beam(kh[0] + 150, kh[1] - 30, 1620, 560); glow(g, 1620, 560, 300, AMBER, 0.55); realTag(g, 1620, 560, "$1,200", "THE REAL PRICE", 1, { size: 150, sub: 44 }); sweat(kh[0] + 190, kh[1] - 90);
+    quote([["\"only $50\" = ", "#ffffff"], ["$1,200", "#ffd23a"]]); }
+  if (v === 1) { grade("rgba(255,90,40,0.4)", "rgba(60,20,120,0.55)");
+    beam(kh[0] + 60, kh[1] - 30, 1400, 560); glow(g, 1400, 560, 380, AMBER, 0.5);
+    realTag(g, 1400, 560, "~$2,270", "~7 YEARS ON A CARD", 1, { size: 160, sub: 46 }); realTag(g, 1500, 860, "-40% = $1,200", null, 1, { size: 70 });
+    sweat(kh[0] + 190, kh[1] - 90); quote([["-40% cost me ", "#ffffff"], ["more", "#ffd23a"], ["..", "#ffffff"]]); }
+  if (v === 2) { grade("rgba(255,70,90,0.35)", "rgba(60,20,140,0.5)"); const b = P(new THREE.Vector3(2.5, 2.7, -10));
+    beam(kh[0] + 40, kh[1] - 20, b[0], b[1], "255,90,106"); glow(g, b[0], b[1], 320, "255,90,106", 0.55); sparkles(g, b[0], b[1], 0, 0.25, 6, 220);
+    g.save(); g.translate(b[0] - 40, b[1] - 230); g.rotate(-0.12); g.font = "150px Anton"; g.lineWidth = 26; g.strokeStyle = "#0e0c14"; g.strokeText("✕", 0, 0); g.fillStyle = "#ff3b4e"; g.fillText("✕", 0, 0); g.restore();
+    quote([["i didn't ", "#ffffff"], ["press", "#ffd23a"], [" it..", "#ffffff"]]); }
+  return O.toDataURL("image/jpeg", 0.95);
+};
+window.ready = true;
+</script></body></html>
