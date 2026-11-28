@@ -5,3 +5,5 @@ finance02/voice/
 finance_series/*/build/
 __pycache__/
 finance_series/*/build3d/
+research/yt1/*/frames/
+research/yt1/*/audio.wav
