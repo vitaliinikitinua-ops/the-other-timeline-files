@@ -68,8 +68,10 @@ Checked:
   classroom orientation, mirror shot, assembly wide shot), then 1 frame every 15 s of the final file: no broken frames.
 - File: 9:11 (551 s incl. 15 s end screen), 94.8 MB (grain removed with a denoise pass to stay under 100 MB),
   loudness -15.4 LUFS integrated (target about -14; acceptable).
-- Audio tracks: 5 x 551.3 s, same length as the video. Each dubbed line starts with the English line and is sped up
-  (max 1.35x) only when it would run into the next one.
+- Audio tracks: 5 x 551.3 s, same length as the video, -15 to -16.5 LUFS. Lines never overlap: each starts with its
+  English line (or right after the previous one), voices for uk/fr/pt-BR/es/de are synthesized 1.3/1.12/1.08/1.05/1.05x
+  faster, and a line is sped up (max 1.4x) only if it still does not fit. Lines more than 0.5 s behind the picture:
+  uk 10, fr 4, de 2, es 1, pt-BR 1 (of 179). Ukrainian track spot-checked with speech recognition (first 25 s correct).
 - Thumbnails A/B/C viewed at full size; quote readable, one yellow word, number not covering faces.
 - Shorts: 42.8 s and 35.3 s, hook headline from frame 1, CTA "FULL VIDEO ON THE CHANNEL" in the last 3 s.
 Not checked: nobody listened to the full English or dubbed tracks end to end (only the timing and lengths were checked).
