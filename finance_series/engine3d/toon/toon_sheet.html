@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<canvas id="o" width="1920" height="1080" style="display:none"></canvas>
+<script type="module">
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, makeStage, makeSet, CAST } from "./toon.js";
+import { post, loadFonts } from "../../engine2d/engine.js";
+await loadFonts("../../../ep2/fonts/");
+const st = makeStage(); makeSet(st.scene, "kitchen");
+const O = document.getElementById("o"), g = O.getContext("2d");
+const chars = [];
+window.renderSheet = (page) => {
+  for (const c of chars) st.scene.remove(c.root); chars.length = 0;
+  let labels = [];
+  if (page === 0) {
+    const ids = ["karl", "karl_red", "mom", "dad", "mia", "grandma", "max", "lena"], emos = ["happy", "smug", "happy", "neutral", "laugh", "happy", "smug", "shy"], poses = ["cheer", "idle", "idle", "point", "cheer", "idle", "shrug", "idle"];
+    ids.forEach((id, i) => { const ch = makeChar(id); ch.root.position.set(-6.3 + i * 1.8, 0, 0.5); ch.root.rotation.y = 0.15 * (i < 4 ? 1 : -1); applyPose(ch, poses[i], 0.4, { seed: i }); setFace(ch, emos[i]); st.scene.add(ch.root); chars.push(ch); labels.push([CAST[id].name, ch]); });
+    st.camera.position.set(0, 2.6, 15.5); st.camera.lookAt(0, 1.7, 0);
+  } else {
+    const emos = ["neutral", "happy", "laugh", "smug", "shock", "panic", "sad", "worried", "dazed", "angry"], poses = ["idle", "cheer", "cheer", "point", "panic", "panic", "slump", "hold", "idle", "shrug"];
+    emos.forEach((e, i) => { const ch = makeChar(i === 4 || i === 9 ? "karl_red" : "karl"); ch.root.position.set(-5.2 + (i % 5) * 2.6, i < 5 ? 3.2 : 0, i < 5 ? -1.4 : 0.6); ch.root.scale.setScalar(0.95); applyPose(ch, poses[i], i, { seed: i }); setFace(ch, e, 1, e === "dazed" ? [0, -1] : [0.4, 0]); st.scene.add(ch.root); chars.push(ch); labels.push([e.toUpperCase(), ch]); });
+    st.camera.position.set(0, 3.4, 17); st.camera.lookAt(0, 2.9, 0);
+  }
+  st.renderer.render(st.scene, st.camera);
+  g.drawImage(st.renderer.domElement, 0, 0); post(g, 1920, 1080, 0);
+  g.font = "34px Anton"; g.textAlign = "center"; g.lineWidth = 7; g.strokeStyle = "#141218";
+  for (const [txt, ch] of labels) { const p = ch.root.getWorldPosition(new THREE.Vector3()).project(st.camera); const x = (p.x + 1) / 2 * 1920, y = (1 - p.y) / 2 * 1080 + 40; g.strokeText(txt, x, y); g.fillStyle = page ? "#ffc23a" : "#fff"; g.fillText(txt, x, y); }
+  return O.toDataURL("image/jpeg", 0.92);
+};
+window.ready = true;
+</script></body></html>

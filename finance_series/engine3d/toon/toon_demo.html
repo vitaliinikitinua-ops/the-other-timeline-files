@@ -1,0 +1,51 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<canvas id="o" width="1920" height="1080" style="display:none"></canvas>
+<script type="module">
+// 10-second 3D toon style test: "It's only $5 a day!" -> pocket rings + receipt "$1,825 per year".
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, blinkAt, shot, makeStage, makeSet, worldPos } from "./toon.js";
+import { post, loadFonts, rings, glow, sparkles, receipt, pill, easeOut } from "../../engine2d/engine.js";
+await loadFonts("../../../ep2/fonts/");
+const W = 1920, H = 1080, st = makeStage(W, H); makeSet(st.scene, "kitchen");
+const O = document.getElementById("o"), g = O.getContext("2d");
+let T = null; try { T = await (await fetch("./test/demo_timing.json")).json(); } catch (e) {}
+const at = (i, d) => (T && T[i] !== undefined ? T[i] : d);
+const karl = makeChar("karl"), max = makeChar("max"), mia = makeChar("mia");
+for (const c of [karl, max, mia]) st.scene.add(c.root);
+const P = (v) => { const p = v.clone().project(st.camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; };
+const RCPT = [{ l: "\"ONLY\" $5 A DAY", size: 26, font: "Anton" }, { l: "x 365 DAYS", size: 30 }, { l: "= $1,825", size: 44, font: "Anton", col: "#e0344a" }, { l: "PER YEAR", size: 26 }];
+const pose = (ch, from, to, t0, t, o = {}) => applyPose(ch, from === to ? to : { from, to, t0, dur: 0.25 }, t, o);
+window.renderAt = (t) => {
+  const s1 = at(1, 3.1), s2 = at(2, 6.0), s3 = at(3, 8.6);
+  mia.root.visible = false; let grade = null; const ov = [];
+  karl.root.position.set(-0.9, 0, 0.6); karl.root.rotation.y = 0.45; max.root.position.set(1.1, 0, 0.5); max.root.rotation.y = -0.5;
+  if (t < s1) {            // SHOT 1: two-shot
+    pose(max, "idle", "point", 0.3, t, { seed: 1 }); setFace(max, "happy", blinkAt(t, 1)); pose(karl, "idle", "idle", 0, t); setFace(karl, "neutral", blinkAt(t), [1, 0]);
+    shot(st.camera, [0.4, 2.7, 10.5], [0.2, 2.6, 9.6], [0.1, 2.0, 0], t / s1, 0, 0.004, t);
+    ov.push(() => { const [x, y] = P(worldPos(max.head).add(new THREE.Vector3(0.9, 1.1, 0))); pill(g, x, y, "It's only $5 a day!", (t - 0.5) / 1.4, { tail: [-60] }); });
+  } else if (t < s2) {     // SHOT 2: close-up on Karl, pocket rings + receipt
+    const lt = t - s1; max.root.visible = true;
+    pose(karl, "idle", "panic", s1 + 0.5, t, { squash: s1 + 0.55 }); setFace(karl, lt > 0.55 ? "shock" : "neutral", blinkAt(t), [0, lt > 0.55 ? 0.6 : 0]);
+    const k = worldPos(karl.torso); shot(st.camera, [k.x + 1.7, 2.5, k.z + 6.8], [k.x + 1.5, 2.45, k.z + 6.0], [k.x + 1.0, 2.0, k.z], lt / (s2 - s1), lt < 0.3 ? 0.06 : 0, 0.004, t);
+    grade = "rgba(80,220,200,0.18)";
+    ov.push(() => { const [px, py] = P(worldPos(karl.torso).add(new THREE.Vector3(0, 0.3, 0.4)));
+      glow(g, px, py, 220 * easeOut(lt / 0.4), "70,230,210", 0.5); rings(g, px, py, s1 + 0.15, t, "120,255,235", 3, 260); sparkles(g, px, py - 20, s1 + 0.2, t, 5, 150);
+      if (lt > 0.5) receipt(g, px + 420, py + 80, RCPT, (lt - 0.5) / 1.1, { w: 300 }); });
+  } else if (t < s3) {     // SHOT 3: reverse angle on Max, receipt held up
+    const lt = t - s2;
+    pose(karl, "panic", "point", s2, t); setFace(karl, "smug", blinkAt(t), [1, 0]); pose(max, "point", "panic", s2 + 0.3, t, { squash: s2 + 0.35 }); setFace(max, lt > 0.4 ? "panic" : "neutral", blinkAt(t, 1), [-1, 0.3]);
+    shot(st.camera, [-1.8, 2.6, 8.4], [-1.5, 2.6, 7.6], [0.5, 2.1, 0], lt / (s3 - s2), 0, 0.004, t);
+    ov.push(() => { receipt(g, 1000, 930, RCPT, 1, { w: 300, rot: 6 }); if (lt > 0.6) { const [x, y] = P(worldPos(max.head).add(new THREE.Vector3(0.6, 1.0, 0))); pill(g, x, y, "...a YEAR?", (lt - 0.6) / 0.6); } });
+  } else {                 // SHOT 4: wide, Mia laughs
+    mia.root.visible = true; mia.root.position.set(3.2, 0, 0.9); mia.root.rotation.y = -0.6;
+    pose(karl, "point", "shrug", s3, t); setFace(karl, "happy", blinkAt(t)); pose(max, "panic", "slump", s3, t); setFace(max, "sad", blinkAt(t, 1));
+    applyPose(mia, "cheer", t, { hop: true }); setFace(mia, "laugh", blinkAt(t, 2));
+    shot(st.camera, [0.8, 3.0, 12.5], [0.8, 2.9, 11.8], [0.8, 1.9, 0], (t - s3) / 2, 0, 0.004, t);
+  }
+  st.renderer.render(st.scene, st.camera);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(st.renderer.domElement, 0, 0); for (const f of ov) f(); post(g, W, H, t, grade);
+  return O.toDataURL("image/jpeg", 0.9);
+};
+window.ready = true;
+</script></body></html>
