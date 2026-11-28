@@ -261,3 +261,6 @@ Edit speed: 2.5-3.6 s average shot; faster (2.2-2.5 s) when the power is visual 
 
 ## 15. Open questions for the next videos
 - Is the subscribe pill always at 2:00-2:30? Do they ever use a sponsor? Typical end length 9-13 min.
+
+## Standing user decisions (28.11.2026)
+- NEW STYLE (user decision 28.11.2026): new videos follow `karl-2d-template` (viral 2D "What If You...?" style from `youtube-skill-1`, Karl in turquoise hoodie + orange cap with a red-hoodie A/B test, cast Mom/Dad/Mia/Grandma Rose/Max/Lena, 50/50 money/general topics, 9-11 min, 3 per week, English + 5 audio dubs es/pt-BR/de/fr/uk). The 3D engine stays for older formats.

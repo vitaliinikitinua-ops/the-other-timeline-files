@@ -124,6 +124,7 @@ shake), eye blinks. Do this before the next new episode and show the user a test
 - Never name an episode helper `numbers.py` (shadows the stdlib module and breaks PIL) -> `epNN_numbers.py`.
 
 ## Standing user decisions (28.11.2026)
+- NEW STYLE (user decision 28.11.2026): new videos follow `karl-2d-template` (viral 2D "What If You...?" style from `youtube-skill-1`, Karl in turquoise hoodie + orange cap with a red-hoodie A/B test, cast Mom/Dad/Mia/Grandma Rose/Max/Lena, 50/50 money/general topics, 9-11 min, 3 per week, English + 5 audio dubs es/pt-BR/de/fr/uk). The 3D engine stays for older formats.
 - SHORTS PER VIDEO (user decision 28.11.2026): 1 long video + **1-2 Shorts**, never 3+. 2 Shorts only when the topic is broad and the long video has many strong hooks; otherwise 1. Shorts are SHORT (~20-40 s), one hook each, and always point to the full video (pinned comment/description link + "FULL VIDEO ON THE CHANNEL" end card).
 - MAIN HERO of every video = **Karl** (cast.js key `you`, name "Karl"). Narration and on-screen text call him Karl; the story is still told so the viewer sees themselves in him.
 - ROUND all money on screen and in the voice-over so it looks clean ($1,200, ~$390, ~$2,850, ~32 hours). Exact values stay in BRIEF.md / the description's method section.
