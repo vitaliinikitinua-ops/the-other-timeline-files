@@ -305,7 +305,7 @@ FN={"H":scene_H,"1":scene_1,"2":scene_2,"3":scene_3,"4":scene_4,"5":scene_5,"B":
 CREAM=(250,248,240)
 N=int(TOTAL*FPS)
 cmd=["ffmpeg","-y","-loglevel","error","-f","rawvideo","-pix_fmt","rgb24","-s",f"{W}x{H}","-r",str(FPS),"-i","-","-i","mix.wav",
-     "-c:v","libx264","-preset","medium","-crf","19","-pix_fmt","yuv420p","-profile:v","high","-c:a","aac","-b:a","160k","-ar","44100","-shortest","-movflags","+faststart","videoXX_cukr_mos_5krokiv.mp4"]
+     "-c:v","libx264","-preset","medium","-crf","19","-pix_fmt","yuv420p","-profile:v","high","-c:a","aac","-b:a","160k","-ar","44100","-shortest","-movflags","+faststart","video05_cukr_mos_5krokiv.mp4"]
 p=subprocess.Popen(cmd,stdin=subprocess.PIPE)
 for i in range(N):
     t=i/FPS
