@@ -11,10 +11,9 @@ Source of the style: `youtube-skill-1` (3 viral videos analysed frame by frame).
 - Look (same build as the source channel, our own colours): glossy BLACK ball head with a soft top-left sheen,
   two big touching white eyes with black pupils, tiny mouth, blush on happy; thin black stick arms/legs with ball
   hands; ~3 heads tall; white sneakers.
-- Identity: **turquoise hoodie (#2EC4B6) + orange cap worn backwards** = default look.
-  A/B test: some videos use a **red hoodie** variant (same cap). Log which look each video used in VIDEOS.md and
+- Identity: **turquoise hoodie (#2EC4B6), NO cap** (user removed the cap 28.11.2026; bare glossy black head like the source channel) = default look.
+  A/B test: some videos use a **red hoodie** variant (also no cap). Log which look each video used in VIDEOS.md and
   compare CTR / retention after 7 days; the winner becomes the default.
-- The cap is a story prop (taken away / returned / lost) like the source channel's hat.
 - AGE changes per series to fit the topic (user decision): kid 12-14 (allowance, piggy bank, school), student
   18-21 (first card, dorm, side gig), young worker 22-28 (rent, salary, BNPL, dating), 30+ when needed (mortgage,
   kids). Same face and hoodie; age is shown by height, setting and props. Say the age in the first 45 s.

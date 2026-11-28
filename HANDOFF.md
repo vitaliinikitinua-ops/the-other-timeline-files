@@ -2,7 +2,7 @@
 Read this first in a new session, then the skills it names. Branch: `claude/awesome-hopper-sx7soy`. Answer the user in Ukrainian.
 
 ## Standing user decisions (all also written into the skills)
-- Hero = **Karl** (cast key `you` in engine3d/cast.js; in the new style Karl = turquoise hoodie #2EC4B6 + orange backwards cap;
+- Hero = **Karl** (cast key `you` in engine3d/cast.js; in the new style Karl = turquoise hoodie #2EC4B6, NO cap (removed by the user 28.11);
   some videos use a RED hoodie as an A/B test -> log which in VIDEOS.md, compare CTR/retention after 7 days).
 - Round all money on screen and in VO; exact values stay in BRIEF/description method.
 - 1 long video + **1-2 Shorts** (2 only if the topic is broad with many hooks), short, always link to the full video.
@@ -22,7 +22,7 @@ Read this first in a new session, then the skills it names. Branch: `claude/awes
 ## Engines
 - `finance_series/engine3d/toon/` = **current look** (three.js MeshToon + outlines + glossy black heads). `toon.js` (cast,
   extras, sets kitchen/cafeteria/gym/void), `toon_sheet.html`, `toon_demo.html`, `trailer.html`, `rtoon.js` (renders via
-  Playwright routing, no server), `trailer.py`. Known TODO: depth-of-field, smoother gestures, cap visibility, more sets
+  Playwright routing, no server), `trailer.py`. Known TODO: depth-of-field, smoother gestures, more sets
   (street, store, bank, office, bedroom), lip/face changes per line, a full-episode builder like engine3d/epbuild.py.
 - `finance_series/engine2d/` = flat 2D test (rejected look; keep its FX/overlay helpers: rings, glow, sparkles, receipt, pill, post).
 - `finance_series/engine3d/` (epbuild.py, episode.html) = older 3D episode pipeline used for ep11.

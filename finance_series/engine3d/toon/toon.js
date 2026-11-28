@@ -23,8 +23,8 @@ export function mesh(geo, mat, { outline = 0x1a1726, w = 0.02, shadow = true } =
 const capsuleGeo = (r, len) => { const g = new THREE.CapsuleGeometry(r, len, 8, 16); g.translate(0, -len / 2 - r * 0.2, 0); return g; };
 
 export const CAST = {
-  karl:     { name: "Karl", top: 0x2ec4b6, pants: 0x2f3b5c, hat: "cap", hatColor: 0xff8a3d, strings: true },
-  karl_red: { name: "Karl (red test)", top: 0xe0413b, pants: 0x2f3b5c, hat: "cap", hatColor: 0xff8a3d, strings: true },
+  karl:     { name: "Karl", top: 0x2ec4b6, pants: 0x2f3b5c, strings: true },
+  karl_red: { name: "Karl (red test)", top: 0xe0413b, pants: 0x2f3b5c, strings: true },
   mom:      { name: "Mom", top: 0x3fa874, pants: 0x2e3a55, hair: "long", hairColor: 0x7a4a2a, lashes: true, cardigan: true },
   dad:      { name: "Dad", top: 0x4a7fc1, pants: 0x8a7650, hair: "short", hairColor: 0x5a3e26, mustache: true, scale: 1.07, collar: true },
   mia:      { name: "Mia", top: 0x9a6edc, pants: 0x2c2c3c, hair: "buns", hairColor: 0x5a3524, scale: 0.74, lashes: true },
