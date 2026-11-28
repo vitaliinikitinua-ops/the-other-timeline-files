@@ -59,5 +59,18 @@ Left box: latest Karl video (or "Black Friday's Most Expensive Button"). Right b
 2. `KARL01_short_400.mp4`: "Could you pay $400 today?" (4 in 10, average vs middle)
 Both are in `../SHORTS_QUEUE.json` (status pending).
 
-## QA (episode-qa)
-See the QA section below (filled after the render).
+## QA (episode-qa, 28.11.2026)
+Checked:
+- Numbers: janitor example recomputed in `ep.py numbers()` = $398,298 ("almost $400K", labelled EXAMPLE on screen);
+  SHED 2025 63% -> "about 4 in 10"; SCF 2022 mean $1,063,700 / median $192,900 -> "~$1.06M" / "~$193K"; lottery study
+  phrased as in the paper. All other balances are story numbers. Disclaimer in the description.
+- Visuals: contact sheets of all 179 lines before the full render (fixed: cameras inside heads, over-the-shoulder shots,
+  classroom orientation, mirror shot, assembly wide shot), then 1 frame every 15 s of the final file: no broken frames.
+- File: 9:11 (551 s incl. 15 s end screen), 94.8 MB (grain removed with a denoise pass to stay under 100 MB),
+  loudness -15.4 LUFS integrated (target about -14; acceptable).
+- Audio tracks: 5 x 551.3 s, same length as the video. Each dubbed line starts with the English line and is sped up
+  (max 1.35x) only when it would run into the next one.
+- Thumbnails A/B/C viewed at full size; quote readable, one yellow word, number not covering faces.
+- Shorts: 42.8 s and 35.3 s, hook headline from frame 1, CTA "FULL VIDEO ON THE CHANNEL" in the last 3 s.
+Not checked: nobody listened to the full English or dubbed tracks end to end (only the timing and lengths were checked).
+The dubbed voices are free Piper voices; female characters in pt-BR use a pitched male voice (no free pt-BR female voice).

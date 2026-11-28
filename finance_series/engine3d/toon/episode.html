@@ -175,13 +175,13 @@ function card(c, lt, ln) {
     c.lines.forEach((l, i) => { const ap = easeOut((lt - 0.3 - i * 0.35) / 0.4); g.save(); g.globalAlpha = ap;
       const y = c.k === "people" ? cy + 70 * U + i * 100 * U : cy - 80 * U + i * 140 * U; txt(l, cx, y, i === 0 ? (c.k === "people" ? 110 : 96) : 62, i === 0 ? "#e0344a" : "#1e1b26"); g.restore(); });
     src(c.src, a); return; }
-  if (c.k === "bars") { panel(a); const base = cy + H * 0.17, maxH = H * 0.36, bw = (V ? 220 : 260) * U;
+  if (c.k === "bars") { panel(a); const base = cy + H * 0.17, maxH = H * (V ? 0.29 : 0.36), bw = (V ? 220 : 260) * U;
     const xs = [cx - (V ? 170 : 260) * U, cx + (V ? 170 : 260) * U];
     const vals = [1.06, 0.193], labels = ["AVERAGE", "MIDDLE"], money = ["~$1.06M", "~$193K"], cols = ["#9a6edc", "#2ec4b6"];
     for (let i = 0; i < 2; i++) { if (c.show < i + 1) continue; const lt2 = i === 1 && c.show === 2 ? lt : 9; const k = ease(Math.min(1, (c.show === i + 1 ? lt : 9) / 0.9));
       const h = maxH * vals[i] / 1.06 * k; g.fillStyle = cols[i]; g.beginPath(); g.roundRect(xs[i] - bw / 2, base - h, bw, h, 14 * U); g.fill();
       txt(money[i], xs[i], base - h - 50 * U, 72, "#1e1b26"); txt(labels[i], xs[i], base + 50 * U, 50, "#5a5466"); }
-    txt("NET WORTH OF A US FAMILY", cx, V ? cy - H * 0.16 : cy - H * 0.3, V ? 46 : 54, "#1e1b26");
+    txt("NET WORTH OF A US FAMILY", cx, V ? cy - H * 0.225 : cy - H * 0.3, V ? 46 : 54, "#1e1b26");
     if (c.show >= 3) { const k = easeOut(lt / 0.5); g.save(); g.globalAlpha = k; for (let i = 0; i < 3; i++) { const bx = xs[0] + (i - 1) * 70 * U, by = cy - H * 0.2 + (i % 2) * 30 * U;
         g.fillStyle = "#ffc23a"; g.beginPath(); g.roundRect(bx - 30 * U, by - 20 * U, 60 * U, 40 * U, 10 * U); g.fill(); txt("$$$", bx, by + 2 * U, 26, "#2a1a12"); }
       txt("A FEW GIANT NUMBERS", xs[0], cy - H * 0.27, 38, "#b8860b"); g.restore(); }
@@ -304,8 +304,8 @@ window.renderShort = (t) => window.renderAt(t, { hook: (gg, W2, H2, tt) => { con
   gg.save(); gg.textAlign = "center"; gg.textBaseline = "middle"; gg.lineJoin = "round";
   h.title.forEach((l, i) => { gg.font = `${l.size || 92}px Anton`; gg.lineWidth = (l.size || 92) * 0.18; gg.strokeStyle = "#141218"; gg.strokeText(l.t, W2 / 2, 250 + i * 112); gg.fillStyle = l.col || "#fff"; gg.fillText(l.t, W2 / 2, 250 + i * 112); });
   const p = Math.min(1, (tt - h.t0) / (h.t1 - h.t0)); gg.fillStyle = "rgba(255,255,255,0.25)"; gg.fillRect(0, H2 - 14, W2, 14); gg.fillStyle = "#ffc23a"; gg.fillRect(0, H2 - 14, W2 * p, 14);
-  if (tt > h.t1 - 3.2) { const a = Math.min(1, (tt - (h.t1 - 3.2)) / 0.4); gg.globalAlpha = a; gg.fillStyle = "rgba(18,14,30,0.75)"; gg.beginPath(); gg.roundRect(90, H2 * 0.72 - 90, W2 - 180, 180, 40); gg.fill();
-    gg.font = "62px Anton"; gg.fillStyle = "#ffc23a"; gg.fillText("FULL VIDEO ON THE CHANNEL", W2 / 2, H2 * 0.72 - 20); gg.font = "40px Mont"; gg.fillStyle = "#fff"; gg.fillText("What If You Could See Everyone's Bank Account?", W2 / 2, H2 * 0.72 + 42); }
+  if (tt > h.t1 - 3.2) { const a = Math.min(1, (tt - (h.t1 - 3.2)) / 0.4); gg.globalAlpha = a; gg.fillStyle = "rgba(18,14,30,0.75)"; gg.beginPath(); gg.roundRect(50, H2 * 0.72 - 90, W2 - 100, 180, 40); gg.fill();
+    gg.font = "62px Anton"; gg.fillStyle = "#ffc23a"; gg.fillText("FULL VIDEO ON THE CHANNEL", W2 / 2, H2 * 0.72 - 20); gg.font = "31px Mont"; gg.fillStyle = "#fff"; gg.fillText("What If You Could See Everyone's Bank Account?", W2 / 2, H2 * 0.72 + 42); }
   gg.restore(); } });
 // ---------------------------------------------------------------- thumbnails (A/B/C): Karl huge in front, power as a glowing line, one quote
 const THUMBS = {

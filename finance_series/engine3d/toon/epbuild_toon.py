@@ -26,6 +26,7 @@ VOICES = {
     "fr": {"n": ("fr_FR-tom-medium", None, 1.0, 1.0), "_f": ("fr_FR-siwis-medium", None, 1.0, 1.0)},
     "uk": {"n": ("uk_UA-ukrainian_tts-medium", 1, 1.0, 1.0), "_f": ("uk_UA-ukrainian_tts-medium", 0, 1.0, 1.0)},
 }
+LANG_SPEED = {"uk": 1.3, "fr": 1.12, "pt-BR": 1.08, "es": 1.05, "de": 1.05}
 FEMALE = {"mom", "lena", "mia", "grandma", "principal"}
 PITCH = {"karl": 1.1, "max": 1.17, "dad": 0.9, "ortiz": 0.88, "kid": 1.22, "mia": 1.15, "grandma": 0.92, "lena": 1.04}
 
@@ -83,7 +84,7 @@ def synth(lang, text, v, speed, cache):
     return trim(read_wav(p))
 
 def tts(ep, m, lang="en", texts=None):
-    cache = bdir(ep, "tts"); speed = m.META.get("speed", 1.1)
+    cache = bdir(ep, "tts"); speed = m.META.get("speed", 1.1) * LANG_SPEED.get(lang, 1.0)
     texts = texts or [l["t"] for l in m.LINES]
     jobs = [(lang, t, l["v"], speed, cache) for t, l in zip(texts, m.LINES)]
     with ThreadPoolExecutor(4) as ex: return list(ex.map(lambda j: synth(*j), jobs))
@@ -241,19 +242,20 @@ def srt(ep, tl, texts=None, lang="en"):
 
 def mux(ep, m, tl, wav, out):
     vid = os.path.join(bdir(ep), "video.mp4")
-    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", vid, "-i", wav, "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-preset", "medium", "-crf", "23",
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", vid, "-i", wav, "-map", "0:v", "-map", "1:a", "-vf", "hqdn3d=6:4:8:6", "-c:v", "libx264", "-preset", "slow", "-crf", "26",
                     "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", out], check=True)
 
-def fit_dub(tl, parts):
-    """Place each dubbed line at the EN line start; speed it up (max 1.35x) if it would run into the next line."""
-    out = []
+def fit_dub(tl, parts, lag=0.5):
+    """Place dubbed lines in order, never overlapping: each starts at its English start (or right after the previous
+    line), may end up to `lag` s after the next English start, and is sped up (max 1.4x) only if it still does not fit."""
+    out, cursor, late = [], 0.0, 0
     for i, (ln, a) in enumerate(zip(tl["lines"], parts)):
         nxt = tl["lines"][i + 1]["vo"] if i + 1 < len(tl["lines"]) else tl["speech_end"]
-        room = nxt - ln["vo"] - 0.08; d = len(a) / SR
-        if d > room:
-            r = min(1.35, d / room)
-            a = tempo(a, r)
-        out.append((ln["vo"], a))
+        start = max(ln["vo"], cursor + 0.06); room = max(0.3, nxt + lag - start); d = len(a) / SR
+        if d > room: a = tempo(a, min(1.4, d / room))
+        out.append((start, a)); cursor = start + len(a) / SR
+        if cursor > nxt + lag + 0.05: late += 1
+    print("lines running late:", late)
     return out
 
 def tempo(a, r):
@@ -279,7 +281,7 @@ if __name__ == "__main__":
             subprocess.run(["node", os.path.join(HERE, "rep.js"), q, "stills", bdir(ep, "short_stills"), ",".join(str(round(t0 + f * (t1 - t0), 2)) for f in (0.02, 0.3, 0.6, 0.97)), "renderShort"], check=True, env=env); sys.exit()
         subprocess.run(["node", os.path.join(HERE, "rep.js"), q, "video", vid, str(t0), str(t1), "renderShort"], check=True, env=env)
         out = os.path.join(FS, ep, sh["name"] + ".mp4"); wav = os.path.join(bdir(ep), "mix_en.wav")
-        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", vid, "-ss", str(t0), "-t", str(t1 - t0), "-i", wav, "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-crf", "23", "-preset", "medium",
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", vid, "-ss", str(t0), "-t", str(t1 - t0), "-i", wav, "-map", "0:v", "-map", "1:a", "-vf", "hqdn3d=6:4:8:6", "-c:v", "libx264", "-crf", "25", "-preset", "slow",
                         "-af", f"afade=t=out:st={t1 - t0 - 0.8:.2f}:d=0.8,loudnorm=I=-14:TP=-1.5", "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", out], check=True)
         print(out)
     if cmd == "dub":
