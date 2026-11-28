@@ -1,7 +1,7 @@
 # EP11 / Video #1 — publishing package (user publishes the long video at 18:00 Warsaw)
 
 **File:** `finance_series/ep11/EP11_Black_Friday_Button.mp4` (16:9, ~8.2 min incl. 15 s end screen)
-**Thumbnails (Test & Compare):** `thumb_A.jpg` ($50 crossed out -> $1,200) · `thumb_B.jpg` ($2,270 more than full price) · `thumb_C.jpg` (7 years for one sale)
+**Thumbnails (Test & Compare):** `thumb_A.jpg` ($50 crossed out to $1,200) · `thumb_B.jpg` ($2,270 more than full price) · `thumb_C.jpg` (7 years for one sale)
 **Captions:** `captions_en.srt`
 
 ## Title
@@ -35,8 +35,8 @@ Chapters
 Method (example story, real data; numbers on screen are rounded)
 - Example cart: $2,000 full price, 40% off = $1,200 = 6 BNPL plans x $200 (24 payments of $50).
 - Hours: $1,200 / $38.00 average US hourly pay (BLS via FRED CES0500000003, Oct 2026, before tax) = 31.6 hours.
-- Card: $1,200 at 21.19% APR (FRED TERMCBCCALLNS, Aug 2026, accounts assessed interest); minimum payment = 1% of balance + interest, at least $25 -> 87 months, $1,072 interest, $2,272 total. First minimum payment $33.19, of which $21.19 is interest.
-- Timeline B: $800 in the S&P 500 price index, Sep 2016 -> Sep 2026 (x3.55, dividends not included) = $2,844. Past returns are not a promise.
+- Card: $1,200 at 21.19% APR (FRED TERMCBCCALLNS, Aug 2026, accounts assessed interest); minimum payment = 1% of balance + interest, at least $25 to 87 months, $1,072 interest, $2,272 total. First minimum payment $33.19, of which $21.19 is interest.
+- Timeline B: $800 in the S&P 500 price index, Sep 2016 to Sep 2026 (x3.55, dividends not included) = $2,844. Past returns are not a promise.
 
 Sources
 - CFPB, "Consumer Use of Buy Now, Pay Later and Other Unsecured Debt" (Jan 2025)
