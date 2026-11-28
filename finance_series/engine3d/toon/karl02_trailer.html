@@ -1,0 +1,77 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<canvas id="o" width="1920" height="1080" style="display:none"></canvas>
+<script type="module">
+// Trailer for Karl #02 "What If Every 'Pay in 4' Button Showed You the Real Price?" (timing: karl02/build/trailer_timing.json)
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, blinkAt, shot, makeStage, worldPos, extraSpec, TOON, mesh } from "./toon.js";
+import { makeSet2 } from "./sets2.js";
+import { post, loadFonts, rings, glow, sparkles, receipt, easeOut } from "../../engine2d/engine.js";
+import { phone, realTag, bubble, bigText, AMBER } from "./fx2.js";
+import { crowd, phoneProp } from "./crowd2.js";
+await loadFonts("../../../ep2/fonts/");
+const W = 1920, H = 1080, st = makeStage(W, H);
+const SETS = {}; for (const n of ["bedroom", "store", "mall"]) SETS[n] = makeSet2(st.scene, n);
+const O = document.getElementById("o"), g = O.getContext("2d");
+const T = await (await fetch("../../karl02/build/trailer_timing.json")).json();
+const C = {}; for (const id of ["karl", "max"]) { C[id] = makeChar(id); st.scene.add(C[id].root); }
+const PH = { karl: phoneProp(C.karl), max: phoneProp(C.max) };
+const EX = []; for (let i = 0; i < 40; i++) { const e = makeChar(extraSpec(i + 11)); st.scene.add(e.root); EX.push(e); }
+const CROWD = crowd(st.scene, 900, { x0: -24, x1: 24, z0: 3, z1: 16 }); SETS.mall.add(CROWD);
+const P = (v) => { const p = v.clone().project(st.camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; };
+const headTop = (ch, d = 1.15) => worldPos(ch.head).add(new THREE.Vector3(0, d * (ch.spec.scale || 1), 0));
+function place(ch, x, z, ry, y = 0) { ch.root.visible = true; ch.root.position.set(x, y, z); ch.root.rotation.y = ry; }
+function show(set) { for (const k in SETS) SETS[k].visible = k === set; }
+const bedroomLight = (on) => { st.scene.background.set(on ? 0x1c1a33 : 0xe9dcc9); st.sun.intensity = on ? 0.7 : 2.0; };
+window.renderAt = (t) => {
+  let i = T.findIndex(([a, b]) => t < b); if (i < 0) i = T.length - 1; const [s0, s1] = T[i], lt = t - s0, k = lt / Math.max(1, s1 - s0);
+  for (const id in C) C[id].root.visible = false; EX.forEach(e => e.root.visible = false); PH.karl.visible = PH.max.visible = false;
+  const ov = []; let grade = null; bedroomLight(false);
+  if (i <= 3) {   // bedroom, 11:58
+    show("bedroom"); bedroomLight(true); grade = "rgba(60,80,200,0.35)";
+    place(C.karl, 1.6, -2.2, -0.35, 0.5); applyPose(C.karl, "sit", t); C.karl.hips.position.y += 0.18; PH.karl.visible = true;
+    const a = C.karl.arms.R; a.sh.rotation.set(-1.2, 0, 0.25); a.el.rotation.set(-1.5, 0, 0); C.karl.arms.L.sh.rotation.set(-0.3, 0, -0.3);
+    const m = worldPos(C.karl.head);
+    if (i === 0) { setFace(C.karl, "sleepy", blinkAt(t), [-0.6, 0.6]); shot(st.camera, [-1.2, 3.0, 8.5], [-0.8, 2.8, 7.4], [1.2, 1.7, -2.4], k, 0, 0.002, t);
+      ov.push(() => { g.save(); g.font = "64px Anton"; g.fillStyle = "#ff5a6a"; g.textAlign = "center"; g.fillText("11:58", 360, 170); g.font = "28px Mont"; g.fillStyle = "#e8e4ff"; g.fillText("BLACK FRIDAY", 360, 215); g.restore(); }); }
+    if (i === 1 || i === 2) { setFace(C.karl, "neutral", 1, [0, 0.4]); shot(st.camera, [m.x - 2.2, 2.5, 4.6], [m.x - 2.0, 2.5, 4.2], [m.x, 2.0, m.z], k, 0, 0, t);
+      const fk = i === 2 ? Math.min(1, Math.max(0, (lt - 0.35) / 0.5)) : 0;
+      ov.push(() => { g.fillStyle = "rgba(10,8,30,0.45)"; g.fillRect(0, 0, W, H);
+        phone(g, 960, 540, 1.0 * (1 + 0.02 * lt), { clock: "11:58", old: "$240", price: "$120", sub: "-50%  ENDS IN 00:01:59", flipK: fk }, t);
+        if (i === 2) { rings(g, 960, 800, s0 + 0.4, t, AMBER, 3, 420); sparkles(g, 960, 800, s0 + 0.5, t, 6, 300); } }); }
+    if (i === 3) { setFace(C.karl, "shock", 1, [0, 0.2]); shot(st.camera, [m.x - 1.5, m.y + 0.1, m.z + 3.0], [m.x - 1.3, m.y + 0.1, m.z + 2.6], [m.x, m.y - 0.1, m.z], k, lt < 0.25 ? 0.05 : 0, 0.003, t);
+      ov.push(() => { const [x, y] = P(worldPos(PH.karl)); glow(g, x, y, 380, AMBER, 0.45); realTag(g, 330, 300, "$120", "6 HOURS OF YOUR LIFE", lt / 0.4, { size: 70, sub: 32 }); }); }
+  } else if (i === 4) {   // store: real prices everywhere
+    show("store"); place(C.karl, -1.2 + lt * 0.5, 2.4, 0.5); applyPose(C.karl, "idle", t, { walk: true }); setFace(C.karl, "dazed", blinkAt(t), [0.4, -0.8]);
+    shot(st.camera, [0, 3.4, 13.5], [0, 3.3, 12.2], [0, 2.9, -2.5], k, 0, 0.003, t);
+    const TAGS = [[-6.4, 2.6, "$80", "4 HOURS"], [-5.1, 1.5, "$45", "2.3 HOURS"], [-2.6, 3.4, "$300", "15 HOURS"], [-1.4, 1.6, "$60", "3 HOURS"], [3.2, 2.6, "$600", "30 HOURS"], [4.6, 1.5, "$120", "6 HOURS"], [0.6, 6.4, "-40%?", "ALSO LAST TUESDAY"]];
+    ov.push(() => TAGS.forEach(([x, y, a, b], j) => { const [px, py] = P(new THREE.Vector3(x, y, -3.8)); rings(g, px, py, s0 + 0.3 + j * 0.22, t, AMBER, 1, 120); realTag(g, px, py - 40, a, b, (lt - 0.3 - j * 0.22) / 0.35, { size: 40, sub: 22 }); }));
+  } else if (i === 5 || i === 6) {   // Max at the checkout: six $50 -> $1,200 -> 7 years
+    show("store"); place(C.max, 1.0, 0.2, -0.3); place(C.karl, -1.4, 0.8, 0.5); PH.max.visible = true;
+    applyPose(C.max, i === 5 ? "idle" : "panic", t, { seed: 2 }); const a = C.max.arms.R; if (i === 5) { a.sh.rotation.set(-1.1, 0, 0.3); a.el.rotation.set(-1.2, 0, 0); }
+    setFace(C.max, i === 5 ? "happy" : "panic", blinkAt(t, 2)); applyPose(C.karl, "idle", t); setFace(C.karl, "worried", blinkAt(t), [1, -0.3]);
+    const m = worldPos(C.max.head);
+    if (i === 5) { shot(st.camera, [m.x - 2.4, 2.9, 7.6], [m.x - 2.2, 2.9, 6.8], [m.x - 0.6, 2.4, 0], k, 0, 0.003, t);
+      ov.push(() => { const [x0] = P(headTop(C.max, 1.3)); const x = Math.min(1500, Math.max(420, x0)), y = 330; const pts = [[-330, 0], [-200, -90], [-66, -20], [66, -100], [200, -10], [330, -80]];
+        const merge = easeOut((lt - 1.5) / 0.5);
+        if (merge < 0.95) pts.forEach(([dx, dy], j) => bubble(g, x + dx * (1 - merge), y + dy * 0.6 * (1 - merge), "$50", (lt - 0.1 - j * 0.15) / 0.3 * (1 - merge * 0.999)));
+        if (lt > 1.5) { rings(g, x, y, s0 + 1.6, t, AMBER, 3, 300); realTag(g, x, y, "$1,200", "60 HOURS  ·  EXAMPLE", (lt - 1.6) / 0.35, { size: 80, sub: 28 }); } }); }
+    else { shot(st.camera, [m.x - 1.0, 2.8, 6.4], [m.x - 0.8, 2.8, 5.6], [m.x + 0.2, 2.6, 0], k, lt < 0.25 ? 0.06 : 0, 0.004, t); grade = "rgba(120,60,90,0.25)";
+      ov.push(() => { const [x, y] = P(worldPos(C.max.head)); receipt(g, x + 520, y + 470, [{ l: "EXAMPLE", size: 24, col: "#8a8496" }, { l: "$1,200 ON A CARD", size: 34, font: "Anton" }, { l: "~21% A YEAR", size: 32 }, { l: "MINIMUM PAYMENTS", size: 32 }, { l: "~7 YEARS", size: 46, font: "Anton", col: "#e0344a" }, { l: "TOTAL ~$2,270", size: 46, font: "Anton", col: "#e0344a" }], lt / 1.6, { w: 400 }); }); }
+  } else {   // mall atrium: 10,000 people, one giant button / title
+    show("mall"); st.scene.background.set(0x2a2440); place(C.karl, -0.5, -10, 0, 1.28); applyPose(C.karl, i === 7 ? "idle" : "shrug", t); setFace(C.karl, i === 7 ? "worried" : "smug", blinkAt(t), [0, 0]);
+    EX.forEach((e, j) => { const r = Math.floor(j / 10), c = j % 10; place(e, -9 + c * 2 + (r % 2), -5.5 + r * 1.6, Math.PI * 0.02 * (c - 5) + Math.PI * 0 ); e.root.rotation.y = Math.PI; applyPose(e, ["cheer", "idle", "point", "cheer"][(j + r) % 4], t, { seed: j }); setFace(e, ["happy", "shock", "laugh", "dazed"][j % 4], blinkAt(t, j)); });
+    CROWD.userData.update(t);
+    if (i === 7) { shot(st.camera, [0, 12, 25], [0, 10, 21.5], [0, 2.4, -8], k, 0, 0.003, t); grade = "rgba(140,60,200,0.25)";
+      ov.push(() => { const [x, y] = P(new THREE.Vector3(2.5, 2.8, -10)); rings(g, x, y, s0 + 0.6, t, "255,90,106", 3, 200); glow(g, x, y, 200, "255,90,106", 0.35); }); }
+    else { const m = worldPos(C.karl.head); EX.forEach(e => e.root.visible = false); shot(st.camera, [-7.0, 3.3, -0.5], [-6.4, 3.2, -1.6], [3.2, 2.7, -10], k, 0, 0.002, t); grade = "rgba(255,140,60,0.18)";
+      ov.push(() => { const [x, y] = P(headTop(C.karl)); rings(g, x, y, s0 + 0.2, t, AMBER, 4, 700); glow(g, x, y, 340, AMBER, 0.3);
+        const a = (lt - 0.3) / 0.5; bigText(g, 1280, 330, "WHAT IF EVERY", 96, "#ffffff", a); bigText(g, 1280, 460, "\"PAY IN 4\" BUTTON", 124, "#ffb828", a - 0.25); bigText(g, 1280, 590, "SHOWED THE REAL PRICE?", 96, "#ffffff", a - 0.5);
+        bigText(g, 1280, 720, "NEW VIDEO", 48, "#4fe08a", a - 0.8); }); }
+  }
+  st.renderer.render(st.scene, st.camera);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(st.renderer.domElement, 0, 0); for (const f of ov) f(); post(g, W, H, t, grade);
+  return O.toDataURL("image/jpeg", 0.9);
+};
+window.ready = true;
+</script></body></html>

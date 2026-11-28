@@ -1,0 +1,117 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<canvas id="o" width="1920" height="1080" style="display:none"></canvas>
+<script type="module">
+// Generic full-episode player for the toon look. toon_ep.html?ep=karl02 -> ../../karl02/shots.js + ../../karl02/build/ep_timing.json
+// One VO line = one shot. Blocks give set/cast/camera cycle; per-line overrides add poses, faces, FX.
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, blinkAt, shot, makeStage, makeSet, worldPos, extraSpec } from "./toon.js";
+import { makeSet2 } from "./sets2.js";
+import { makeProp } from "./props2.js";
+import { crowd, phoneProp } from "./crowd2.js";
+import { post, loadFonts, rings, glow, sparkles, receipt, pill, easeOut, pop } from "../../engine2d/engine.js";
+import { phone, realTag, bubble, bigText, AMBER } from "./fx2.js";
+await loadFonts("../../../ep2/fonts/");
+const EP = new URLSearchParams(location.search).get("ep");
+const S = await import(`../../${EP}/shots.js`);
+const TM = await (await fetch(`../../${EP}/build/ep_timing.json`)).json();
+const W = 1920, H = 1080, st = makeStage(W, H), O = document.getElementById("o"), g = O.getContext("2d");
+const SETS = {}; for (const n of S.SETS) SETS[n] = ["kitchen", "cafeteria", "gym", "void"].includes(n) ? makeSet(st.scene, n) : makeSet2(st.scene, n);
+const C = {}; for (const id of S.CAST) { C[id] = makeChar(S.SPECS?.[id] || id); C[id].spec = { ...C[id].spec }; st.scene.add(C[id].root); C[id].phone = phoneProp(C[id]); }
+const EX = []; for (let i = 0; i < (S.EXTRAS || 0); i++) { const e = makeChar(extraSpec(i + 21)); st.scene.add(e.root); EX.push(e); }
+const CROWD = S.CROWD ? crowd(st.scene, S.CROWD.n, S.CROWD.box) : null; if (CROWD) CROWD.visible = false;
+const PROPS = {}; const propPool = (name, k) => { const key = name + "#" + k; if (!PROPS[key]) { PROPS[key] = makeProp(name); st.scene.add(PROPS[key]); } return PROPS[key]; };
+const P = (v) => { const p = v.clone().project(st.camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; };
+const headTop = (ch, d = 1.15) => worldPos(ch.head).add(new THREE.Vector3(0, d * (ch.spec.scale || 1), 0));
+const merge = (a, b) => { const o = { ...a }; for (const k in b) o[k] = (b[k] && typeof b[k] === "object" && !Array.isArray(b[k]) && a[k] && typeof a[k] === "object" && !Array.isArray(a[k])) ? { ...a[k], ...b[k] } : b[k]; return o; };
+function specAt(i) { const b = S.BLOCKS.find(b => i >= b.from && i <= b.to) || S.BLOCKS[S.BLOCKS.length - 1]; return { b, s: merge(b, S.LINES[i] || {}) }; }
+function anchor(at, ctx) {
+  if (!at) return [960, 400];
+  if (Array.isArray(at)) return at.length === 2 ? at : P(new THREE.Vector3(...at));
+  const [kind, id, dy] = at.split(":");
+  if (kind === "head") return P(headTop(C[id] || EX[+id], dy ? +dy : 1.15));
+  if (kind === "face") return P(worldPos(C[id].head));
+  if (kind === "hand") return P(worldPos(C[id].arms.R.hand));
+  if (kind === "phone") return P(worldPos(C[id].phone));
+  if (kind === "prop") { const p = ctx.props[+id]; return P(p.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, dy ? +dy : 1.2, 0))); }
+  return [960, 400];
+}
+const CAMS = {
+  // each returns [from, to, look]
+  wide: (s, ids) => { const c = center(ids); const sp = spread(ids); const d = 8.5 + sp * 1.1; return [[c.x - 0.6, 3.3, c.z + d], [c.x - 0.3, 3.1, c.z + d * 0.9], [c.x, 2.1, c.z]]; },
+  two: (s, ids) => { const c = center(ids); const sp = spread(ids); const d = 5.5 + sp * 1.0; return [[c.x + 0.8, 2.9, c.z + d], [c.x + 0.6, 2.9, c.z + d * 0.92], [c.x, 2.4, c.z]]; },
+  ms: (s, [id], side = 1) => { const h = worldPos(C[id].head); return [[h.x + 1.4 * side, h.y - 0.1, h.z + 5.6], [h.x + 1.2 * side, h.y - 0.1, h.z + 5.0], [h.x + 0.3 * side, h.y - 0.6, h.z]]; },
+  cu: (s, [id], side = 1) => { const h = worldPos(C[id].head); return [[h.x + 1.0 * side, h.y + 0.1, h.z + 3.3], [h.x + 0.85 * side, h.y + 0.1, h.z + 2.9], [h.x + 0.2 * side, h.y - 0.1, h.z]]; },
+  ots: (s, [a, b]) => { const A = worldPos(C[a].head), Bp = worldPos(C[b].head); const d = A.clone().sub(Bp).setY(0).normalize(); const side = new THREE.Vector3(-d.z, 0, d.x);
+    const f = A.clone().add(d.clone().multiplyScalar(1.6)).add(side.multiplyScalar(0.9)).add(new THREE.Vector3(0, 0.3, 0)); return [f.toArray(), f.clone().lerp(Bp, 0.06).toArray(), [Bp.x, Bp.y - 0.2, Bp.z]]; },
+  crowdwide: () => [[0, 12, 25], [0, 10, 21.5], [0, 2.4, -8]],
+  stage: (s) => { const h = worldPos(C.karl.head); return [[h.x - 4.2, 3.3, -0.8], [h.x - 3.8, 3.2, -1.8], [h.x + 2.2, 2.6, -10]]; },
+};
+function visIds(s) { return Object.keys(s.cast || {}).filter(id => s.cast[id]); }
+function center(ids) { const v = new THREE.Vector3(); ids.forEach(id => v.add(C[id].root.position)); return ids.length ? v.multiplyScalar(1 / ids.length) : v; }
+function spread(ids) { if (ids.length < 2) return 0; const xs = ids.map(id => C[id].root.position.x); return Math.max(...xs) - Math.min(...xs); }
+function poseOf(spec, id, def, t, t0) { const p = spec?.[id] ?? def; if (!p) return "idle"; if (typeof p === "string") return p; return { from: p[0], to: p[1], t0: t0 + (p[2] || 0), dur: p[3] || 0.25 }; }
+let EVENTS = [];
+window.renderAt = (t) => {
+  const L = TM.lines; let i = L.findIndex(([a, b], j) => t < (L[j + 1] ? L[j + 1][0] : b)); if (i < 0) i = L.length - 1;
+  const endMode = t >= TM.endStart;
+  const [s0] = L[i], s1 = L[i + 1] ? L[i + 1][0] : TM.dur, lt = t - s0, k = lt / Math.max(1, s1 - s0);
+  const { b, s } = specAt(i);
+  for (const id in C) { C[id].root.visible = false; C[id].phone.visible = false; } EX.forEach(e => e.root.visible = false); for (const p in PROPS) PROPS[p].visible = false;
+  for (const n in SETS) SETS[n].visible = n === s.set; if (CROWD) CROWD.visible = !!s.crowd;
+  st.scene.background.set(s.bg ?? 0xe9dcc9); st.sun.intensity = s.sun ?? 2.0;
+  for (const id of visIds(s)) { const [x, z, ry, y = 0] = s.cast[id]; const ch = C[id]; ch.root.visible = true; ch.root.position.set(x, y, z); ch.root.rotation.y = ry;
+    const walk = s.walk?.[id]; if (walk) ch.root.position.x += walk * lt;
+    applyPose(ch, poseOf(s.pose, id, "idle", t, s0), t, { seed: id.length, walk: !!walk, squash: s.squash?.[id] !== undefined ? s0 + s.squash[id] : 0 });
+    if (s.sit?.[id]) ch.hips.position.y += s.sit[id];
+    if (s.phone?.[id]) { ch.phone.visible = true; const a = ch.arms.R; a.sh.rotation.set(-1.15, 0, 0.3); a.el.rotation.set(-1.4, 0, 0); }
+    const emo = s.emo?.[id] ?? "neutral"; const e = Array.isArray(emo) ? (lt < emo[1] ? emo[0] : emo[2]) : emo;
+    setFace(ch, e, blinkAt(t, id.length), s.look?.[id] || [0, 0]); }
+  const props = (s.props || []).map(([name, x, y, z, ry = 0, sc = 1], j) => { const p = propPool(name, j); p.visible = true; p.position.set(x, y, z); p.rotation.y = ry; p.scale.setScalar(sc); return p; });
+  if (s.extras) s.extras.forEach(([x, z, ry, y = 0], j) => { const e = EX[j]; if (!e) return; e.root.visible = true; e.root.position.set(x, y, z); e.root.rotation.y = ry;
+    applyPose(e, (s.exPose || ["idle", "cheer", "point", "idle", "shrug"])[(j + i) % (s.exPose?.length || 5)], t, { seed: j }); setFace(e, (s.exEmo || ["happy", "neutral", "shock", "laugh", "dazed"])[j % (s.exEmo?.length || 5)], blinkAt(t, j)); });
+  if (CROWD && s.crowd) CROWD.userData.update(t);
+  // camera
+  const ids = visIds(s); let cam = s.cam || (b.cams ? b.cams[(i - b.from) % b.cams.length] : "wide");
+  let F; if (Array.isArray(cam)) F = cam; else { const [name, ...args] = cam.split(":"); const side = (i % 2) ? -1 : 1; F = CAMS[name](s, args.length ? args : ids, side); }
+  shot(st.camera, F[0], F[1], F[2], k, (s.punch && lt < 0.25) ? 0.05 : 0, s.shake || 0.002, t);
+  st.renderer.render(st.scene, st.camera);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.drawImage(st.renderer.domElement, 0, 0);
+  const ctx = { props, lt, t, s0 };
+  for (const f of (s.fx || [])) drawFx(f, ctx);
+  if (S.GLOBAL) S.GLOBAL(g, t, TM, { bigText, pill, pop, easeOut, i, lt });
+  post(g, W, H, t, s.grade || null);
+  if (endMode) endScreen(t - TM.endStart);
+  return O.toDataURL("image/jpeg", 0.9);
+};
+function drawFx(f, { props, lt, t, s0 }) {
+  const d = f.t || 0, kk = (lt - d) / (f.dur || 0.4); if (lt < d) return;
+  const ctx = { props }; const [x, y] = f.at ? anchor(f.at, ctx) : [f.x ?? 960, f.y ?? 400];
+  const ox = f.dx || 0, oy = f.dy || 0;
+  if (f.type === "tag") { if (f.ring !== false) rings(g, x + ox, y + oy, s0 + d, t, AMBER, 2, 180); realTag(g, x + ox, y + oy, f.top, f.bot, kk, { size: f.size || 54, sub: f.sub || 26 }); }
+  if (f.type === "rings") rings(g, x + ox, y + oy, s0 + d, t, f.col || AMBER, f.n || 3, f.r || 260);
+  if (f.type === "glow") glow(g, x + ox, y + oy, (f.r || 260) * easeOut(kk), f.col || AMBER, f.a || 0.4);
+  if (f.type === "spark") sparkles(g, x + ox, y + oy, s0 + d, t, f.n || 5, f.r || 140);
+  if (f.type === "pill") pill(g, x + ox, y + oy, f.text, (lt - d) / (f.dur || 1.2), { size: f.size || 34 });
+  if (f.type === "receipt") receipt(g, x + ox, y + oy, f.lines.map(l => typeof l === "string" ? { l, size: 32 } : l), (lt - d) / (f.dur || 1.0), { w: f.w || 360 });
+  if (f.type === "bubbles") { const merge = f.merge !== undefined ? easeOut((lt - f.merge) / 0.4) : 0; const n = f.n || 6;
+    if (merge < 0.95) for (let j = 0; j < n; j++) { const a = -Math.PI / 2 + (j - (n - 1) / 2) * 0.5, rr = (f.r || 240) * (1 - merge); bubble(g, x + ox + Math.cos(a) * rr * 1.4, y + oy + Math.sin(a) * rr * 0.5 + 60, f.text || "$50", ((lt - d - j * 0.12) / 0.3)); }
+    if (f.merge !== undefined && lt > f.merge) { rings(g, x + ox, y + oy, s0 + f.merge, t, AMBER, 3, 300); realTag(g, x + ox, y + oy, f.top, f.bot, (lt - f.merge) / 0.35, { size: 74, sub: 28 }); } }
+  if (f.type === "phone") { g.fillStyle = "rgba(10,8,30,0.5)"; g.fillRect(0, 0, W, H); const fk = f.flip !== undefined ? Math.min(1, Math.max(0, (lt - f.flip) / 0.5)) : 0;
+    phone(g, f.x ?? 960, f.y ?? 540, (f.s || 1.0) * (1 + 0.02 * lt), { ...f.o, flipK: fk }, t); if (f.flip !== undefined && lt > f.flip) { rings(g, f.x ?? 960, (f.y ?? 540) + 260, s0 + f.flip, t, AMBER, 3, 420); sparkles(g, f.x ?? 960, (f.y ?? 540) + 260, s0 + f.flip + 0.1, t, 6, 300); } }
+  if (f.type === "text") bigText(g, x + ox, y + oy, f.text, f.size || 90, f.col || "#ffffff", kk);
+  if (f.type === "card") { const a = easeOut(kk); g.save(); g.globalAlpha = a; g.fillStyle = "rgba(20,18,30,0.86)"; g.beginPath(); g.roundRect(x - (f.w || 700) / 2, y - (f.h || 220) / 2, f.w || 700, f.h || 220, 30); g.fill(); g.lineWidth = 5; g.strokeStyle = "#ffb828"; g.stroke(); g.restore();
+    (f.lines || []).forEach(([txt, size, col], j) => bigText(g, x, y - ((f.lines.length - 1) * (size + 14)) / 2 + j * (size + 18), txt, size, col || "#fff", kk - 0.1 * j, "rgba(0,0,0,0)")); }
+  if (f.type === "draw") f.fn(g, x + ox, y + oy, kk, lt, t);
+  if (f.ev && !f._ev) { /* events are computed in eventsList */ }
+}
+function endScreen(et) { const a = easeOut(et / 0.6); g.save(); g.globalAlpha = a * 0.92; g.fillStyle = "#16141f"; g.fillRect(0, 0, W, H); g.globalAlpha = a;
+  for (const [x, lbl] of [[560, "WATCH NEXT"], [1360, "MORE \"WHAT IF\""]]) { g.fillStyle = "#2a2640"; g.beginPath(); g.roundRect(x - 330, 360, 660, 372, 26); g.fill(); g.lineWidth = 4; g.strokeStyle = "#2ec4b6"; g.stroke(); bigText(g, x, 546, lbl, 56, "#ffffff", 1, "rgba(0,0,0,0)"); }
+  bigText(g, 960, 200, "SO... WOULD YOU WANT IT?", 92, "#ffb828", 1); bigText(g, 960, 870, "SUBSCRIBE FOR A NEW \"WHAT IF\" EVERY WEEK", 46, "#ffffff", (et - 0.5) / 0.5); g.restore(); }
+// SFX events for the mixer: one per fx with a sound type
+window.eventsList = () => { const ev = []; TM.lines.forEach(([s0], i) => { const { s } = specAt(i); for (const f of (s.fx || [])) {
+  const d = s0 + (f.t || 0); const ty = { tag: "ping", rings: "ping", receipt: "print", bubbles: "pops", phone: f.flip !== undefined ? "flip" : "blip", pill: "pop", card: "whoosh", text: "whoosh" }[f.type]; if (ty) ev.push({ t: ty === "flip" ? d + f.flip : d, type: ty });
+  if (f.type === "bubbles" && f.merge !== undefined) ev.push({ t: s0 + f.merge, type: "merge" }); }
+  if (s.sfx) for (const [ty, dt] of s.sfx) ev.push({ t: s0 + dt, type: ty }); }); return ev; };
+window.ready = true;
+</script></body></html>
