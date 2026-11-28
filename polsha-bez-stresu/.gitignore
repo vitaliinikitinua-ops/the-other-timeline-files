@@ -5,3 +5,4 @@ voice/model/
 **/frame_*.png
 **/_*.png
 **/run.log
+**/_*.wav
