@@ -64,12 +64,12 @@ function paintFace(ctx, emo, blink, look, c) {
 }
 export function setFace(ch, emo, blink = 1, look = [0, 0]) {
   const key = emo + (blink > 0.5 ? "o" : "c") + look.join(","); if (key === ch.lastKey) return; ch.lastKey = key;
-  paintFace(ch.ctx, emo, blink, look, CAST[ch.who]); ch.tex.needsUpdate = true;
+  paintFace(ch.ctx, emo, blink, look, ch.spec); ch.tex.needsUpdate = true;
 }
 
 // ---------------------------------------------------------------- character
 export function makeChar(who) {
-  const c = CAST[who]; const S = c.scale || 1;
+  const c = typeof who === "string" ? CAST[who] : who; const S = c.scale || 1;
   const mTop = TOON(c.top), mPants = TOON(c.pants), mInk = TOON(0x1c1a22), mShoe = TOON(0xf4f2ee);
   const root = new THREE.Group(); const scaler = new THREE.Group(); scaler.scale.setScalar(S); root.add(scaler);
   const hips = new THREE.Group(); hips.position.y = 1.0; scaler.add(hips);
@@ -131,10 +131,15 @@ export function makeChar(who) {
     const foot = mesh(new THREE.SphereGeometry(0.15, 16, 12), mShoe, { w: 0.012 }); foot.scale.set(1, 0.65, 1.6); foot.position.set(0, -0.47, 0.08); kn.add(foot);
     legs[side] = { hp, kn, sx };
   }
-  const ch = { who, root, hips, torso, neck, head, face, ctx, tex, arms, legs, lastKey: "" };
+  const ch = { who: typeof who === "string" ? who : "extra", spec: c, root, hips, torso, neck, head, face, ctx, tex, arms, legs, lastKey: "" };
   setFace(ch, "neutral"); return ch;
 }
 export function worldPos(obj) { return obj.getWorldPosition(new THREE.Vector3()); }
+
+const TOPS = [0xff6b5b, 0x4a7fc1, 0x3fa874, 0x9a6edc, 0xf2b84b, 0x38c6b4, 0xe86a9a, 0x7a8a9a, 0xd9734a, 0x5ab0e0];
+const HAIRS = [null, "short", "curly", "bob", "long", "buns", null, "short"];
+export function extraSpec(i) { const r = (k) => ((i * 9301 + k * 49297) % 233280) / 233280;
+  return { name: "extra", top: TOPS[Math.floor(r(1) * TOPS.length)], pants: [0x2f3b5c, 0x2c2c3c, 0x4a4458, 0x384a6b][Math.floor(r(2) * 4)], hair: HAIRS[Math.floor(r(3) * HAIRS.length)], hairColor: [0x2a1a12, 0x5a3524, 0xc8843a, 0x7a4a2a][Math.floor(r(4) * 4)], strings: r(5) > 0.5, lashes: r(6) > 0.6, scale: 0.92 + r(7) * 0.12 }; }
 
 // ---------------------------------------------------------------- stage + sets
 export function makeStage(w = 1920, h = 1080) {
@@ -162,6 +167,22 @@ export function makeSet(scene, name) {
     for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.CircleGeometry(0.5, 16, 0, Math.PI), new THREE.MeshBasicMaterial({ color: 0x86b872 })); b.position.set(1.0 + i * 0.75, 2.56, -3.96); g.add(b); }
     box(g, 1.6, 3.6, 1.1, 0xf2eee6, 5.6, 1.8, -3.3); box(g, 0.08, 0.7, 0.05, 0xc8c1b4, 5.0, 2.6, -2.72, { outline: null });
     box(g, 2.8, 0.12, 1.4, 0xd9a66f, 1.2, 1.25, -1.2); for (const [x, z] of [[-0.1, -1.7], [2.5, -1.7], [-0.1, -0.7], [2.5, -0.7]]) box(g, 0.1, 1.2, 0.1, 0xb9884f, x, 0.6, z);
+  }
+  if (name === "cafeteria") {
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(40, 30), TOON(0xd8d2c4)); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; g.add(fl);
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(40, 14), TOON(0xf0e6d2)); wall.position.set(0, 7, -5); g.add(wall);
+    box(g, 40, 1.2, 0.1, 0x5a8ac9, 0, 0.6, -4.95, { outline: null });
+    for (let i = 0; i < 4; i++) { const w = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.8), new THREE.MeshBasicMaterial({ color: 0xa8dbf2 })); w.position.set(-6 + i * 4, 3.6, -4.94); g.add(w); box(g, 2.4, 0.12, 0.1, 0xffffff, -6 + i * 4, 2.65, -4.9, { outline: null }); }
+    box(g, 3.2, 0.6, 0.05, 0x3f6e52, 0, 5.5, -4.93, { outline: null });
+    for (const z of [-1.2, 2.2]) { box(g, 7, 0.12, 1.3, 0xece5d8, 0, 1.05, z); for (const x of [-3.2, 3.2]) box(g, 0.12, 1.0, 0.9, 0x9aa3ad, x, 0.5, z);
+      for (const dz of [-1.05, 1.05]) box(g, 7, 0.1, 0.4, 0x5a8ac9, 0, 0.6, z + dz); }
+  }
+  if (name === "gym") {
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), TOON(0xd9a96a)); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; g.add(fl);
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(60, 20), TOON(0xe8dfcf)); wall.position.set(0, 10, -14); g.add(wall);
+    for (let r = 0; r < 4; r++) box(g, 36, 0.5, 1.4, 0x8a6a4a, 0, 0.25 + r * 0.5, -6 - r * 1.4, { outline: 0x5a4532 });
+    box(g, 4, 0.5, 2, 0x3a4a6a, 0, 0.25, 5.5); const pole = mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.6), TOON(0x222222)); pole.position.set(0.9, 1.3, 5.6); g.add(pole);
+    const banner = new THREE.Mesh(new THREE.PlaneGeometry(8, 1.4), new THREE.MeshBasicMaterial({ color: 0x2ec4b6 })); banner.position.set(0, 7.5, -13.9); g.add(banner);
   }
   if (name === "void") { const fl = new THREE.Mesh(new THREE.CircleGeometry(30, 32), TOON(0x3a3060)); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; g.add(fl); }
   return g;

@@ -1,0 +1,81 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<canvas id="o" width="1920" height="1080" style="display:none"></canvas>
+<script type="module">
+// Trailer for Karl #01 "What If You Could See Everyone's Bank Account?" (timing from test/trailer_timing.json)
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, blinkAt, shot, makeStage, makeSet, worldPos, extraSpec } from "./toon.js";
+import { post, loadFonts, rings, glow, sparkles, receipt, pill, easeOut, pop } from "../../engine2d/engine.js";
+await loadFonts("../../../ep2/fonts/");
+const W = 1920, H = 1080, st = makeStage(W, H);
+const SETS = { cafeteria: makeSet(st.scene, "cafeteria"), kitchen: makeSet(st.scene, "kitchen"), gym: makeSet(st.scene, "gym") };
+const O = document.getElementById("o"), g = O.getContext("2d");
+const T = await (await fetch("./test/trailer_timing.json")).json();   // [[start, end], ...] per VO line
+const C = {}; for (const id of ["karl", "max", "lena", "grandma", "dad", "mom"]) { C[id] = makeChar(id); st.scene.add(C[id].root); }
+const EX = []; for (let i = 0; i < 46; i++) { const e = makeChar(extraSpec(i + 3)); st.scene.add(e.root); EX.push(e); }
+const P = (v) => { const p = v.clone().project(st.camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; };
+const headTop = (ch) => worldPos(ch.head).add(new THREE.Vector3(0, 1.15 * (ch.spec.scale || 1), 0));
+function bar(x, y, text, col, k, flash = 0) {
+  const a = pop(k); if (a <= 0.01) return; g.save(); g.translate(x, y); g.scale(a, a);
+  g.font = "44px Anton"; const w = g.measureText(text).width + 56;
+  g.fillStyle = "rgba(20,18,30,0.88)"; g.beginPath(); g.roundRect(-w / 2, -32, w, 64, 32); g.fill();
+  g.lineWidth = 4; g.strokeStyle = flash ? `rgba(255,77,94,${0.5 + 0.5 * Math.sin(flash * 18)})` : "rgba(255,255,255,0.25)"; g.stroke();
+  g.fillStyle = col; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, 0, 3); g.restore();
+}
+const GREEN = "#4fe08a", RED = "#ff5a6a";
+function place(ch, x, z, ry) { ch.root.visible = true; ch.root.position.set(x, 0, z); ch.root.rotation.y = ry; }
+function show(set) { for (const k in SETS) SETS[k].visible = k === set; }
+const BAL = ["$84", "$1,240", "-$2,300", "$12", "$37,900", "-$640", "$3", "$215", "$9", "-$18,000", "$560", "$41"];
+window.renderAt = (t) => {
+  let i = T.findIndex(([a, b]) => t < b + 0.2); if (i < 0) i = T.length - 1; const [s0, s1] = T[i], lt = t - s0, k = lt / Math.max(1, s1 - s0);
+  for (const id in C) C[id].root.visible = false; EX.forEach(e => e.root.visible = false);
+  const ov = []; let grade = null; st.scene.background.set(0xe9dcc9);
+  if (i <= 3) {   // cafeteria: Max, Karl, Lena at the table
+    show("cafeteria"); place(C.max, 0.9, 0.3, -0.5); place(C.karl, -1.0, 0.4, 0.5); place(C.lena, -2.6, -0.2, 0.4);
+    applyPose(C.lena, "idle", t, { seed: 3 }); setFace(C.lena, "neutral", blinkAt(t, 3), [1, 0]);
+    if (i === 0) { applyPose(C.max, { from: "idle", to: "point", t0: s0 + 0.4, dur: 0.2 }, t, { squash: s0 + 0.5 }); setFace(C.max, "smug", blinkAt(t, 1)); applyPose(C.karl, "idle", t); setFace(C.karl, "neutral", blinkAt(t), [1, 0]);
+      shot(st.camera, [-0.3, 3.0, 11], [-0.3, 2.9, 10], [-0.3, 1.8, 0], k, lt < 0.4 ? 0.05 : 0, 0.004, t); }
+    if (i === 1) { applyPose(C.max, "cheer", t, { seed: 1 }); setFace(C.max, "laugh", blinkAt(t, 1)); applyPose(C.karl, "idle", t); setFace(C.karl, "neutral", 1, [1, 0]);
+      const m = worldPos(C.max.head); shot(st.camera, [m.x - 1.2, 2.8, 6.4], [m.x - 1.0, 2.8, 5.8], [m.x + 0.3, 2.3, 0], k, 0, 0.004, t);
+      ov.push(() => { const [x, y] = P(headTop(C.max).add(new THREE.Vector3(1.4, 0.2, 0))); pill(g, x, y, "Limited edition. $200.", lt / 1.3); }); }
+    if (i === 2) { applyPose(C.karl, "idle", t); setFace(C.karl, lt > 1 ? "dazed" : "neutral", blinkAt(t), [0.6, lt > 1 ? -1 : 0]);
+      const m = worldPos(C.karl.head); shot(st.camera, [m.x + 1.6, 2.6, 6.2], [m.x + 1.3, 2.7, 5.4], [m.x + 0.5, 2.6, 0], k, 0, 0.004, t); }
+    if (i === 3) { applyPose(C.max, "point", t, { seed: 1 }); setFace(C.max, "smug", blinkAt(t, 1)); applyPose(C.karl, "idle", t); setFace(C.karl, "shock", 1, [1, -0.5]);
+      const m = worldPos(C.max.head); shot(st.camera, [m.x - 1.4, 2.4, 6.8], [m.x - 1.3, 2.5, 6.0], [m.x + 0.2, 2.9, 0], k, lt < 0.3 ? 0.06 : 0, 0.004, t);
+      ov.push(() => { const [x, y] = P(headTop(C.max)); rings(g, x, y, s0 + 0.1, t, "255,120,120", 3, 220); bar(x, y, "$3.12", RED, lt / 0.5);
+        if (lt > 0.8) receipt(g, x + 380, y + 380, [{ l: "SNEAKERS  $200", size: 30, font: "Anton" }, { l: "PAY IN 4", size: 30 }, { l: "PAID: 1 OF 4", size: 38, font: "Anton", col: "#e0344a" }], (lt - 0.8) / 1.0, { w: 310 }); }); }
+  } else if (i === 4) {   // cafeteria wide: balances over every head
+    show("cafeteria"); place(C.karl, 0, 3.0, 0); applyPose(C.karl, "idle", t); setFace(C.karl, "dazed", blinkAt(t), [0, -1]);
+    const spots = [[-4, -1.6], [-2.2, -2.0], [-0.6, -1.7], [1.2, -2.0], [3.0, -1.6], [4.6, -2.0], [-3.2, 0.4], [-1.4, 0.8], [1.8, 0.7], [3.6, 0.4]];
+    spots.forEach(([x, z], j) => { const e = EX[j]; place(e, x, z, (j % 3 - 1) * 0.4); applyPose(e, ["idle", "point", "shrug", "idle"][j % 4], t, { seed: j }); setFace(e, ["happy", "neutral", "smug", "laugh"][j % 4], blinkAt(t, j)); });
+    shot(st.camera, [0, 3.4, 13.5], [0, 3.3, 12.4], [0, 2.0, -0.5], k, 0, 0.004, t);
+    ov.push(() => spots.forEach((_, j) => { const [x, y] = P(headTop(EX[j])); const v = BAL[j]; bar(x, y, v, v.startsWith("-") ? RED : GREEN, (lt - 0.3 - j * 0.12) / 0.4); rings(g, x, y, s0 + 0.3 + j * 0.12, t, "255,255,255", 1, 120); }));
+  } else if (i === 5) {   // kitchen: Grandma's number wraps around her bun
+    show("kitchen"); place(C.grandma, 0.4, 0.4, -0.2); applyPose(C.grandma, { from: "idle", to: "point", t0: s0 + 1.2, dur: 0.3 }, t); setFace(C.grandma, lt > 1.2 ? "smug" : "happy", blinkAt(t, 4));
+    const m = worldPos(C.grandma.head); shot(st.camera, [m.x + 1.2, 2.7, 7.2], [m.x + 1.0, 2.7, 6.4], [m.x, 2.6, 0], k, 0, 0.004, t);
+    ov.push(() => { const [x, y] = P(headTop(C.grandma)); bar(x, y, "$" + Math.floor(Math.min(1, lt / 1.6) * 1284900).toLocaleString("en-US"), GREEN, lt / 0.4); sparkles(g, x, y, s0 + 1.0, t, 6, 200); glow(g, x, y, 260 * easeOut((lt - 0.8) / 0.6), "255,210,90", 0.35); });
+  } else if (i === 6) {   // kitchen: Dad's flashing red number
+    show("kitchen"); place(C.dad, 1.6, -0.4, -0.3); place(C.mom, -0.2, -0.3, 0.3); place(C.karl, -2.0, 0.6, 0.6);
+    applyPose(C.dad, "thumbsup", t); setFace(C.dad, "happy", blinkAt(t, 5)); applyPose(C.mom, "idle", t); setFace(C.mom, "worried", blinkAt(t, 6), [1, 0]); applyPose(C.karl, "idle", t); setFace(C.karl, "worried", 1, [1, -0.4]);
+    shot(st.camera, [-0.6, 3.0, 10], [-0.4, 2.9, 9.2], [0.2, 2.0, 0], k, 0, 0.004, t); grade = "rgba(120,60,120,0.25)";
+    ov.push(() => { const [x, y] = P(headTop(C.dad)); bar(x, y, "-$2,300", RED, lt / 0.4, lt); if (lt > 1.0) receipt(g, x + 360, y + 300, [{ l: "CARD MINIMUM DUE", size: 28, font: "Anton" }, { l: "RENT IN 4 DAYS", size: 30, col: "#e0344a" }], (lt - 1) / 0.8, { w: 320 }); });
+  } else if (i === 7) {   // gym: 800 kids, 800 numbers
+    show("gym"); st.scene.background.set(0xe8dfcf); place(C.karl, 0, 5.5, Math.PI); C.karl.root.position.y = 0.5; applyPose(C.karl, "idle", t); setFace(C.karl, "worried", blinkAt(t));
+    EX.forEach((e, j) => { const r = Math.floor(j / 12), c = j % 12; place(e, -8.8 + c * 1.6 + (r % 2) * 0.8, -5.6 - r * 1.4, 0); e.root.position.y = 0.5 + r * 0.5; applyPose(e, ["idle", "cheer", "idle", "shrug"][j % 4], t, { seed: j }); setFace(e, ["neutral", "happy", "dazed", "smug"][j % 4], blinkAt(t, j)); });
+    shot(st.camera, [0.5, 4.2, 12], [0.2, 3.9, 10.5], [0, 2.4, -6], k, 0, 0.004, t);
+    ov.push(() => EX.forEach((e, j) => { const [x, y] = P(headTop(e)); const v = BAL[j % BAL.length]; g.save(); g.globalAlpha = 0.95; bar(x, y, v, v.startsWith("-") ? RED : GREEN, (lt - 0.2 - (j % 12) * 0.05) / 0.4); g.restore(); }));
+  } else {   // title
+    show("cafeteria"); place(C.karl, 0, 0.5, 0); applyPose(C.karl, "shrug", t); setFace(C.karl, "smug", blinkAt(t), [0, -0.3]);
+    const m = worldPos(C.karl.head); shot(st.camera, [m.x + 2.2, 2.6, 7.0], [m.x + 2.0, 2.6, 6.4], [m.x + 1.8, 2.3, 0], k, 0, 0.003, t);
+    ov.push(() => { const [x, y] = P(headTop(C.karl)); bar(x, y, "$11", GREEN, lt / 0.4);
+      const a = easeOut((lt - 0.2) / 0.5); g.globalAlpha = a; g.textAlign = "center"; g.textBaseline = "middle"; g.lineJoin = "round";
+      for (const [txt, yy, size, col] of [["WHAT IF YOU COULD SEE", 380, 96, "#ffffff"], ["EVERYONE'S", 500, 120, "#ffc23a"], ["BANK ACCOUNT?", 630, 120, "#ffffff"]]) {
+        g.font = `${size}px Anton`; g.lineWidth = size * 0.16; g.strokeStyle = "#141218"; g.strokeText(txt, 1240, yy); g.fillStyle = col; g.fillText(txt, 1240, yy); }
+      g.font = "44px Anton"; g.lineWidth = 8; g.strokeText("NEW VIDEO", 1240, 760); g.fillStyle = "#4fe08a"; g.fillText("NEW VIDEO", 1240, 760); g.globalAlpha = 1; });
+  }
+  st.renderer.render(st.scene, st.camera);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(st.renderer.domElement, 0, 0); for (const f of ov) f(); post(g, W, H, t, grade);
+  return O.toDataURL("image/jpeg", 0.9);
+};
+window.ready = true;
+</script></body></html>
