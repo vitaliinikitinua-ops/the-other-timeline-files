@@ -1,11 +1,12 @@
 import sys, os, math, subprocess, wave, unicodedata
 import numpy as np
 from PIL import Image, ImageDraw
-SP="/tmp/claude-0/-home-user-the-other-timeline-files/0bd9b492-2d39-5628-8b8e-071d69c7e472/scratchpad"
-sys.path.insert(0,SP+"/samples")
+import pathlib
+PBS=pathlib.Path(__file__).resolve().parents[2] if "videos" in __file__ else pathlib.Path(__file__).resolve().parent
+sys.path.insert(0,str(PBS/"lib"))
 import render as R
 from render import W,H,FPS,font,ctext,wrap,clamp,ease,back,prog,face,partial_line,circle_pts
-VOICE=SP+"/voice/uk_UA-ukrainian_tts-medium.onnx"
+VOICE=str(PBS/"voice/model/uk_UA-ukrainian_tts-medium.onnx")
 SPK=int(os.environ.get("SPK","1"))
 A="́"
 # (scene, caption text, tts text)

@@ -1,0 +1,6 @@
+voice/model/
+**/voicecache_*.npy
+**/seg*.wav
+**/mix.wav
+**/frame_*.png
+**/_*.png
