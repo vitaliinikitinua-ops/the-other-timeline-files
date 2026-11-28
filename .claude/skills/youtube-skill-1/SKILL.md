@@ -11,6 +11,14 @@ palette by k-means and the full narration transcript (`research/yt1/v1/transcrip
 measured from the video, not guessed. When more videos from this channel are analysed, add them as v2, v3... and
 mark which rules repeat (= channel formula) and which were one-offs.
 
+
+> **CORRECTION 28.11.2026 (full-res frame check, `research/yt1/close_sheet.jpg`):** the characters are NOT 2D vector
+> puppets. They are **3D models rendered with a toon/cel shader**: real perspective cameras, soft 2-tone shading on
+> hoodies and limbs, a light-grey inverted-hull OUTLINE around the black sphere heads, glossy specular dots, capsule
+> arms/legs with ball hands, depth-of-field blur on foreground heads, 3D crowds of instanced characters. Backgrounds are
+> simple 3D sets with flat painted textures. Reproduce with a 3D engine (three.js MeshToonMaterial + outline pass + DOF),
+> not with flat 2D canvas drawing. Wherever this file says "2D/flat vector", read "3D toon-shaded".
+
 ## 1. The formula in one paragraph
 A second-person story ("You throw the dodgeball...") about ONE ordinary kid who gets ONE exaggerated stat
 ("500 charisma" when "most people have about 10"). It starts mid-scene with a small everyday disaster, shows the

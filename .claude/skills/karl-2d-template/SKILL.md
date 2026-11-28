@@ -47,7 +47,10 @@ Title pattern: "What If You (Had/Got/Could) + number/power + everyday thing?" (q
 - Real numbers follow our YMYL rules (computed from data, one end date, "example" labels, not financial advice).
 - 1 long + 1-2 Shorts per video (see new-youtube-video standing rule).
 
-## 5. Visuals: new 2D engine in code (no AI for video frames)
+## 5. Visuals: engine in code (no AI for video frames)
+> CORRECTION 28.11.2026: the source channel is 3D toon-shaded (see youtube-skill-1). The first 2D canvas test
+> (`finance_series/engine2d/`) looked too flat and boxy to the user -> the engine must be 3D toon (three.js), pending
+> the user's confirmation.
 - Flat painted backgrounds with soft gradients, grain, vignette and bloom; muted creamy palette; saturated colour only
   for Karl, key props and effects. Colour grade per act: warm day, blue-purple night, cold/sepia sad, pink climax.
 - Shot ladder per scene: wide -> medium -> close-up -> insert (top-down desk/phone close-ups); over-the-shoulder with a
