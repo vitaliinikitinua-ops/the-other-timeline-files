@@ -4,3 +4,4 @@ voice/model/
 **/mix.wav
 **/frame_*.png
 **/_*.png
+**/run.log
