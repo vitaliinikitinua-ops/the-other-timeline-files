@@ -41,11 +41,12 @@ irony + drama, 3D rounded cast, fast edit, 8-10 min, Piper voice, no keyword CTA
 - Show the script to the user, apply edits, get an explicit "так/ок" before production.
 
 ## 5. Production -> QA -> package
-- 3D render (engine3d), VO (Piper), SFX, music, overlays; 2-4 Shorts cut from it; run episode-qa.
+- 3D render (engine3d), VO (Piper), SFX, music, overlays; 1-2 Shorts cut from it; run episode-qa.
 - Package for the user (publishes at 18:00): mp4, 3 thumbnails A/B/C, title, description (chapters, method, sources,
   not financial advice), tags, first comment, end-screen suggestion. Add Shorts to SHORTS_QUEUE.json.
 - Log the video in `finance_series/VIDEOS.md` (number, topic, viewer, problem, date, links). Commit + push.
 
 ## Standing user decisions (28.11.2026)
+- SHORTS PER VIDEO (user decision 28.11.2026): 1 long video + **1-2 Shorts**, never 3+. 2 Shorts only when the topic is broad and the long video has many strong hooks; otherwise 1. Shorts are SHORT (~20-40 s), one hook each, and always point to the full video (pinned comment/description link + "FULL VIDEO ON THE CHANNEL" end card).
 - MAIN HERO of every video = **Karl** (cast.js key `you`, name "Karl"). Narration and on-screen text call him Karl; the story is still told so the viewer sees themselves in him.
 - ROUND all money on screen and in the voice-over so it looks clean ($1,200, ~$390, ~$2,850, ~32 hours). Exact values stay in BRIEF.md / the description's method section.

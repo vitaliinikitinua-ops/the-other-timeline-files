@@ -280,6 +280,4 @@ SHORTS = [
      "segs": [("He pays each $50 payment", "And Karl pays the minimum"), ("At the minimum payment", "Karl paid more than full price")]},
     {"name": "guess", "head": ("\"ONLY $50\"...", "HOW MUCH DID HE SPEND?"),
      "segs": [("Then the headphones", "None of these feel big"), ("Remember your guess?", "Three times his list.")]},
-    {"name": "rules", "head": ("3 RULES BEFORE YOU", "CLICK \"PAY IN 4\""),
-     "segs": [("So three rules.", "If you need a second plan")]},
 ]

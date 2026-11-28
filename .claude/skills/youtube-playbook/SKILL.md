@@ -85,7 +85,7 @@ y 1906-1920 progress bar (amber), grows with time
 | ~85% | REVEAL the answer to the guess with a big moment | payoff |
 | last 90 s | Honest part, 3 practical rules, question for comments ("Did you guess right?") | trust + engagement |
 | last 15 s | End screen (next video + subscribe) | session time |
-- Our data says longs get 0-6 views without an audience **[data]**, but the user chose daily longs: so every long gets 2-4 Shorts cut from it (new styles), published in the Shorts slots, so viewers have a path to the long.
+- Our data says longs get 0-6 views without an audience **[data]**, but the user chose daily longs: so every long gets 1-2 Shorts cut from it (new styles), published in the Shorts slots, so viewers have a path to the long.
 
 ## 5. Titles and thumbnails
 - Title <= 55 characters, the hook in the first 40 (mobile truncation). Pattern: "What If You ...?" / "He ... and Had LESS Money" /
@@ -123,5 +123,6 @@ y 1906-1920 progress bar (amber), grows with time
 - YouTube only for now (user decision 27.11).
 
 ## Standing user decisions (28.11.2026)
+- SHORTS PER VIDEO (user decision 28.11.2026): 1 long video + **1-2 Shorts**, never 3+. 2 Shorts only when the topic is broad and the long video has many strong hooks; otherwise 1. Shorts are SHORT (~20-40 s), one hook each, and always point to the full video (pinned comment/description link + "FULL VIDEO ON THE CHANNEL" end card).
 - MAIN HERO of every video = **Karl** (cast.js key `you`, name "Karl"). Narration and on-screen text call him Karl; the story is still told so the viewer sees themselves in him.
 - ROUND all money on screen and in the voice-over so it looks clean ($1,200, ~$390, ~$2,850, ~32 hours). Exact values stay in BRIEF.md / the description's method section.

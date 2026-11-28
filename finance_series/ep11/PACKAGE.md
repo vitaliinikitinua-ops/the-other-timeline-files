@@ -57,7 +57,6 @@ Be honest: how many "pay in 4" plans do you have open right now? 0, 1, or "I'd h
 ## End screen (last 15 s, set in Studio)
 Left box: "What If You Only Paid the Minimum on Your Credit Card?" (EP03, same 21% card topic). Right box: best for viewer. Subscribe button in the centre-bottom.
 
-## Shorts from this video (queued for the automatic Shorts slots)
+## Shorts from this video (2: broad topic, many hooks; each links to the full video)
 1. `EP11_short_twist.mp4` — "-40% cost him MORE than full price" (twist + reveal)
 2. `EP11_short_guess.mp4` — "$50 x 24 = ?" (stacking + first real number)
-3. `EP11_short_rules.mp4` — "3 rules before you click Pay in 4"

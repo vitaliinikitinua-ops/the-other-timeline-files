@@ -8,7 +8,7 @@ description: Make educational personal-finance "What IF" videos (8-10 min 16:9 +
 Finance episodes of **The Other Timeline** (@theothertimeline-toti): "What IF You ...?" told as two or
 three timelines of the same person ("You"), or as a superpower story ("every NO pays $1"), always ending
 with real numbers. Everything is code: no ElevenLabs credits (user decision 27.11: Piper only), no image AI.
-Cadence (27.11): one NEW 8-10 min episode per day for the user to publish at 18:00 + 2-4 Shorts cut from it in the
+Cadence (27.11): one NEW 8-10 min episode per day for the user to publish at 18:00 + 1-2 Shorts cut from it in the
 current winning style (shorts_v2.py) for the automatic Shorts queue. Old EP04-EP10 longs are not published. Load with it:
 **other-timeline-studio** (look), **story-shorts-studio** (Short captions), **youtube-publisher** (upload),
 **episode-qa** (self-check before publishing), **youtube-playbook** (hooks, layout, titles, tests - read first).
@@ -124,5 +124,6 @@ shake), eye blinks. Do this before the next new episode and show the user a test
 - Never name an episode helper `numbers.py` (shadows the stdlib module and breaks PIL) -> `epNN_numbers.py`.
 
 ## Standing user decisions (28.11.2026)
+- SHORTS PER VIDEO (user decision 28.11.2026): 1 long video + **1-2 Shorts**, never 3+. 2 Shorts only when the topic is broad and the long video has many strong hooks; otherwise 1. Shorts are SHORT (~20-40 s), one hook each, and always point to the full video (pinned comment/description link + "FULL VIDEO ON THE CHANNEL" end card).
 - MAIN HERO of every video = **Karl** (cast.js key `you`, name "Karl"). Narration and on-screen text call him Karl; the story is still told so the viewer sees themselves in him.
 - ROUND all money on screen and in the voice-over so it looks clean ($1,200, ~$390, ~$2,850, ~32 hours). Exact values stay in BRIEF.md / the description's method section.
