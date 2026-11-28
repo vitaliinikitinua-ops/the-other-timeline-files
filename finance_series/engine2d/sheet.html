@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+import { drawChar, drawSet, post, loadFonts, CAST } from "./engine.js";
+await loadFonts();
+const cv = document.getElementById("c"), g = cv.getContext("2d");
+window.renderSheet = (page) => {
+  g.clearRect(0, 0, 1920, 1080);
+  if (page === 0) { // cast line-up on the street set
+    drawSet(g, "street");
+    const ids = ["karl", "karl_red", "mom", "dad", "mia", "grandma", "max", "lena"], emos = ["happy", "smug", "happy", "neutral", "laugh", "happy", "smug", "shy"];
+    const poses = ["wave", "idle", "idle", "hold", "cheer", "idle", "point", "idle"];
+    ids.forEach((id, i) => { const x = 140 + i * 235; drawChar(g, id, x, 900, 520, { pose: poses[i], emo: emos[i], t: 0.4 });
+      g.font = "34px Anton"; g.textAlign = "center"; g.lineWidth = 7; g.strokeStyle = "#141218"; g.strokeText(CAST[id].name, x, 970); g.fillStyle = "#fff"; g.fillText(CAST[id].name, x, 970); });
+    post(g, 1920, 1080, 0);
+  } else { // emotions of Karl on kitchen set
+    drawSet(g, "kitchen");
+    const emos = ["neutral", "happy", "laugh", "smug", "shock", "panic", "sad", "worried", "dazed", "angry"];
+    const poses = ["idle", "wave", "cheer", "point", "shock", "shock", "slump", "hold", "idle", "shrug"];
+    emos.forEach((e, i) => { const x = 90 + (i % 5) * 370, y = i < 5 ? 520 : 1040; drawChar(g, i === 4 || i === 9 ? "karl_red" : "karl", x + 100, y, 430, { pose: poses[i], emo: e, t: i, look: e === "dazed" ? [0, -1] : [0.5, 0] });
+      g.font = "32px Anton"; g.textAlign = "center"; g.lineWidth = 7; g.strokeStyle = "#141218"; g.strokeText(e.toUpperCase(), x + 100, y - 470); g.fillStyle = "#ffc23a"; g.fillText(e.toUpperCase(), x + 100, y - 470); });
+    post(g, 1920, 1080, 0);
+  }
+  return cv.toDataURL("image/jpeg", 0.92);
+};
+window.ready = true;
+</script></body></html>

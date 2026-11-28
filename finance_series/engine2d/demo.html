@@ -1,0 +1,48 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+// 10-second style test: "Every time someone says 'it's only...', your pocket prints the real price."
+import { drawChar, drawSet, post, loadFonts, camera, rings, glow, sparkles, receipt, pill, blinkAt, easeOut, pop } from "./engine.js";
+await loadFonts();
+const cv = document.getElementById("c"), g = cv.getContext("2d"), W = 1920, H = 1080;
+const T = await (await fetch("./test/demo_timing.json")).json().catch(() => null);
+const at = (i, d) => (T && T[i] !== undefined ? T[i] : d);   // VO line start times from demo.py
+function world(t, cast, set = "kitchen") { drawSet(g, set); const out = {}; for (const c of cast) out[c.id] = drawChar(g, c.who, c.x, c.y, c.h, { ...c, t, blink: blinkAt(t, c.x) }); return out; }
+window.renderAt = (t) => {
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
+  const s1 = at(1, 3.1), s2 = at(2, 6.0), s3 = at(3, 8.6);
+  let grade = null;
+  if (t < s1) {                       // SHOT 1: wide kitchen, Max: "It's only $5 a day!"
+    const k = t / s1; g.save(); camera(g, W, H, [960, 600], 1.0, 1.08, k);
+    const P = world(t, [{ id: "karl", who: "karl", x: 760, y: 900, h: 560, pose: "idle", emo: "neutral", look: [1, 0] },
+                        { id: "max", who: "max", x: 1180, y: 900, h: 560, pose: t > 0.4 ? "point" : "idle", pose2: "point", k: (t - 0.3) / 0.3, emo: "happy", flip: true, look: [-1, 0] }]);
+    pill(g, 1260, 330, "It's only $5 a day!", (t - 0.5) / 1.4, { tail: [-60] });
+    g.restore();
+  } else if (t < s2) {                // SHOT 2: close-up Karl - rings, glow, receipt prints from the pocket
+    const lt = t - s1, k = lt / (s2 - s1); g.save(); camera(g, W, H, [980, 560], 1.6, 1.72, k);
+    const P = world(t, [{ id: "karl", who: "karl", x: 820, y: 900, h: 560, pose: lt > 0.6 ? "shock" : "idle", pose2: "shock", k: (lt - 0.5) / 0.25, emo: lt > 0.6 ? "shock" : "neutral", look: [0, 1] }]);
+    const [px, py] = P.karl.pocket;
+    glow(g, px, py, 160 * easeOut(lt / 0.4), "70,230,210", 0.55);
+    rings(g, px, py, 0.15 + s1, t, "120,255,235", 3, 200);
+    sparkles(g, px, py - 20, 0.2 + s1, t, 5, 110);
+    if (lt > 0.5) receipt(g, px + 330, py + 60, [{ l: "\"ONLY\" $5 A DAY", size: 26, font: "Anton" }, { l: "x 365 DAYS", size: 30 }, { l: "= $1,825", size: 44, font: "Anton", col: "#e0344a" }, { l: "PER YEAR", size: 26 }], (lt - 0.5) / 1.1, { w: 280 });
+    g.restore(); grade = "rgba(80,220,200,0.18)";
+  } else if (t < s3) {                // SHOT 3: two-shot, Karl holds the receipt, Max shocked
+    const lt = t - s2, k = lt / (s3 - s2); g.save(); camera(g, W, H, [980, 560], 1.2, 1.28, k);
+    const P = world(t, [{ id: "karl", who: "karl", x: 700, y: 900, h: 560, pose: "point", emo: "smug", look: [1, 0] },
+                        { id: "max", who: "max", x: 1300, y: 900, h: 560, pose: "shock", emo: lt > 0.4 ? "panic" : "neutral", flip: true, look: [-1, 0.5] }]);
+    const [hx, hy] = P.karl.hands.R; receipt(g, 1000, 520, [{ l: "\"ONLY\" $5 A DAY", size: 26, font: "Anton" }, { l: "x 365 DAYS", size: 30 }, { l: "= $1,825", size: 44, font: "Anton", col: "#e0344a" }, { l: "PER YEAR", size: 26 }], 1, { w: 280, rot: 6 });
+    if (lt > 0.6) pill(g, 1380, 300, "...a YEAR?", (lt - 0.6) / 0.6, { tail: [-60] });
+    g.restore();
+  } else {                            // SHOT 4: wide, Mia laughs from the door, Max puts the phone down
+    const lt = t - s3, k = lt / (10 - s3); g.save(); camera(g, W, H, [960, 600], 1.05, 1.0, k);
+    world(t, [{ id: "karl", who: "karl", x: 700, y: 900, h: 560, pose: "shrug", emo: "happy" },
+              { id: "max", who: "max", x: 1120, y: 900, h: 560, pose: "slump", emo: "sad", flip: true },
+              { id: "mia", who: "mia", x: 1580, y: 920, h: 560, pose: "cheer", emo: "laugh", flip: true, hop: true }]);
+    g.restore();
+  }
+  post(g, W, H, t, grade);
+  return cv.toDataURL("image/jpeg", 0.9);
+};
+window.ready = true;
+</script></body></html>

@@ -1,0 +1,23 @@
+// node render2d.js sheet <out_dir>                 -> sheet_0.jpg, sheet_1.jpg
+// node render2d.js demo <out.mp4> <seconds> [fps] -> frames piped to ffmpeg (video only; audio muxed by demo.py)
+const { chromium } = require('playwright'); const fs = require('fs'); const path = require('path'); const { spawn } = require('child_process');
+(async () => {
+  const [mode, out, secs, fpsArg] = process.argv.slice(2);
+  const br = await chromium.launch(); const p = await br.newPage({ viewport: { width: 1920, height: 1080 } });
+  const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
+  const ROOT = path.join(__dirname, '..', '..'); const TYPES = { '.js': 'text/javascript', '.html': 'text/html', '.ttf': 'font/ttf', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg' };
+  await p.route('http://local/**', r => { const f = path.join(ROOT, decodeURIComponent(new URL(r.request().url()).pathname));
+    if (!f.startsWith(ROOT) || !fs.existsSync(f)) return r.fulfill({ status: 404, body: '' });
+    r.fulfill({ status: 200, contentType: TYPES[path.extname(f)] || 'application/octet-stream', body: fs.readFileSync(f) }); });
+  await p.goto(`http://local/finance_series/engine2d/${mode}.html`); await p.waitForFunction(() => window.ready, null, { timeout: 60000 });
+  const b64 = d => Buffer.from(d.split(',')[1], 'base64');
+  if (mode === 'sheet') { fs.mkdirSync(out, { recursive: true }); for (const i of [0, 1]) fs.writeFileSync(path.join(out, `sheet_${i}.jpg`), b64(await p.evaluate(i => window.renderSheet(i), i))); }
+  else {
+    const fps = +(fpsArg || 30), n = Math.round(+secs * fps);
+    const ff = spawn('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'image2pipe', '-c:v', 'mjpeg', '-framerate', String(fps), '-i', '-', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', out], { stdio: ['pipe', 'inherit', 'inherit'] });
+    for (let f = 0; f < n; f++) { const buf = b64(await p.evaluate(t => window.renderAt(t), f / fps)); if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r)); }
+    ff.stdin.end(); await new Promise(r => ff.on('close', r));
+  }
+  if (errs.length) console.log('page errors', JSON.stringify(errs.slice(0, 5)));
+  await br.close();
+})();
