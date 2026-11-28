@@ -41,7 +41,7 @@
 | 01 | Переказ мамі: де ховається комісія | final/video01_perekaz_mami.mp4 | готово; користувач хоче **переробити пізніше** |
 | 02 | 4 березня 2027: сім'ї з дітьми | final/video02_4bereznia_simia.mp4 | ✅ опубліковано |
 | 03 | Карта CUKR у MOS: 5 кроків | final/video03_cukr_mos_5krokiv.mp4 | готово, публікація вручну (статус уточнити) |
-| 04 | Profil Zaufany: черга чи диван | final/video04_profil_zaufany.mp4 | готово, подобається користувачу; **підготувати до TikTok** |
+| 04 | Profil Zaufany: черга чи диван | final/video04_profil_zaufany.mp4 | готово; завантажено в Higgsfield (media b95d3685…), prepare_publish зроблено 28.11; чекає ручної публікації (статус уточнити) |
 Сценарії, описи, хештеги, джерела — у `videos/NN_*/scenariy.md`.
 
 ## Контент-план (далі)
