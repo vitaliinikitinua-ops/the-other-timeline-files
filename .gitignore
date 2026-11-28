@@ -7,3 +7,4 @@ __pycache__/
 finance_series/*/build3d/
 research/yt1/*/frames/
 research/yt1/*/audio.wav
+research/yt1/*/clip.wav

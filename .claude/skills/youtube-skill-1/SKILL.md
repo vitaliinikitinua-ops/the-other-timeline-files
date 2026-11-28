@@ -155,6 +155,54 @@ such simple, repeatable visual signature and let it change meaning as the story 
 - Edit: new shot every 2-3 s (one sentence = one shot), 3-6 s holds only for emotion, colour grade per act.
 - Our YMYL rules still apply on top: real numbers from data, "example" labels, honest part, not financial advice.
 
-## 10. Open questions for the next analysed videos (fill in with v2, v3...)
-- Is the 2-psychology-facts rule constant? Is the mirror ending always used? Typical length 8-10 min?
-- Thumbnail style (not in the file) — ask the user for the thumbnails or screenshots of the channel page.
+## 10. Video v2: "What If You Got $1 Every Time Someone Lied to You?" (13:11, analysed 28.11.2026)
+All 791 frames viewed at 1 fps (`research/yt1/v2/sheets/`), cuts measured. NOTE: the file the user sent has a HEBREW
+dub; the transcript (`research/yt1/v2/transcript.txt`) is a rough Whisper translation, good enough for the plot only.
+- Story: cold open at an ice-cream stand (cone is $3, seller says something untrue -> a dollar bill pops out of the
+  hoodie pocket) -> premise line at 0:30 "Every time someone lies to you, you get a dollar" -> "At first, it's
+  amazing": mom's hidden cookies, little sister Cleo ("I didn't touch your tablet" = $1), best friend Wes, a dentist,
+  text messages ("On my way" / "Sorry, just saw this") -> escalation: scam calls ("SCAM LIKELY", "your computer has
+  a virus"), a real stat (Americans lost ~$16 BILLION to scams), used-car dealer "Honest Hank's", a political debate,
+  physics of cash (1 bill = 1 g, ~450 = 1 lb, a 20 LB duffel bag), the bank won't open an account for a kid -> the
+  closet fills with money, popularity is bought (everyone says "We always liked you") -> TURN: a tally notebook per
+  person (CLEO, MOM, WES; mom = 306 lies), a psychology fact about everyday lying, he starts to see why people lie ->
+  low point: friends exposed, mom crying alone on the stairs over bills, he secretly gives her money and it backfires
+  (police, she must explain) -> CLIMAX: a free party for 1,000 kids in the park, on stage he asks "Would you still be
+  here if it wasn't free?" -> 1,000 "yes" = 1,000 dollars at once (the money pours out on stage) -> aftermath: real
+  friends, Wes's honest answer, scam call ignored, phone face down -> ENDING mirrors the start (bedroom, sister,
+  "the best dollar you ever got") -> "So, would you want a dollar every time someone lies to you?"
+- The superpower's visual sign: pink glow + expanding ring on the hoodie POCKET, a bill peeks out (same "ring +
+  glow" grammar as v1's gold head halo, but placed where the money appears).
+- New devices: the TALLY NOTEBOOK (top-down insert, counts per person, a big circled total "306"); phone screens
+  full-frame (lock screen 6:40, group chat "what did everybody do this weekend? / Nothing / Stayed home"); white
+  speech-bubble pills over heads for short dialogue ("Love the shoes.", "Sick backpack.", "We always liked you.");
+  thought clouds; infographic inserts on plain cream background (grid of bills -> two piles -> "5%"; scale "1 g",
+  "450 = 1 LB", "20 LB"; balance scale money vs. a kid); aerial crowd of ~1,000 for the climax; TV-in-the-room shots.
+- Grades: neutral cream day scenes; night = blue-purple; sad = brown/sepia vignette (kitchen at night, stairs).
+- Edit: 220 shots in 791 s, mean 3.6 s, median 3.3 s (10% under 1.9 s); 20 cuts/min in the first minute, 14-18 in
+  the middle, 12 at the end. Slower than v1 (2.7 s) because the video is longer and talkier.
+- Subscribe pill animation (channel avatar + SUBSCRIBE -> SUBSCRIBED + bell) at 2:20-2:26 and 13:04-13:10.
+  No sponsor card in this one.
+
+## 11. Channel formula = confirmed in 2 of 2 videos (treat as rules)
+| Rule | v1 Charisma | v2 $1 per lie |
+|---|---|---|
+| Title "What If You (Had/Got) + number + everyday thing", a question | yes | yes |
+| Second person, present tense, deadpan narrator | yes | yes |
+| Cold-open mini-story proving the power before naming it, premise line at 0:30-0:45 | 0:44 | 0:30 |
+| Same cast language: black ball heads, two white eyes, stick limbs, hero in mustard hoodie | yes | yes |
+| Same world: house, kitchen, bedroom with basketball poster, school lockers, cafeteria, town | yes | yes |
+| One repeatable "power" effect: ring + glow + sparkles | head, gold | pocket, pink |
+| "At first, it's amazing" wins -> escalation up to national level | President | $16B, politicians |
+| 1-3 short real facts/stats ("Psychologists found...") | 2 | 2-3 |
+| Dark turn through family and best friend; mom crying alone | yes | yes |
+| Public climax in front of a huge crowd where the power is used against itself | 30,000 | 1,000 |
+| Mirror ending + callbacks, last line = "So would you want ...?" | yes | yes |
+| Almost no on-screen text; only diegetic text, UI bars, infographic labels | yes | yes |
+| Colour grade per mood (warm day, purple night, cold/sepia sad) | yes | yes |
+| Animated subscribe pill around 2:00-2:30 and at the end | yes | yes |
+Varies: length (9.5 vs 13 min), cut speed (2.7 vs 3.6 s), sponsor card (v1 only), counting device (UI bar vs notebook).
+
+## 12. Open questions for the next videos
+- Thumbnail style (not in the files): ask the user for thumbnails/channel-page screenshots.
+- Are the cold open + premise always before 0:45? Is the climax always a public speech?
