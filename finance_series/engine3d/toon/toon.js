@@ -34,7 +34,7 @@ export const CAST = {
 };
 
 // ---------------------------------------------------------------- face (painted on a front cap of the black sphere)
-function paintFace(ctx, emo, blink, look, c) {
+function paintFace(ctx, emo, blink, look, c, talk = 0) {
   const W = 512; ctx.clearRect(0, 0, W, W);
   const cx = 256, cy = 250, ex = 70, er = 62, lx = look[0] * 16, ly = look[1] * 12;
   const shocked = emo === "shock" || emo === "panic";
@@ -53,7 +53,9 @@ function paintFace(ctx, emo, blink, look, c) {
   if (["angry", "worried", "sad", "panic"].includes(emo)) { ctx.strokeStyle = "#fbfaf7"; ctx.lineWidth = 12; ctx.lineCap = "round";
     for (const s of [-1, 1]) { const tilt = emo === "angry" ? 18 : -18; ctx.beginPath(); ctx.moveTo(cx + s * ex - 40, cy - 92 + s * tilt); ctx.lineTo(cx + s * ex + 40, cy - 92 - s * tilt); ctx.stroke(); } }
   const my = cy + 120; ctx.lineCap = "round";
-  if (["happy", "laugh", "love"].includes(emo)) { ctx.beginPath(); ctx.moveTo(cx - 44, my - 8); ctx.quadraticCurveTo(cx, my + (emo === "laugh" ? 62 : 42), cx + 44, my - 8); ctx.closePath(); ctx.fillStyle = "#e85a6a"; ctx.fill(); }
+  if (talk > 0.15 && !["shock", "panic"].includes(emo)) { ctx.beginPath(); ctx.ellipse(cx, my + 4, 30, 8 + talk * 24, 0, 0, 7); ctx.fillStyle = "#e85a6a"; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx, my + 4 + talk * 10, 16, 5 + talk * 6, 0, 0, 7); ctx.fillStyle = "#b8334a"; ctx.fill(); }
+  else if (["happy", "laugh", "love"].includes(emo)) { ctx.beginPath(); ctx.moveTo(cx - 44, my - 8); ctx.quadraticCurveTo(cx, my + (emo === "laugh" ? 62 : 42), cx + 44, my - 8); ctx.closePath(); ctx.fillStyle = "#e85a6a"; ctx.fill(); }
   else if (["shock", "panic"].includes(emo)) { ctx.beginPath(); ctx.ellipse(cx, my + 10, 20, 28, 0, 0, 7); ctx.fillStyle = "#e85a6a"; ctx.fill(); }
   else if (["sad", "worried"].includes(emo)) { ctx.beginPath(); ctx.arc(cx, my + 34, 26, Math.PI * 1.15, Math.PI * 1.85); ctx.strokeStyle = "#fbfaf7"; ctx.lineWidth = 9; ctx.stroke(); }
   else if (emo === "smug") { ctx.beginPath(); ctx.moveTo(cx - 26, my); ctx.quadraticCurveTo(cx + 10, my + 18, cx + 40, my - 14); ctx.strokeStyle = "#fbfaf7"; ctx.lineWidth = 9; ctx.stroke(); }
@@ -62,9 +64,10 @@ function paintFace(ctx, emo, blink, look, c) {
   if (emo === "panic" || emo === "worried") { ctx.beginPath(); ctx.moveTo(cx + 175, cy - 90); ctx.quadraticCurveTo(cx + 205, cy - 30, cx + 175, cy - 15); ctx.quadraticCurveTo(cx + 145, cy - 30, cx + 175, cy - 90); ctx.fillStyle = "#8fd3ff"; ctx.fill(); }
   if (c.mustache) { ctx.fillStyle = "#e9e2d8"; ctx.beginPath(); ctx.ellipse(cx - 30, my - 34, 34, 13, 0.2, 0, 7); ctx.ellipse(cx + 30, my - 34, 34, 13, -0.2, 0, 7); ctx.fill(); }
 }
-export function setFace(ch, emo, blink = 1, look = [0, 0]) {
-  const key = emo + (blink > 0.5 ? "o" : "c") + look.join(","); if (key === ch.lastKey) return; ch.lastKey = key;
-  paintFace(ch.ctx, emo, blink, look, ch.spec); ch.tex.needsUpdate = true;
+export function setFace(ch, emo, blink = 1, look = [0, 0], talk = 0) {
+  talk = Math.round(talk * 3) / 3;
+  const key = emo + (blink > 0.5 ? "o" : "c") + look.map(v => (+v).toFixed(2)).join(",") + talk; if (key === ch.lastKey) return; ch.lastKey = key;
+  paintFace(ch.ctx, emo, blink, look, ch.spec, talk); ch.tex.needsUpdate = true;
 }
 
 // ---------------------------------------------------------------- character

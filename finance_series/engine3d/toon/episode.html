@@ -1,0 +1,339 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<script type="importmap">{"imports":{"three":"../../../games/junk-tycoon/vendor/three.module.js"}}</script></head><body>
+<canvas id="o" style="display:none"></canvas>
+<script type="module">
+// Generic toon episode player. ?tl=<timeline.json path from repo root>&w=1920&h=1080
+// timeline: {lines:[{start,end,t,v,s:{resolved state}}], dur, end_screen}
+import * as THREE from "three";
+import { makeChar, setFace, applyPose, blinkAt, makeStage, makeSet, worldPos, extraSpec } from "./toon.js";
+import { makeSet2, makeProp } from "./world.js";
+import { post, loadFonts, rings, glow, sparkles, receipt, pill, easeOut, ease, pop } from "../../engine2d/engine.js";
+await loadFonts("../../../ep2/fonts/");
+const Q = new URLSearchParams(location.search);
+const W = +(Q.get("w") || 1920), H = +(Q.get("h") || 1080), V = H > W, U = Math.min(W, H) / 1080;
+const st = makeStage(W, H); if (V) st.camera.fov = 58; st.camera.aspect = W / H; st.camera.updateProjectionMatrix();
+const O = document.getElementById("o"); O.width = W; O.height = H; const g = O.getContext("2d");
+const TL = await (await fetch("/" + Q.get("tl"))).json();
+const LINES = TL.lines;
+
+// ---------------------------------------------------------------- cast
+const NAMED = {
+  ortiz: { name: "Mr. Ortiz", top: 0x6a7f6a, pants: 0x4a4458, hair: "short", hairColor: 0x9a9aa4, mustache: true, scale: 1.04, collar: true },
+  senior: { name: "Senior", top: 0x9a6edc, pants: 0x2c2c3c, hair: "short", hairColor: 0x2a1a12, scale: 1.08, strings: true },
+  watch: { name: "Gold watch guy", top: 0x26222e, pants: 0x2c2c3c, hair: "short", hairColor: 0x2a1a12, scale: 1.08, collar: true },
+  bagwoman: { name: "Bag woman", top: 0xe86a9a, pants: 0x384a6b, hair: "long", hairColor: 0xc8843a, lashes: true },
+  suitman: { name: "Suit man", top: 0x3a4458, pants: 0x3a4458, hair: "short", hairColor: 0x5a3e26, collar: true, scale: 1.06 },
+  guru: { name: "Millionaire Mindset", top: 0xffc23a, pants: 0x26222e, hair: "short", hairColor: 0x1a1a1a, collar: true, glasses: true, scale: 1.05 },
+  sales: { name: "Salesman", top: 0x8a8fa0, pants: 0x8a8fa0, hair: "short", hairColor: 0x1a1a1a, collar: true, mustache: true, scale: 1.06 },
+  principal: { name: "Principal", top: 0x8a6a4a, pants: 0x4a4458, hair: "bun", hairColor: 0x7a7a84, glasses: true, cardigan: true, lashes: true },
+};
+const C = {};
+function getChar(id) {
+  if (C[id]) return C[id];
+  let spec = id;
+  if (NAMED[id]) spec = NAMED[id]; else if (/^e\d+$/.test(id)) spec = extraSpec(+id.slice(1) + 3);
+  const ch = makeChar(spec); st.scene.add(ch.root); ch.root.visible = false; return (C[id] = ch);
+}
+const EX = []; for (let i = 0; i < 48; i++) { const e = makeChar(extraSpec(i + 20)); e.root.visible = false; st.scene.add(e.root); EX.push(e); }
+for (const ln of LINES) for (const id in ln.s.chars || {}) getChar(id);
+getChar("karl");
+
+// ---------------------------------------------------------------- sets
+const SETS = {};
+for (const n of ["kitchen", "cafeteria", "gym", "void"]) SETS[n] = makeSet(st.scene, n);
+for (const n of ["street", "mall", "hallway", "classroom", "dealer", "hall", "behindgym", "tv", "bus"]) SETS[n] = makeSet2(st.scene, n);
+const ANCHOR = { "@car": [3.2, 2.9, -2.2], "@box": [-3.0, 1.0, 4.6], "@board": [-1.5, 4.9, -4.8], "@crowd": [0, 3.4, -1] };
+const WIDE = {
+  cafeteria: [[0, 3.6, 13.5], [0, 2.0, -0.5]], kitchen: [[-0.4, 3.2, 10.5], [0.2, 1.9, 0]], street: [[0, 3.0, 12.5], [0.5, 2.0, -1]],
+  mall: [[0, 3.4, 13.5], [0, 2.2, -1]], hallway: [[0, 3.0, 11.5], [0, 2.0, -1]], classroom: [[-0.5, 4.2, 11.0], [0, 1.6, -1.0]],
+  dealer: [[0, 3.6, 12], [0, 1.8, -1]], hall: [[1.5, 3.0, 8.5], [0, 1.8, -1]], behindgym: [[0, 2.8, 10], [0, 1.9, -0.5]],
+  tv: [[0, 3.0, 11], [0, 2.4, -1]], bus: [[0, 3.0, 13], [0, 2.0, -2]], gym: [[0.5, 4.2, 14], [0, 2.4, -2]], void: [[0, 2.6, 9], [0, 2.0, 0]],
+};
+const CROWDCAM = {
+  cafeteria: [[0, 5.2, 10.5], [0, 1.6, -1.5]], mall: [[0, 6.0, 12], [0, 1.4, -2]], classroom: [[0.5, 5.2, 9.5], [0, 1.2, -1.0]],
+  dealer: [[0, 5.0, 11], [0, 1.6, -1.5]], hallway: [[0, 5.0, 10], [0, 1.6, 0]], gym: [[0, 4.6, 3.0], [0, 2.4, -8]], bus: [[0, 4.0, 11], [0, 1.6, 0]],
+};
+// ---------------------------------------------------------------- crowds
+const rnd = (i, k) => (((i + 1) * 9301 + k * 49297) % 233280) / 233280;
+function crowdSpots(name) {
+  const S = [];
+  if (name === "cafe") { for (let i = 0; i < 6; i++) S.push([-6.5 + i * 2.6, -3.0, 0.1 * (i % 3 - 1), i % 3 ? "idle" : "shrug"]); for (let i = 0; i < 4; i++) S.push([-7.5 + i * 5, -4.3, 0, "idle"]); }
+  if (name === "mall") for (let i = 0; i < 14; i++) S.push([-10 + i * 1.5 + rnd(i, 1), -3.6 + (i % 3) * 1.4, (rnd(i, 2) - 0.5) * 1.6, i % 4 === 0 ? "walk" : "idle"]);
+  if (name === "class") { const desks = []; for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) desks.push([-4.5 + c * 2.6, -2.2 + r * 2.2 + 0.7]);
+    desks.forEach(([x, z]) => S.push([x, z - 1.4, 0, "sit"])); }
+  if (name === "hall") for (let i = 0; i < 10; i++) S.push([-8 + i * 1.8, -1.4 + (i % 2) * 0.8, (rnd(i, 3) - 0.5) * 2, i % 3 === 0 ? "walk" : "idle"]);
+  if (name === "dealer") for (let i = 0; i < 6; i++) S.push([-6 + i * 2.4, -0.4 + (i % 2) * 1.6, (rnd(i, 4) - 0.5), "idle"]);
+  if (name === "gym") for (let j = 0; j < 48; j++) { const r = Math.floor(j / 12), c = j % 12; S.push([-8.8 + c * 1.6 + (r % 2) * 0.8, -5.6 - r * 1.4, 0, "idle", 0.5 + r * 0.5]); }
+  if (name === "bus") for (let i = 0; i < 12; i++) S.push([-6 + i * 1.1, -1.2 + (i % 2) * 0.6, 0, "cheer"]);
+  return S;
+}
+const BALS = ["$84", "$1,240", "-$2,300", "$12", "$37,900", "-$640", "$3", "$215", "$9", "-$18,000", "$560", "$41", "$7,300", "$150", "-$90", "$22", "$310", "$2,050"];
+const SMALL = ["$12", "$3", "$41", "$0", "$9", "-$60", "$27", "$150", "$5", "$68", "$1,240", "$19"];
+const TAGS = ["RICH", "FAKE", "BROKE", "FINE"];
+function crowdBar(mode, j, lt) {
+  if (mode === true) { const v = BALS[j % BALS.length]; return [v, v.startsWith("-") ? RED : GREEN]; }
+  if (mode === "small") { const v = SMALL[j % SMALL.length]; return [v, v.startsWith("-") || v === "$0" ? RED : GREEN]; }
+  if (mode === "fourten") { const red = [0, 3, 5, 8].includes(j % 10); return [red ? ["$40", "$12", "-$90", "$150"][j % 4] : ["$2,300", "$900", "$5,400", "$610"][j % 4], red ? RED : GREEN]; }
+  if (mode === "half") { const red = j % 2 === 0; return [red ? ["$62", "$12", "-$90", "$150", "$7"][j % 5] : ["$2,300", "$480", "$5,400", "$910"][j % 4], red ? RED : GREEN]; }
+  if (mode === "tags") { const v = TAGS[j % 4]; return [v, v === "RICH" ? GREEN : v === "FINE" ? "#f6f1e7" : RED]; }
+  if (mode === "rise") { const base = BALS[j % BALS.length]; const neg = base.startsWith("-") || j % 3 === 0; if (!neg) return [base, GREEN];
+    const v = Math.round(-400 + Math.min(1, lt / 2.5) * (460 + (j % 5) * 40)); return [(v < 0 ? "-$" : "$") + Math.abs(v), v < 0 ? RED : GREEN]; }
+  return null;
+}
+// ---------------------------------------------------------------- props pool
+const PROPS = {};
+function getProp(p) { const key = JSON.stringify(p); if (!PROPS[key]) { const m = makeProp(p[0], p[5] || {}); m.visible = false; st.scene.add(m); PROPS[key] = m; } return PROPS[key]; }
+
+// ---------------------------------------------------------------- helpers
+const GREEN = "#4fe08a", RED = "#ff5a6a";
+const P = (v) => { const p = v.clone().project(st.camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H, p.z < 1]; };
+const headTop = (ch) => worldPos(ch.head).add(new THREE.Vector3(0, 1.12 * (ch.spec.scale || 1), 0));
+function bar(x, y, text, col, k, flash = 0, scale = 1) {
+  const a = pop(k) * scale * U; if (a <= 0.01) return; g.save(); g.translate(x, y); g.scale(a, a);
+  g.font = "44px Anton"; const w = g.measureText(text).width + 56;
+  g.fillStyle = "rgba(20,18,30,0.88)"; g.beginPath(); g.roundRect(-w / 2, -32, w, 64, 32); g.fill();
+  g.lineWidth = 4; g.strokeStyle = flash ? `rgba(255,77,94,${0.5 + 0.5 * Math.sin(flash * 18)})` : "rgba(255,255,255,0.25)"; g.stroke();
+  g.fillStyle = col; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, 0, 3); g.restore();
+}
+const parseMoney = (s) => { const m = /^(-?)\$([\d,]+)(.*)$/.exec(s); return m ? { sign: m[1] ? -1 : 1, v: +m[2].replace(/,/g, ""), tail: m[3] } : null; };
+const fmt = (v, tail = "") => (v < 0 ? "-$" : "$") + Math.abs(Math.round(v)).toLocaleString("en-US") + tail;
+function barValue(spec, lt) {   // "v" | [from, to] | [v, "flash"] | [from, to, "flash"]
+  if (spec == null) return null; if (typeof spec === "string") return { text: spec, flash: 0 };
+  const flash = spec.includes("flash") ? lt + 0.01 : 0; const vals = spec.filter(x => x !== "flash");
+  if (vals.length === 1) return { text: vals[0], flash };
+  const a = parseMoney(vals[0]), b = parseMoney(vals[1]); if (!a || !b) return { text: vals[1], flash };
+  const k = ease(Math.min(1, Math.max(0, (lt - 0.4) / 1.6))); return { text: fmt(a.sign * a.v + (b.sign * b.v - a.sign * a.v) * k, b.tail), flash };
+}
+const GRADES = { warm: "rgba(255,190,120,0.30)", day: "rgba(255,230,190,0.18)", night: "rgba(60,60,160,0.45)", dusk: "rgba(170,90,140,0.30)",
+  cold: "rgba(90,130,170,0.42)", neon: "rgba(160,60,220,0.30)", pink: "rgba(255,120,170,0.32)" };
+const BGS = { night: 0x2a2848, cold: 0xcfd6dc, neon: 0x2a2148 };
+function sub3(a, b) { return new THREE.Vector3().subVectors(a, b); }
+function fwd(ch) { const r = ch.root.rotation.y; return new THREE.Vector3(Math.sin(r), 0, Math.cos(r)); }
+
+function camFor(spec, s, k) {
+  let parts = (spec || "wide").split(":"); if (parts[0] === "ots") parts = ["med", parts[2], parts[1] === "karl" ? "l" : "r"]; if (parts[0] === "mirror") parts = ["cu", "karl", "r"]; const kind = parts[0];
+  const sideOf = (ch) => { const f = fwd(ch); return new THREE.Vector3(f.z, 0, -f.x); };
+  const so = parts.includes("l") ? -0.9 : parts.includes("r") ? 0.9 : 0.35;
+  let pos, look;
+  if (kind === "cu" || kind === "med" || kind === "low") {
+    const ch = C[parts[1]] || C.karl; const h = worldPos(ch.head), sd = sideOf(ch); let f = fwd(ch);
+    const wc = WIDE[s.set] || WIDE.void, axis = new THREE.Vector3(wc[0][0] - wc[1][0], 0, wc[0][2] - wc[1][2]).normalize();
+    if (f.dot(axis) > -0.3) f = f.clone().add(axis.multiplyScalar(0.9)).normalize();
+    const S = ch.spec.scale || 1;
+    if (kind === "cu") { pos = h.clone().addScaledVector(f, 5.4 * S).addScaledVector(sd, so * 1.3).add(new THREE.Vector3(0, 0.35, 0)); look = h.clone().add(new THREE.Vector3(0, 0.35, 0)); }
+    if (kind === "med") { pos = h.clone().addScaledVector(f, 8.6 * S).addScaledVector(sd, so * 2).add(new THREE.Vector3(0, 0.1, 0)); look = h.clone().add(new THREE.Vector3(0, -0.35, 0)); }
+    if (kind === "low") { pos = h.clone().addScaledVector(f, 4.6).addScaledVector(sd, 0.5); pos.y = 0.9; look = h.clone().add(new THREE.Vector3(0, 0.5, 0)); }
+  } else if (kind === "two" || kind === "ots") {
+    const a = C[parts[1]], b = C[parts[2]]; const ha = worldPos(a.head), hb = worldPos(b.head);
+    if (kind === "two") { const m = ha.clone().add(hb).multiplyScalar(0.5); let dir = fwd(a).add(fwd(b)); if (dir.length() < 0.3) dir = new THREE.Vector3(0, 0, 1); dir.normalize();
+      const d = ha.distanceTo(hb); pos = m.clone().addScaledVector(dir, 7.4 + d * 1.35).add(new THREE.Vector3(0, 0.7, 0)); look = m.clone().add(new THREE.Vector3(0, -0.2, 0)); }
+    else { const ab = sub3(ha, hb).setY(0).normalize(); const perp = new THREE.Vector3(ab.z, 0, -ab.x);
+      const dd = ha.distanceTo(hb); pos = hb.clone().addScaledVector(ab, dd + 4.2).addScaledVector(perp, 2.4).add(new THREE.Vector3(0, 0.6, 0)); look = hb.clone().add(new THREE.Vector3(0, 0.1, 0)).addScaledVector(perp, 0.6); }
+  } else if (kind === "crowd") { const c = CROWDCAM[s.set] || WIDE[s.set]; pos = new THREE.Vector3(...c[0]); look = new THREE.Vector3(...c[1]); }
+  else if (kind === "stage") { pos = new THREE.Vector3(1.6, 7.0, -17.0); look = new THREE.Vector3(0, 2.3, 5.5); }
+  else if (kind === "box") { pos = new THREE.Vector3(-1.6, 2.5, 9.6); look = new THREE.Vector3(-3.0, 1.4, 4.0); }
+  else if (kind === "carbar") { pos = new THREE.Vector3(0.6, 2.8, 6.5); look = new THREE.Vector3(2.4, 1.8, -2.2); }
+  else if (kind === "door") { pos = new THREE.Vector3(0.2, 2.0, 4.0); look = new THREE.Vector3(3.2, 1.8, -3.9); }
+  else if (kind === "jar") { pos = new THREE.Vector3(2.0, 2.6, 2.4); look = new THREE.Vector3(1.2, 1.6, -1.2); }
+  else if (kind === "mirror") { const ch = C.karl, h = worldPos(ch.head); pos = h.clone().add(new THREE.Vector3(3.6, 0.3, 0.6)); look = h.clone().add(new THREE.Vector3(0, 0.2, 0)); }
+  else if (kind === "phone") { pos = new THREE.Vector3(0, 2.2, 3.4); look = new THREE.Vector3(0, 2.0, 1.3); }
+  else { const c = WIDE[s.set] || WIDE.void; pos = new THREE.Vector3(...c[0]); look = new THREE.Vector3(...c[1]); }
+  if (V) { const back = sub3(pos, look); pos = look.clone().addScaledVector(back, kind === "cu" ? 0.95 : kind === "crowd" || kind === "wide" ? 1.1 : 1.0); }
+  // slow push-in over the line
+  const start = look.clone().addScaledVector(sub3(pos, look), 1.08);
+  return { pos: start.lerp(pos, ease(Math.min(1, k * 1.1))), look };
+}
+
+// ---------------------------------------------------------------- 2D cards
+const FONT = (px, f = "Anton") => `${Math.round(px * U)}px ${f}`;
+function panel(a, x = W / 2, y = V ? H / 2 + 90 : H / 2, w = V ? W * 0.88 : W * 0.78, h = V ? H * 0.6 : H * 0.72) {
+  g.save(); g.globalAlpha = a; g.fillStyle = "rgba(18,14,30,0.55)"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#fbf6ea"; g.shadowColor = "rgba(0,0,0,0.35)"; g.shadowBlur = 40 * U; g.beginPath(); g.roundRect(x - w / 2, y - h / 2, w, h, 36 * U); g.fill(); g.restore();
+}
+function txt(s, x, y, px, col = "#1e1b26", f = "Anton", align = "center") { g.font = FONT(px, f); g.fillStyle = col; g.textAlign = align; g.textBaseline = "middle"; g.fillText(s, x, y); }
+function src(s, a) { g.save(); g.globalAlpha = a * 0.85; txt("Source: " + s, W / 2, H / 2 + (V ? 600 : 330) * U, V ? 17 : 26, "#5a5466", "Mont"); g.restore(); }
+function person(x, y, s, col) { g.fillStyle = col; g.beginPath(); g.arc(x, y - 44 * s, 26 * s, 0, 7); g.fill(); g.beginPath(); g.roundRect(x - 30 * s, y - 14 * s, 60 * s, 70 * s, 22 * s); g.fill(); }
+function card(c, lt, ln) {
+  const a = Math.min(1, lt / 0.25); const cx = W / 2, cy = H / 2;
+  if (c.k === "sub") { const k = easeOut((lt - 0.2) / 0.5); g.save(); g.globalAlpha = Math.min(1, k * 1.5);
+    const bx = cx, by = H * (V ? 0.7 : 0.78), bw = 420 * U, bh = 100 * U; const clicked = lt > 1.6;
+    g.fillStyle = clicked ? "#8a8794" : "#e0344a"; g.beginPath(); g.roundRect(bx - bw / 2, by - bh / 2, bw, bh, bh / 2); g.fill();
+    txt(clicked ? "SUBSCRIBED" : "SUBSCRIBE", bx, by + 3 * U, 50, "#fff");
+    const cur = Math.min(1, Math.max(0, (lt - 0.8) / 0.8)); const mx = bx + 380 * U * (1 - ease(cur)) + 60 * U, my = by + 200 * U * (1 - ease(cur)) + 20 * U;
+    g.fillStyle = "#fff"; g.strokeStyle = "#1e1b26"; g.lineWidth = 4 * U; g.beginPath(); g.moveTo(mx, my); g.lineTo(mx, my + 54 * U); g.lineTo(mx + 14 * U, my + 40 * U); g.lineTo(mx + 36 * U, my + 40 * U); g.closePath(); g.fill(); g.stroke();
+    if (clicked) rings(g, bx, by, ln.start + 1.6, ln.start + lt, "255,255,255", 2, 200 * U); g.restore(); return; }
+  if (c.k === "notebook") { panel(a); const n = c.n; const x0 = cx - W * 0.3, x1 = cx + (V ? 40 : 60) * U, top = cy - H * 0.26;
+    txt("LOOKS RICH", x0 + 160 * U, top, 64); txt("IS RICH", x1 + 160 * U, top, 64);
+    g.strokeStyle = "#c9c1b0"; g.lineWidth = 3 * U; for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(cx - W * 0.36, top + 60 * U + i * 52 * U); g.lineTo(cx + W * 0.36, top + 60 * U + i * 52 * U); g.stroke(); }
+    const MATCH = [0, 0, 1, 0, 0, 0, 1, 0];
+    for (let i = 0; i < n; i++) { const ap = ease(Math.min(1, (lt - 0.2 - i * 0.18) / 0.3)); if (ap <= 0) continue; g.globalAlpha = ap; const y = top + 86 * U + i * 52 * U;
+      txt("✓", x0 + 160 * U, y, 44, "#1e1b26", "Mont"); txt(MATCH[i] ? "✓" : "✗", x1 + 160 * U, y, 44, MATCH[i] ? "#2fa860" : "#e0344a", "Mont"); g.globalAlpha = 1; }
+    return; }
+  if (c.k === "stat" || c.k === "people") { panel(a);
+    if (c.k === "people") { const n = c.n, red = c.red, sp = (V ? 90 : 120) * U; for (let i = 0; i < n; i++) { const ap = ease(Math.min(1, (lt - i * 0.06) / 0.3));
+        g.save(); g.globalAlpha = ap; person(cx + (i - (n - 1) / 2) * sp, cy - 110 * U, (V ? 1.1 : 1.4) * U, i < red && lt > 0.9 ? "#e0344a" : "#8a8794"); g.restore(); } }
+    c.lines.forEach((l, i) => { const ap = easeOut((lt - 0.3 - i * 0.35) / 0.4); g.save(); g.globalAlpha = ap;
+      const y = c.k === "people" ? cy + 70 * U + i * 100 * U : cy - 80 * U + i * 140 * U; txt(l, cx, y, i === 0 ? (c.k === "people" ? 110 : 96) : 62, i === 0 ? "#e0344a" : "#1e1b26"); g.restore(); });
+    src(c.src, a); return; }
+  if (c.k === "bars") { panel(a); const base = cy + H * 0.17, maxH = H * (V ? 0.29 : 0.36), bw = (V ? 220 : 260) * U;
+    const xs = [cx - (V ? 170 : 260) * U, cx + (V ? 170 : 260) * U];
+    const vals = [1.06, 0.193], labels = ["AVERAGE", "MIDDLE"], money = ["~$1.06M", "~$193K"], cols = ["#9a6edc", "#2ec4b6"];
+    for (let i = 0; i < 2; i++) { if (c.show < i + 1) continue; const lt2 = i === 1 && c.show === 2 ? lt : 9; const k = ease(Math.min(1, (c.show === i + 1 ? lt : 9) / 0.9));
+      const h = maxH * vals[i] / 1.06 * k; g.fillStyle = cols[i]; g.beginPath(); g.roundRect(xs[i] - bw / 2, base - h, bw, h, 14 * U); g.fill();
+      txt(money[i], xs[i], base - h - 50 * U, 72, "#1e1b26"); txt(labels[i], xs[i], base + 50 * U, 50, "#5a5466"); }
+    txt("NET WORTH OF A US FAMILY", cx, V ? cy - H * 0.225 : cy - H * 0.3, V ? 46 : 54, "#1e1b26");
+    if (c.show >= 3) { const k = easeOut(lt / 0.5); g.save(); g.globalAlpha = k; for (let i = 0; i < 3; i++) { const bx = xs[0] + (i - 1) * 70 * U, by = cy - H * 0.2 + (i % 2) * 30 * U;
+        g.fillStyle = "#ffc23a"; g.beginPath(); g.roundRect(bx - 30 * U, by - 20 * U, 60 * U, 40 * U, 10 * U); g.fill(); txt("$$$", bx, by + 2 * U, 26, "#2a1a12"); }
+      txt("A FEW GIANT NUMBERS", xs[0], cy - H * 0.27, 38, "#b8860b"); g.restore(); }
+    src("Federal Reserve, Survey of Consumer Finances 2022 (mean $1,063,700, median $192,900)", a); return; }
+  if (c.k === "lottery") { panel(a); const n = 5, sp = (V ? 170 : 250) * U, y = cy - 20 * U;
+    for (let i = 0; i < n; i++) { const x = cx + (i - 2) * sp, win = i === 2; const hc = win ? "#ffc23a" : c.step >= 2 ? "#e0344a" : "#8fb3d9";
+      if (win && c.step >= 1) glow(g, x, y, 170 * U * easeOut(lt / 0.6), "255,210,90", 0.6);
+      g.fillStyle = hc; g.beginPath(); g.moveTo(x - 80 * U, y); g.lineTo(x, y - 80 * U); g.lineTo(x + 80 * U, y); g.closePath(); g.fill(); g.fillRect(x - 65 * U, y, 130 * U, 110 * U);
+      g.fillStyle = "#fbf6ea"; g.fillRect(x - 20 * U, y + 45 * U, 40 * U, 65 * U);
+      if (win) txt("JACKPOT", x, y - 130 * U, 40, "#b8860b");
+      if (!win && c.step >= 2) { const k = ease(Math.min(1, lt / 0.6)); g.save(); g.globalAlpha = k; g.fillStyle = "#e0344a"; g.beginPath(); g.moveTo(x, y - 160 * U); g.lineTo(x - 26 * U, y - 120 * U); g.lineTo(x + 26 * U, y - 120 * U); g.fill(); g.fillRect(x - 9 * U, y - 122 * U, 18 * U, 30 * U); g.restore(); } }
+    if (c.step >= 2) txt("NEIGHBORS: MORE BANKRUPTCIES", cx, cy + 190 * U, V ? 46 : 64, "#e0344a");
+    if (c.step >= 3) txt("THEY JUST TRIED TO KEEP UP", cx, cy + 290 * U, V ? 40 : 54, "#1e1b26");
+    if (c.step === 1) txt("YOUR NEIGHBOR WINS THE LOTTERY", cx, cy + 190 * U, V ? 46 : 64, "#1e1b26");
+    src("Agarwal, Mikhed & Scholnick, Philadelphia Fed / Review of Financial Studies (2020)", a); return; }
+  if (c.k === "feed") { g.save(); g.globalAlpha = a; g.fillStyle = "#1a1726"; g.fillRect(0, 0, W, H);
+    const pw = (V ? 760 : 560) * U, ph = (V ? 1500 : 980) * U; g.fillStyle = "#0e0c14"; g.beginPath(); g.roundRect(cx - pw / 2, cy - ph / 2, pw, ph, 50 * U); g.fill();
+    g.fillStyle = "#f6f1e7"; g.beginPath(); g.roundRect(cx - pw / 2 + 18 * U, cy - ph / 2 + 18 * U, pw - 36 * U, ph - 36 * U, 36 * U); g.fill();
+    g.save(); g.beginPath(); g.rect(cx - pw / 2 + 18 * U, cy - ph / 2 + 18 * U, pw - 36 * U, ph - 36 * U); g.clip();
+    const scroll = lt * 160 * U; const posts = [["NEW CAR!!", "#ff6b5b"], ["MALDIVES", "#38c6b4"], ["DRIP CHECK", "#9a6edc"], ["YACHT DAY", "#4a7fc1"], ["NEW WATCH", "#f2b84b"], ["PENTHOUSE", "#e86a9a"]];
+    posts.forEach(([t2, col], i) => { const y = cy - ph / 2 + 60 * U + i * 330 * U - scroll; g.fillStyle = col; g.beginPath(); g.roundRect(cx - pw / 2 + 50 * U, y, pw - 100 * U, 250 * U, 24 * U); g.fill();
+      txt(t2, cx, y + 125 * U, 58, "#fff"); txt("♥ 12.4K", cx - pw / 2 + 120 * U, y + 220 * U, 26, "#fff", "Mont"); });
+    g.restore(); txt("ONLINE, EVERYONE IS RICH", cx, H * (V ? 0.08 : 0.08), V ? 56 : 64, "#ffc23a"); g.restore(); return; }
+  if (c.k === "rule") { panel(a); txt("THE ONE RULE", cx, cy - H * 0.24, 54, "#9a6edc");
+    const k1 = easeOut((lt - 0.3) / 0.5), k2 = easeOut((lt - 2.2) / 0.5);
+    g.save(); g.globalAlpha = k1; txt(V ? "DON'T COMPARE YOUR INSIDE" : "DON'T COMPARE YOUR INSIDE", cx, cy - 70 * U, V ? 56 : 76); txt("TO SOMEONE ELSE'S OUTSIDE.", cx, cy + 20 * U, V ? 56 : 76); g.restore();
+    g.save(); g.globalAlpha = k2; txt("COMPARE THIS MONTH TO LAST MONTH.", cx, cy + 150 * U, V ? 46 : 64, "#2fa860"); g.restore(); return; }
+}
+
+// ---------------------------------------------------------------- main
+function lineAt(t) { let lo = 0, hi = LINES.length - 1; if (t < LINES[0].start) return 0; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (LINES[m].start <= t) lo = m; else hi = m - 1; } return lo; }
+const VOICE2CHAR = { karl: "karl", max: "max", mia: "mia", mom: "mom", dad: "dad", grandma: "grandma", lena: "lena", sales: "sales", guru: "guru", ortiz: "ortiz", principal: "principal" };
+
+window.renderAt = (t, opts = {}) => {
+  const endScreen = t >= TL.speech_end;
+  const i = endScreen ? LINES.length - 1 : lineAt(t); const ln = LINES[i]; const s = ln.s;
+  const lt = endScreen ? t - ln.start : t - ln.start, dur = Math.max(0.5, ln.end - ln.start), k = lt / dur;
+  for (const n in SETS) SETS[n].visible = n === s.set;
+  st.scene.background.set(BGS[s.grade] || (s.set === "void" ? 0x2a2448 : s.set === "tv" ? 0x2a2148 : 0xe9dcc9));
+  for (const id in C) C[id].root.visible = false; EX.forEach(e => e.root.visible = false); for (const key in PROPS) PROPS[key].visible = false;
+  const talker = ln.v !== "n" && !endScreen ? VOICE2CHAR[ln.v] : null;
+  // characters
+  for (const [id, c] of Object.entries(s.chars || {})) {
+    const ch = getChar(id); ch.root.visible = true; let x = c.x, z = c.z, ry = c.ry, walking = false;
+    if (c.walk) { const from = c.from || [c.x0 ?? c.x, c.z0 ?? c.z]; const kk = Math.min(1, Math.max(0, (lt - 0.1) / Math.max(0.8, dur - 0.3)));
+      x = from[0] + (c.walk[0] - from[0]) * kk; z = from[1] + (c.walk[1] - from[1]) * kk; walking = kk < 1; if (walking) ry = Math.atan2(c.walk[0] - from[0], c.walk[1] - from[1]); }
+    let y = c.y || 0; if (s.set === "gym" && z > 4.4 && Math.abs(x) < 2.05) y = 0.5;
+    ch.root.position.set(x, y, z); ch.root.rotation.y = ry;
+    const seed = id.length * 1.7; const pose = c.pose || "idle";
+    if (pose.includes(">")) { const [a, b] = pose.split(">"); applyPose(ch, { from: a, to: b, t0: ln.start + 0.3, dur: 0.25 }, t, { seed, walk: walking }); }
+    else applyPose(ch, pose, t, { seed, walk: walking, hop: (s.fx || []).includes("nod:" + id) ? 0 : 0 });
+    if ((s.fx || []).includes("nod:" + id)) ch.head.rotation.x += Math.max(0, Math.sin(lt * 7)) * 0.25;
+    if (s.crowdpose === "laugh" && false) {}
+    const talk = talker === id ? Math.abs(Math.sin(t * 13 + Math.sin(t * 5.3) * 2)) : 0;
+    setFace(ch, c.emo || "neutral", blinkAt(t, seed), c.look || [0, 0], talk);
+  }
+  // crowd
+  const named = Object.values(s.chars || {}).map(c => c.walk ? c.walk : [c.x, c.z]);
+  const spots = (s.crowd ? crowdSpots(s.crowd) : []).map(sp => named.some(([nx, nz]) => Math.hypot(nx - sp[0], nz - sp[1]) < 1.0) ? null : sp);
+  spots.forEach((sp, j) => { const e = EX[j]; if (!e || !sp) return; let [x, z, ry, pose, y] = sp; e.root.visible = true; let xx = x;
+    if (pose === "walk") { xx = x + ((t * 0.6 + j * 3) % 8) - 4; ry = Math.PI / 2; }
+    e.root.position.set(xx, y || 0, z); e.root.rotation.y = ry;
+    const pz = s.crowdpose === "laugh" ? (j % 2 ? "cheer" : "shrug") : pose === "walk" ? "idle" : pose;
+    applyPose(e, pz, t, { seed: j, walk: pose === "walk", hop: s.crowdpose === "laugh" && j % 3 === 0 });
+    const emo = s.crowdpose === "laugh" ? "laugh" : s.grade === "cold" ? ["neutral", "worried", "sad"][j % 3] : ["neutral", "happy", "smug", "dazed", "happy"][j % 5];
+    setFace(e, emo, blinkAt(t, j)); });
+  // props
+  for (const p of s.props || []) { const m = getProp(p); m.visible = true; m.position.set(p[1], p[2], p[3]); m.rotation.y = p[4] || 0; }
+  // camera
+  st.scene.updateMatrixWorld();
+  const cam = camFor(endScreen ? "wide" : s.cam, s, k); const punch = (s.fx || []).includes("punch") && lt < 0.35 ? (0.35 - lt) * 0.25 : 0;
+  st.camera.position.copy(cam.pos).lerp(cam.look, punch); st.camera.position.x += Math.sin(t * 0.9) * 0.02; st.camera.position.y += Math.cos(t * 0.7) * 0.015;
+  st.camera.lookAt(cam.look);
+  st.renderer.render(st.scene, st.camera);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(st.renderer.domElement, 0, 0);
+  const T0 = ln.start;
+  // overlays: TV frame, crowd bars, bars, fx, receipt, pill
+  if (s.tvframe && !endScreen) { g.save(); g.strokeStyle = "#141218"; g.lineWidth = 70 * U; g.strokeRect(0, 0, W, H); g.fillStyle = "#e0344a"; g.beginPath(); g.roundRect(70 * U, 60 * U, 130 * U, 50 * U, 10 * U); g.fill(); txt("LIVE", 135 * U, 87 * U, 32, "#fff"); g.restore(); }
+  if (s.crowdbars && !endScreen) spots.forEach((sp, j) => { const e = EX[j]; if (!e || !sp) return; const [x, y, ok] = P(headTop(e)); if (!ok || x < -100 || x > W + 100) return;
+    const b = crowdBar(s.crowdbars, j, lt); if (b) bar(x, y, b[0], b[1], (lt - 0.15 - (j % 12) * 0.05) / 0.35, 0, s.crowd === "gym" ? 0.7 : 0.85); });
+  if (!endScreen) for (const [id, spec] of Object.entries(s.bars || {})) {
+    let pt; if (id.startsWith("@")) pt = new THREE.Vector3(...ANCHOR[id]); else { if (!C[id] || !C[id].root.visible) continue; pt = headTop(C[id]); }
+    let [x, y, ok] = P(pt); if (!ok) continue; y = Math.max(y, 110 * U); const bv = barValue(spec, lt); if (!bv) continue;
+    const isNew = !(ln.prevBars || {})[id]; const neg = bv.text.startsWith("-"), q = bv.text === "?";
+    bar(x, y, bv.text, q ? "#ffffff" : neg ? RED : GREEN, isNew ? (lt - 0.1) / 0.4 : 1, bv.flash, s.cam && s.cam.startsWith("cu:" + id) ? 1.25 : 1);
+  }
+  for (const f of endScreen ? [] : s.fx || []) { const [kind, who] = f.split(":");
+    const at = who && (who.startsWith("@") ? P(new THREE.Vector3(...ANCHOR[who === "box" ? "@box" : who])) : C[who] && C[who].root.visible ? P(headTop(C[who])) : null);
+    if (kind === "ping" && at) rings(g, at[0], at[1], T0 + 0.1, t, "255,255,255", 3, 220 * U);
+    if (kind === "glow" && at) glow(g, at[0], at[1], 260 * U * easeOut((lt - 0.3) / 0.6), "255,210,90", 0.35);
+    if (kind === "sparkle" && at) sparkles(g, at[0], at[1], T0 + 0.3, t, 6, 200 * U);
+    if (kind === "coin" && at) { const kk = easeOut((lt - 0.4) / 0.6); g.save(); g.globalAlpha = 1 - Math.max(0, (lt - 1.6) / 0.4); txt(f === "coin:senior" ? "+$60" : "-$10", at[0] + 60 * U, at[1] - 60 * U * kk, 56, f === "coin:senior" ? GREEN : RED); g.restore(); }
+    if (kind === "hearts" && at) for (let h = 0; h < 4; h++) { const kk = ((lt * 0.6 + h * 0.25) % 1); g.save(); g.globalAlpha = Math.sin(kk * Math.PI); txt("♥", at[0] + (h - 1.5) * 50 * U, at[1] - kk * 120 * U, 54, "#ff6b8a", "Mont"); g.restore(); }
+    if (kind === "gold") { const p2 = P(new THREE.Vector3(...ANCHOR["@box"])); rings(g, p2[0], p2[1], T0 + 0.4, t, "255,210,90", 3, 260 * U); glow(g, p2[0], p2[1], 240 * U, "255,210,90", 0.35 * Math.min(1, lt)); sparkles(g, p2[0], p2[1], T0 + 0.6, t, 6, 160 * U); }
+    if (kind === "pingall") spots.forEach((sp, j) => { if (j % 2 || !EX[j] || !sp) return; const [x, y, ok] = P(headTop(EX[j])); if (ok) rings(g, x, y, T0 + 0.15 + (j % 12) * 0.05, t, "255,255,255", 1, 120 * U); });
+    if (kind === "flow" && at) spots.forEach((sp, j) => { if (!EX[j] || !sp) return; const [x, y, ok] = P(headTop(EX[j])); if (!ok) return; const kk = ((lt * 0.7 + j * 0.17) % 1);
+      g.save(); g.globalAlpha = Math.sin(kk * Math.PI); txt("$", x + (at[0] - x) * kk, y + (at[1] - y) * kk - Math.sin(kk * Math.PI) * 80 * U, 44, GREEN); g.restore(); });
+  }
+  if (s.locker && !endScreen) { g.save(); g.translate(W * 0.5, H * 0.36); g.rotate(-0.06); g.globalAlpha = Math.min(1, lt / 0.4); txt(s.locker, 0, 0, 120, "#ffffff"); g.restore(); }
+  if (s.shadows && !endScreen) { const [x, y] = P(new THREE.Vector3(3.2, 1.6, -3.9)); g.save(); g.fillStyle = "rgba(40,24,30,0.75)"; for (const [dx, sc] of [[-0.35, 1.07], [0.35, 1]]) person(x + dx * 200 * U, y + 60 * U, 1.9 * sc * U, "rgba(40,24,30,0.75)"); g.restore(); }
+  if (s.cam === "mirror" && !endScreen) { g.save(); const gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, "rgba(170,220,255,0.25)"); gr.addColorStop(0.5, "rgba(255,255,255,0.05)"); gr.addColorStop(1, "rgba(170,220,255,0.3)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    g.strokeStyle = "#f6f1e7"; g.lineWidth = 34 * U; g.strokeRect(W * 0.06, H * 0.06, W * 0.88, H * 0.88); g.beginPath(); g.moveTo(W / 2, H * 0.06); g.lineTo(W / 2, H * 0.94); g.stroke();
+    g.globalAlpha = 0.5; g.fillStyle = "#ffffff"; g.beginPath(); g.moveTo(W * 0.62, H * 0.06); g.lineTo(W * 0.7, H * 0.06); g.lineTo(W * 0.5, H * 0.94); g.lineTo(W * 0.42, H * 0.94); g.fill(); g.restore(); if (s.bars && s.bars.karl) { rings(g, W * 0.3, H * 0.2, T0 + 0.1, t, "255,255,255", 3, 200 * U); bar(W * 0.3, H * 0.2, s.bars.karl, GREEN, (lt - 0.1) / 0.4, 0, 1.6); } }
+  if (s.rc && !endScreen) { const pt = s.rc.at.startsWith("@") ? new THREE.Vector3(...ANCHOR[s.rc.at]) : headTop(C[s.rc.at]); const [x, y] = P(pt);
+    const L = s.rc.lines.map(([l, r, col]) => ({ l, r, size: 32 * U, font: "Anton", col: col === "red" ? "#e0344a" : col === "green" ? "#1f9d55" : "#2a2630" }));
+    const rx = Math.min(W - 230 * U, x + (V ? 120 : 330) * U), ry = Math.min(H * 0.9, y + 360 * U);
+    receipt(g, rx, ry, L, (lt - 0.5) / (s.rc.long ? 2.0 : 1.0), { w: 360 * U }); }
+  if (s.pill && !endScreen) { const [who, text] = s.pill; const pt = who.startsWith("@") ? new THREE.Vector3(...ANCHOR[who]) : headTop(C[who]).add(new THREE.Vector3(1.2, 0.3, 0));
+    const [x, y] = P(pt); pill(g, Math.min(W - 300 * U, Math.max(300 * U, x)), Math.max(120 * U, y), text, (lt - 0.2) / 1.2, { size: 38 * U }); }
+  if (s.card && !endScreen) card(s.card, lt, ln);
+  if (endScreen) { const k2 = Math.min(1, (t - TL.speech_end) / 0.6); g.save(); g.globalAlpha = k2; g.fillStyle = "rgba(18,14,30,0.72)"; g.fillRect(0, 0, W, H);
+    for (const bx of [W * 0.27, W * 0.73]) { g.strokeStyle = "rgba(255,255,255,0.35)"; g.lineWidth = 4; g.setLineDash([14, 10]); g.strokeRect(bx - 330, H * 0.36 - 186, 660, 372); g.setLineDash([]); }
+    txt("WATCH NEXT", W / 2, H * 0.12, 64, "#ffc23a"); g.fillStyle = "#e0344a"; g.beginPath(); g.roundRect(W / 2 - 200, H * 0.8 - 46, 400, 92, 46); g.fill(); txt("SUBSCRIBE", W / 2, H * 0.8 + 3, 48, "#fff"); g.restore(); }
+  post(g, W, H, t, GRADES[s.grade] || null);
+  if (opts.hook) opts.hook(g, W, H, t);
+  return O.toDataURL("image/jpeg", 0.9);
+};
+// Shorts overlays: headline at top + end card. window.shortHook = {title, t0, t1, end}
+window.renderShort = (t) => window.renderAt(t, { hook: (gg, W2, H2, tt) => { const h = window.SHORT; if (!h) return;
+  gg.save(); gg.textAlign = "center"; gg.textBaseline = "middle"; gg.lineJoin = "round";
+  h.title.forEach((l, i) => { gg.font = `${l.size || 92}px Anton`; gg.lineWidth = (l.size || 92) * 0.18; gg.strokeStyle = "#141218"; gg.strokeText(l.t, W2 / 2, 250 + i * 112); gg.fillStyle = l.col || "#fff"; gg.fillText(l.t, W2 / 2, 250 + i * 112); });
+  const p = Math.min(1, (tt - h.t0) / (h.t1 - h.t0)); gg.fillStyle = "rgba(255,255,255,0.25)"; gg.fillRect(0, H2 - 14, W2, 14); gg.fillStyle = "#ffc23a"; gg.fillRect(0, H2 - 14, W2 * p, 14);
+  if (tt > h.t1 - 3.2) { const a = Math.min(1, (tt - (h.t1 - 3.2)) / 0.4); gg.globalAlpha = a; gg.fillStyle = "rgba(18,14,30,0.75)"; gg.beginPath(); gg.roundRect(50, H2 * 0.72 - 90, W2 - 100, 180, 40); gg.fill();
+    gg.font = "62px Anton"; gg.fillStyle = "#ffc23a"; gg.fillText("FULL VIDEO ON THE CHANNEL", W2 / 2, H2 * 0.72 - 20); gg.font = "31px Mont"; gg.fillStyle = "#fff"; gg.fillText("What If You Could See Everyone's Bank Account?", W2 / 2, H2 * 0.72 + 42); }
+  gg.restore(); } });
+// ---------------------------------------------------------------- thumbnails (A/B/C): Karl huge in front, power as a glowing line, one quote
+const THUMBS = {
+  A: { set: "cafeteria", other: "max", oPos: [1.2, -1.0, -0.3], oPose: "cheer", oEmo: "smug", bar: "$3.12", barCol: RED, quote: [["“nice shoes.” ", "#fff"], ["$3.12", "#ffc23a"]], props: [["shoebox", 0.4, 1.12, -1.6, 0.3]], grade: "rgba(255,150,90,0.22)" },
+  B: { set: "kitchen", other: "grandma", oPos: [1.1, -1.2, -0.3], oPose: "shrug", oEmo: "smug", bar: "$1,284,900", barCol: GREEN, quote: [["“just my ", "#fff"], ["little", "#ffc23a"], [" pension”", "#fff"]], grade: "rgba(255,190,120,0.25)" },
+  C: { set: "kitchen", other: "dad", oPos: [1.1, -1.2, -0.3], oPose: "thumbsup", oEmo: "happy", bar: "-$2,300", barCol: RED, quote: [["“business is ", "#fff"], ["great", "#ffc23a"], ["”", "#fff"]], grade: "rgba(90,70,170,0.35)", night: true },
+};
+window.renderThumb = (v) => {
+  if (typeof v === "number") v = "ABC"[v]; const T = THUMBS[v];
+  for (const n in SETS) SETS[n].visible = n === T.set; st.scene.background.set(T.night ? 0x2a2848 : 0xe9dcc9);
+  for (const id in C) C[id].root.visible = false; EX.forEach(e => e.root.visible = false); for (const k in PROPS) PROPS[k].visible = false;
+  for (const p of T.props || []) { const m = getProp(p); m.visible = true; m.position.set(p[1], p[2], p[3]); m.rotation.y = p[4] || 0; }
+  const k = getChar("karl"), o = getChar(T.other); k.root.visible = o.root.visible = true;
+  k.root.position.set(-1.6, 0, 3.6); k.root.rotation.y = 0.55; applyPose(k, "panic", 0.3); setFace(k, "panic", 1, [1, -0.8]);
+  o.root.position.set(...T.oPos.slice(0, 2).length ? [T.oPos[0], 0, T.oPos[1]] : [0, 0, 0]); o.root.rotation.y = T.oPos[2]; applyPose(o, T.oPose, 0.3); setFace(o, T.oEmo, 1, [-0.4, 0]);
+  st.scene.updateMatrixWorld();
+  st.camera.position.set(-0.2, 2.4, 7.6); st.camera.lookAt(0.3, 3.15, 0); st.renderer.render(st.scene, st.camera);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(st.renderer.domElement, 0, 0);
+  const [bx, by] = P(headTop(o)); const [kx, ky] = P(worldPos(k.head));
+  // glowing line from Karl's eyes to the number
+  g.save(); g.lineCap = "round"; for (const [w, a] of [[46, 0.18], [24, 0.35], [9, 0.95]]) { g.strokeStyle = `rgba(255,214,90,${a})`; g.lineWidth = w; g.beginPath(); g.moveTo(kx + 60, ky - 40); g.quadraticCurveTo((kx + bx) / 2, Math.min(ky, by) - 160, bx - 40, by + 10); g.stroke(); } g.restore();
+  glow(g, bx, by, 300, "255,210,90", 0.55); bar(bx, by, T.bar, T.barCol, 1, 0, 2.1); sparkles(g, bx, by, 0.6, 0.85, 6, 230);
+  // quote
+  g.font = "112px Anton"; const parts = T.quote; const total = parts.reduce((a, [s2]) => a + g.measureText(s2).width, 0); let x = W / 2 - total / 2;
+  g.textBaseline = "middle"; g.lineJoin = "round"; g.textAlign = "left";
+  for (const [s2, col] of parts) { g.lineWidth = 22; g.strokeStyle = "#141218"; g.strokeText(s2, x, 120); g.fillStyle = col; g.fillText(s2, x, 120); x += g.measureText(s2).width; }
+  post(g, W, H, 0.5, T.grade);
+  return O.toDataURL("image/jpeg", 0.93);
+};
+window.ready = true;
+</script></body></html>

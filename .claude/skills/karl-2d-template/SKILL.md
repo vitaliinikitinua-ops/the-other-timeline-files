@@ -60,6 +60,10 @@ Title pattern: "What If You (Had/Got/Could) + number/power + everyday thing?" (q
   **plus our signature: a small receipt/counter that pops out with the amount or number** (e.g. "+$1", "-3 h",
   "306") - the bridge between the viral style and our honest numbers.
 
+- Full-episode pipeline (built for karl01): `finance_series/engine3d/toon/epbuild_toon.py` + `episode.html` (see HANDOFF.md
+  "Engines"): ep.py LINES -> Piper TTS -> timeline -> 4 parallel Playwright renders -> mux; dubs, Shorts and thumbnails A/B/C
+  from the same timeline. Check `qs.sh` contact sheets before the long render (camera inside heads, crowds blocking faces).
+
 ## 6. Thumbnails: channel recipe, rendered in our engine (free)
 Karl huge in the foreground (cut by the frame edge) with a shocked/guilty face and a sweat drop; the power drawn as a
 glowing line to the person/thing it hits; adult night-time scene with candles/neon; ONE lowercase quote of the most

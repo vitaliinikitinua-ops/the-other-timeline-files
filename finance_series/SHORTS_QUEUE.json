@@ -2,7 +2,7 @@
  {
   "ep": "ep04",
   "style": "fx-glow",
-  "status": "pending",
+  "status": "done",
   "title": "$10K Hidden in 2000: Cash vs Gold vs Stocks? #shorts",
   "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep04/tests/EP04_short_fx-glow.mp4",
   "description": "Cash vs gold vs S&P 500 from January 2000, real CPI and price data. Not financial advice. #inflation #gold #money",
@@ -17,12 +17,13 @@
    "purchasing power",
    "personal finance"
   ],
-  "url": null
+  "url": "https://youtube.com/shorts/I7rxgXmKrqg",
+  "published_at": "2026-11-28T11:58:54Z"
  },
  {
   "ep": "ep06",
   "style": "fx-minimal",
-  "status": "pending",
+  "status": "done",
   "title": "What If Price Tags Showed HOURS of Your Life? #shorts",
   "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep06/tests/EP06_short_fx-minimal.mp4",
   "description": "US average pay $38/hour (BLS, Oct 2026). A $40,000 car = 1,053 hours. Not financial advice. #money #whatif",
@@ -37,12 +38,13 @@
    "lifestyle inflation",
    "personal finance"
   ],
-  "url": null
+  "url": "https://youtube.com/shorts/ZdoGpaQ84f8",
+  "published_at": "2026-11-28T13:57:59Z"
  },
  {
   "ep": "ep03",
   "style": "fx-chalk",
-  "status": "pending",
+  "status": "done",
   "title": "$5,000 Card + Minimum Payments = 19 YEARS #shorts",
   "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/ep03/tests/EP03_short_fx-chalk.mp4",
   "description": "$5,000 at 21.19% APR, minimum payments only. Real average US card rate (Fed G.19). Not financial advice. #creditcard #debt #money\nFull video: https://www.youtube.com/watch?v=dNrWLsh3NuY",
@@ -57,7 +59,8 @@
    "debt payoff",
    "personal finance"
   ],
-  "url": null
+  "url": "https://youtube.com/shorts/1AY5PCrQWMM",
+  "published_at": "2026-11-28T15:58:30Z"
  },
  {
   "ep": "ep05",
@@ -196,6 +199,81 @@
    "compound interest",
    "s&p 500",
    "index fund"
+  ],
+  "url": null
+ },
+ {
+  "ep": "karl01",
+  "style": "toon",
+  "status": "pending",
+  "title": "His Bank Account Was Floating Over His Head #shorts",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/karl01/KARL01_short_312.mp4",
+  "description": "Max bragged about $200 sneakers. Then you saw his real balance. Full video: What If You Could See Everyone's Bank Account? Example story, not financial advice. #whatif #money\nFull video: (link after the long video is published)",
+  "tags": [
+   "shorts",
+   "what if",
+   "bank account",
+   "money",
+   "keeping up",
+   "animated story"
+  ],
+  "url": null
+ },
+ {
+  "ep": "karl01",
+  "style": "toon",
+  "status": "pending",
+  "title": "4 in 10 Americans Can't Do This #shorts",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/karl01/KARL01_short_400.mp4",
+  "description": "Federal Reserve SHED 2025: about 4 in 10 adults would not cover a $400 surprise bill with cash. SCF 2022: mean family net worth ~$1.06M, median ~$193K. Full video on the channel. Not financial advice. #money #personalfinance\nFull video: (link after the long video is published)",
+  "tags": [
+   "shorts",
+   "emergency fund",
+   "400 dollar emergency",
+   "federal reserve",
+   "average vs median",
+   "personal finance",
+   "money"
+  ],
+  "url": null
+ },
+ {
+  "ep": "karl02",
+  "style": "toon-vertical",
+  "status": "pending",
+  "title": "The \"Pay in 4\" Button Told Him the Truth #shorts",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/karl02/short1_button_told_the_truth.mp4",
+  "description": "What if every \"Pay in 4\" button showed the real price? $30 today = $120 = 6 hours of your life (example: $20/h). Full video on the channel. Not financial advice. #whatif #bnpl #blackfriday",
+  "tags": [
+   "shorts",
+   "what if",
+   "pay in 4",
+   "buy now pay later",
+   "bnpl",
+   "black friday",
+   "real price",
+   "money",
+   "animation"
+  ],
+  "url": null
+ },
+ {
+  "ep": "karl02",
+  "style": "toon-vertical",
+  "status": "pending",
+  "title": "\"-40% Off\" Cost Him MORE Than Full Price #shorts",
+  "video": "https://raw.githubusercontent.com/vitaliinikitinua-ops/the-other-timeline-files/claude/awesome-hopper-sx7soy/finance_series/karl02/short2_minus40_cost_more.mp4",
+  "description": "$1,200 split into 24 payments of $50 -> moved to a card at ~21% (FRED, Aug 2026) -> minimum payments: ~7 years, ~$2,270. Example story, real data. Full video on the channel. Not financial advice. #bnpl #creditcard",
+  "tags": [
+   "shorts",
+   "what if",
+   "pay in 4",
+   "buy now pay later",
+   "credit card interest",
+   "minimum payment",
+   "black friday",
+   "personal finance",
+   "animation"
   ],
   "url": null
  }
