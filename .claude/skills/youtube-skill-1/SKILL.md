@@ -203,6 +203,61 @@ dub; the transcript (`research/yt1/v2/transcript.txt`) is a rough Whisper transl
 | Animated subscribe pill around 2:00-2:30 and at the end | yes | yes |
 Varies: length (9.5 vs 13 min), cut speed (2.7 vs 3.6 s), sponsor card (v1 only), counting device (UI bar vs notebook).
 
-## 12. Open questions for the next videos
-- Thumbnail style (not in the files): ask the user for thumbnails/channel-page screenshots.
-- Are the cold open + premise always before 0:45? Is the climax always a public speech?
+## 12. Video v3: "What If Everyone Could Hear Your Thoughts?" (11:08, analysed 28.11.2026)
+All 668 frames viewed at 1 fps (`research/yt1/v3/sheets/`). The file has a PORTUGUESE dub; transcript is a Whisper
+translation (plot only, stops at ~8:00; the rest of the plot is read from the frames).
+- Story: cold open in a test - hero gives Nora a pencil, thinks "She's so pretty." and the whole class hears it;
+  "Wait. Did I say that out loud?" / "Stop thinking about how pretty she is." / "Okay, floor. Swallow me. Please." ->
+  premise at 0:49 ("everyone around you can hear your thoughts") -> "At first, it's amazing": knows Canberra, wins
+  the fight with little sister Tess, roasts the bully back, grandpa's lasagna ("best thing I've ever eaten" -> he makes
+  it every Sunday) -> "Then it gets bigger": "best taco in the history of the world" -> line around the block, every
+  shop wants him, it can't be filmed (videos show just a kid chewing), a toy company flies him in ("Boring." -> line
+  cancelled), pop star Skye books him for her 20,000 arena show (tickets 19,945 -> 1,147 -> SOLD OUT on a phone) ->
+  science fact (2025 Stanford brain implant decoding inner speech; password lock) -> TURN: "the baby looks exactly like
+  a potato", a nervous classmate drops her cards because everyone hears him, choosing Carter over best friend Miles
+  in his head, "I hate you" from Tess, grandpa's cookies "like chewing a bug" -> he stops baking them, Tess's hidden D
+  ("Don't think about the math test... in the front pocket of her backpack" -> mom finds it), white-bear experiment
+  (1987, thought suppression), bathroom/principal "Don't think Carter", kids go silent around him, he hums to drown
+  thoughts, alone on the back steps -> Miles's secret (family living in the Starlite motel) he must not think about ->
+  TV "MOST TRUSTED KID IN AMERICA" -> CLIMAX: on stage with Skye in front of 20,000, he can't hide anything - so he
+  lets the true good thoughts out (what he loves about Nora: tiny stars on her shoes, half her sandwich in 3rd grade,
+  "I like her so much it's embarrassing", "Nora laughs like a hiccup") -> crowd cries and cheers, Skye turns it into a
+  song (lyrics on a phone) -> repair: Miles on the steps, Tess "I never hated you. Not for one second.", note in the
+  lunch bag -> MIRROR ENDING: the same test, pencil to Nora, "She's so pretty." - and this time she smiles back.
+- Power visual: concentric lavender/white rings expanding from the head + a white CLOUD-EDGED thought pill with the
+  thought typed in word by word (synced to narration: "She's" -> "She's so" -> "She's so pretty."); small doodle
+  thought clouds for images (pizza, taco, cookie, a white bear, a sheep, a heart). At the climax the rings turn
+  PINK and fill the arena.
+- Inserts: answer sheet + pencil (opening and ending), whiteboard grade sheet with a "C+" circled, test with a red
+  "D", phone screens (tickets, lyrics, group photos), chalkboard menu with an item crossed out, lunch box with a note.
+- Edit: 271 shots in 668 s, mean 2.5 s, median 2.2 s; 26-28 cuts/min in the first 3 min, 21-24 later. Closest to v1.
+- Subscribe pill at 2:14-2:19 and 11:01-11:06 (again "after the first escalation" + the very end).
+
+## 13. Thumbnails (3 channel thumbnails supplied, `research/yt1/thumbs/`)
+They look DIFFERENT from the video: a glossy, high-detail, saturated illustration (not the flat in-video look).
+- Subject: the same yellow-hoodie hero with a black glossy head (white rim light, specular highlight), HUGE white eyes,
+  sweat drop, mouth open in shock or a guilty grin; he is cut by the frame edge in the foreground (left or right third),
+  the "victims" (date, family, bride) in mid-ground with big expressive eyes, lashes, real hair and clothes.
+- The POWER is drawn as a glowing beam/energy line (neon green with a dollar bill, magenta arcs from his head to each
+  head at the table, a pink beam from his waving hand to the bride) - the viewer sees cause -> effect in one frame.
+- Location = an emotionally loaded adult scene the video only hints at (candle-lit date, Thanksgiving dinner with a
+  carving fork, a church wedding), night lighting, warm candles + purple/teal neon, deep vignette.
+- Text: ONE short line, a quote of the awkward moment, lowercase, chunky rounded sans (white with black outline and
+  drop shadow), last word or the number in YELLOW: `"i love you" +$1`, `your mom's hot..`, `i just said hi..`.
+  The text is NOT the title; it is the funniest consequence. Trailing ".." = cringe.
+- Composition: text across the top ~22%, hero face 35-45% of the frame height, eye contact lines toward the glow.
+- For our videos: same recipe - Karl in the foreground with a shocked face, the "power" as a glowing line toward the
+  person/thing it affects, one lowercase quote with one yellow word or number; render with a richer, glossier look
+  than the video itself.
+
+## 14. Channel formula update (3 of 3 videos)
+Confirmed again in v3: question title, deadpan 2nd person, cold open solving/causing a mini-crisis, premise before
+0:50, "At first, it's amazing" -> "Then it gets bigger" -> turn -> family + best friend hurt -> public climax in a huge
+crowd (30,000 / 1,000 / 20,000) where the power is turned around -> mirror ending with the same props -> "So would
+you want ...?", 1 visual signature for the power (rings + glow), 2-3 real research facts, subscribe pill ~2:00-2:30 and
+at the end, mood colour grades, near-zero on-screen text except diegetic/UI/thought pills.
+New pattern: the climax uses the power for something GOOD (truth/love/no-asking) instead of fighting it.
+Edit speed: 2.5-3.6 s average shot; faster (2.2-2.5 s) when the power is visual and comedic.
+
+## 15. Open questions for the next videos
+- Is the subscribe pill always at 2:00-2:30? Do they ever use a sponsor? Typical end length 9-13 min.
